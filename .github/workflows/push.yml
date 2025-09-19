@@ -1,0 +1,31 @@
+name: Push
+
+on:
+  push:
+    branches: [main]
+    tags: ["*"]
+  pull_request:
+
+concurrency:
+  group: ${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build_backend:
+    name: Build backend Python Docker image
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v5
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3.11.1
+
+    - name: Build Backend
+      uses: docker/build-push-action@v6.18.0
+      with:
+        context: ./backend
+        push: false
+        tags: gmri/buoy_retriever_backend:latest
