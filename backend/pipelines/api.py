@@ -1,5 +1,5 @@
 from django.shortcuts import get_object_or_404
-from ninja import Router, ModelSchema, PatchDict
+from ninja import Router, ModelSchema
 
 from .models import Runner
 
@@ -12,6 +12,7 @@ class RunnerSchema(ModelSchema):
         fields = [
             "id",
             "slug",
+            "name",
             "config_schema",
             "description",
             "created",
@@ -28,7 +29,7 @@ def list_runners(request):
 class RunnerPostSchema(ModelSchema):
     class Meta:
         model = Runner
-        fields = ["slug", "config_schema", "description"]
+        fields = ["slug", "name", "config_schema", "description"]
 
 
 @router.post("/", response=RunnerSchema)
@@ -36,6 +37,7 @@ def create_update_runner(request, payload: RunnerPostSchema):
     """If a runner with the given slug already exists, update it instead of creating a new one."""
     try:
         existing = Runner.objects.get(slug=payload.slug)
+        existing.name = payload.name
         existing.config_schema = payload.config_schema
         existing.description = payload.description
         existing.active = True
@@ -47,16 +49,22 @@ def create_update_runner(request, payload: RunnerPostSchema):
         return runner
 
 
-@router.patch("/{slug}", response=RunnerSchema)
-def patch_runner(request, slug: str, payload: PatchDict[RunnerPostSchema]):
-    runner = get_object_or_404(Runner, slug=slug)
-    for attr, value in payload.items():
-        setattr(runner, attr, value)
-    runner.save()
-    return runner
+# @router.patch("/{slug}", response=RunnerSchema)
+# def patch_runner(request, slug: str, payload: PatchDict[RunnerPostSchema]):
+#     runner = get_object_or_404(Runner, slug=slug)
+#     for attr, value in payload.items():
+#         setattr(runner, attr, value)
+#     runner.save()
+#     return runner
 
 
-@router.get("/{slug}", response=RunnerSchema)
-def get_runner(request, slug: str):
-    runner = get_object_or_404(Runner, slug=slug)
+# @router.get("/{slug}", response=RunnerSchema)
+# def get_runner(request, slug: str):
+#     runner = get_object_or_404(Runner, slug=slug)
+#     return runner
+
+
+@router.get("/{id}", response=RunnerSchema)
+def get_runner_by_id(request, id: int):
+    runner = get_object_or_404(Runner, id=id)
     return runner

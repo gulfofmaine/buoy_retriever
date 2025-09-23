@@ -1,6 +1,21 @@
 from django.db import models
 
 
+class SimplifiedDataset(models.Model):
+    slug = models.SlugField(unique=True)
+    runner = models.ForeignKey("pipelines.Runner", on_delete=models.CASCADE)
+    config = models.JSONField(blank=True)
+
+    created = models.DateTimeField(auto_now_add=True)
+    edited = models.DateTimeField(auto_now=True)
+
+    def __repr__(self):
+        return f"{self.slug}"
+
+    def __str__(self):
+        return self.__repr__()
+
+
 class Dataset(models.Model):
     slug = models.SlugField(
         "Admin slug",
