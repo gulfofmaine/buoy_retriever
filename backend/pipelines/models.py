@@ -3,6 +3,7 @@ from django.db import models
 
 class Runner(models.Model):
     slug = models.SlugField(unique=True)
+    name = models.CharField(max_length=255)
     config_schema = models.JSONField(blank=True)
     description = models.TextField()
 
@@ -11,7 +12,7 @@ class Runner(models.Model):
     active = models.BooleanField(default=True)
 
     def __repr__(self):
-        return f"Runner(slug={self.slug}, description={self.description})"
+        return f"{self.name} ({self.slug})"
 
     def __str__(self):
         return self.__repr__()

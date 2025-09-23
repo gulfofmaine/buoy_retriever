@@ -29,3 +29,4 @@ platforms = [ "osx-arm64", "linux-64", "linux-aarch64" ]
 django = ">=5.2.6,<6"
 django-ninja = ">=1.4.3,<2"
 psycopg = ">=3.2.9,<4"
+django-cors-headers = ">=4.9.0,<5"
