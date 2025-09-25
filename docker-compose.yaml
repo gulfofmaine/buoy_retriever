@@ -97,8 +97,6 @@ services:
       - dagster_postgres
       - dagster_daemon
 
-
-
   s3_timeseries:
     build:
       context: .
