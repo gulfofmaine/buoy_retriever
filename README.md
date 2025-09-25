@@ -8,11 +8,11 @@ IOOS Offshore Operations data management system
 
 This is setup as a mono-repo with a `backend/` Django server exposing Django-Ninja API endpoints and acting as a centeralized dataset configuration management system with Django's admin & auth systems for low level functionality.
 
-Various `pipeline/` runners report their capabilities into the Django backend, and retrieve dataset configurations for them to process. These will largely be implemented in Dagster, but there is the potential for other pipeline runners (AWS Lambda, Prefect, ...) to interact with the same backend and frontend.
+Various `pipeline/`s report their capabilities into the Django backend, and retrieve dataset configurations for them to process. These will largely be implemented in Dagster, but there is the potential for other pipeline (AWS Lambda, Prefect, ...) to interact with the same backend and frontend.
 
-Shared tooling will live in `common/` where they can be incorporated into the backend, runners, as well as potentially be published as a PyPI library that can be used in runners not included in this repo.
+Shared tooling will live in `common/` where they can be incorporated into the backend, pipelines, as well as potentially be published as a PyPI library that can be used in pipelines not included in this repo.
 
-Most users (including RA/DAC admins) however, will be interacting with a Javascript `frontend/` which helps them configure their datasets based on the runner capabilities.
+Most users (including RA/DAC admins) however, will be interacting with a Javascript `frontend/` which helps them configure their datasets based on the pipelines capabilities.
 
 ## Getting started
 

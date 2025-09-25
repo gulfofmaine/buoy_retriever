@@ -3,7 +3,7 @@ from django.db import models
 
 class SimplifiedDataset(models.Model):
     slug = models.SlugField(unique=True)
-    runner = models.ForeignKey("pipelines.Runner", on_delete=models.CASCADE)
+    pipeline = models.ForeignKey("pipelines.Pipeline", on_delete=models.CASCADE)
     config = models.JSONField(blank=True)
 
     created = models.DateTimeField(auto_now_add=True)
@@ -47,7 +47,7 @@ class Dataset(models.Model):
 
 class DatasetConfig(models.Model):
     dataset = models.ForeignKey(Dataset, on_delete=models.CASCADE)
-    runner = models.ForeignKey("pipelines.Runner", on_delete=models.CASCADE)
+    pipeline = models.ForeignKey("pipelines.Pipeline", on_delete=models.CASCADE)
     config = models.JSONField()
 
     created = models.DateTimeField(auto_now_add=True)

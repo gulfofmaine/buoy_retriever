@@ -1,7 +1,7 @@
 from django.db import models
 
 
-class Runner(models.Model):
+class Pipeline(models.Model):
     slug = models.SlugField(unique=True)
     name = models.CharField(max_length=255)
     config_schema = models.JSONField(blank=True)
