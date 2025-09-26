@@ -2,8 +2,10 @@ from django.db import models
 
 
 class SimplifiedDataset(models.Model):
+    """A simplified dataset model for demonstration purposes"""
+
     slug = models.SlugField(unique=True)
-    runner = models.ForeignKey("pipelines.Runner", on_delete=models.CASCADE)
+    pipeline = models.ForeignKey("pipelines.Pipeline", on_delete=models.CASCADE)
     config = models.JSONField(blank=True)
 
     created = models.DateTimeField(auto_now_add=True)
@@ -17,6 +19,9 @@ class SimplifiedDataset(models.Model):
 
 
 class Dataset(models.Model):
+    """A slightly more full featured dataset model where
+    the configuration is separated so that it can be versioned"""
+
     slug = models.SlugField(
         "Admin slug",
         unique=True,
@@ -46,8 +51,15 @@ class Dataset(models.Model):
 
 
 class DatasetConfig(models.Model):
+    """A versionable configuration for a dataset.
+
+    Needs to have state management so that there can only be one active and testing
+    configuration at a time per dataset. Trying to edit an active
+    config should create a new draft config instead.
+    """
+
     dataset = models.ForeignKey(Dataset, on_delete=models.CASCADE)
-    runner = models.ForeignKey("pipelines.Runner", on_delete=models.CASCADE)
+    pipeline = models.ForeignKey("pipelines.Pipeline", on_delete=models.CASCADE)
     config = models.JSONField()
 
     created = models.DateTimeField(auto_now_add=True)

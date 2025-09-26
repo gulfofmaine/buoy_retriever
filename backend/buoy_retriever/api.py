@@ -1,8 +1,6 @@
-from ninja import NinjaAPI
-
 from datasets.api import router as datasets_router
+from ninja import NinjaAPI
 from pipelines.api import router as pipelines_router
-
 
 api = NinjaAPI()
 
