@@ -1,17 +1,16 @@
 "use client";
-import {
-  FormCreator,
-  type IForm,
-  type IFormValues,
-  schemaToFormUtils,
-} from "@axdspub/axiom-ui-forms";
+import type { IFormValues } from "@axdspub/axiom-ui-forms";
 import { useQuery } from "@tanstack/react-query";
 import type { JSONSchema6 } from "json-schema";
-import { use, useState } from "react";
+import dynamic from "next/dynamic";
+import { useRouter } from "next/navigation";
+import { use, useEffect, useState } from "react";
+
+const Form = dynamic(() => import("./form"), { ssr: false });
 
 interface Dataset {
   slug: string;
-  runner: number;
+  pipeline: number;
   config: object;
   created_at: string;
   updated_at: string;
@@ -49,12 +48,13 @@ async function fetchPipeline(id: number): Promise<Pipeline> {
 
 export default function Dataset({ params }: { params: { slug: string } }) {
   const { slug } = use(params);
-  const { data, error, isLoading } = useQuery({
+  const router = useRouter();
+  const { data, error, isLoading, refetch } = useQuery({
     queryKey: ["dataset", slug],
     queryFn: () => fetchDataset(slug),
   });
 
-  const pipelineId = data?.runner;
+  const pipelineId = data?.pipeline;
 
   const {
     data: pipelineData,
@@ -67,6 +67,11 @@ export default function Dataset({ params }: { params: { slug: string } }) {
   });
 
   const [formValues, setFormValues] = useState<IFormValues>({});
+  useEffect(() => {
+    if (data?.config) {
+      setFormValues(data.config as IFormValues);
+    }
+  }, [data]);
 
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error: {error.message}</div>;
@@ -75,25 +80,42 @@ export default function Dataset({ params }: { params: { slug: string } }) {
   if (pipelineError)
     return <div>Error loading pipeline: {pipelineError.message}</div>;
 
-  console.log(data);
-  console.log(pipelineData);
-  const formConfig = schemaToFormUtils.schemaToFormObject(
-    pipelineData?.config_schema as JSONSchema6,
-  );
-  console.log(formConfig);
+  async function updateDataset() {
+    const response = await fetch(
+      `http://localhost:8080/backend/api/datasets/${slug}`,
+      {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          config: formValues,
+        }),
+      },
+    );
 
-  //   debugger;
+    if (!response.ok) {
+      throw new Error("Failed to update dataset");
+    }
+
+    refetch();
+    router.push("/manage/");
+  }
 
   return (
     <div>
       <main>
         <h1>Dataset: {slug}</h1>
-        Config: <code>{JSON.stringify(data.config)}</code>
-        <FormCreator
-          from={formConfig as IForm}
-          formValues={[formValues, setFormValues]}
-          urlNavigable={false}
-        />
+        Values: {JSON.stringify(formValues)}
+        {pipelineData?.config_schema && data?.config ? (
+          <form action={updateDataset}>
+            <Form
+              schema={pipelineData?.config_schema as JSONSchema6}
+              formValueState={[formValues, setFormValues]}
+            />
+            <button type="submit">Update dataset</button>
+          </form>
+        ) : null}
       </main>
     </div>
   );

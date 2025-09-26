@@ -5,6 +5,9 @@ up: down build
 	# docker compose up --watch
 	docker compose up
 
+core:
+	docker compose up --build backend frontend dagster_ui dagster_daemon
+
 down:
 	docker compose -f docker-compose.yaml down
 
