@@ -211,6 +211,12 @@ __marimo__/
 
 # Database
 docker-data/postgres
+docker-data/dagster_postgres
 
 # Ignore .env files that may contain sensitive information
 docker-data/secret.env
+docker-data/shared-fs/
+
+# Dagster local storage
+pipeline/*/.dagster/
+pipeline/*/storage/

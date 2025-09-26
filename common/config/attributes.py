@@ -1,4 +1,5 @@
 from typing import Annotated, Any
+from pathlib import Path
 
 from pydantic import BaseModel, Field
 import xarray as xr
@@ -31,7 +32,16 @@ class NcAttributes(BaseModel):
                 ds[var_name].attrs.update(attrs)
 
         ds.attrs.update(self.global_attributes)
-        return ds
+
+    @classmethod
+    def from_yaml(cls, path: Path):
+        """Load attributes from a YAML file"""
+        import yaml
+
+        with path.open("r") as f:
+            data = yaml.safe_load(f)
+
+        return cls(**data)
 
 
 class AttributeConfigMixin:
