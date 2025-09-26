@@ -16,7 +16,7 @@ Including another URLconf
 """
 
 from django.contrib import admin
-from django.urls import path
+from django.urls import include, path
 
 from .api import api
 
@@ -25,4 +25,5 @@ prefix = "backend/"
 urlpatterns = [
     path(f"{prefix}admin/", admin.site.urls),
     path(f"{prefix}api/", api.urls),
+    path(f"{prefix}health/", include("health_check.urls")),  # health check endpoints
 ]

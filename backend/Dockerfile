@@ -32,6 +32,8 @@ ENV IMAGE_TAG=${IMAGE_TAG:-unknown}
 
 ENTRYPOINT ["/bin/bash", "/support/shell-hook.sh"]
 
+HEALTHCHECK --interval=30s --timeout=10s --start-period=20s CMD ["curl", "-f", "http://localhost:8000/backend/health/"] || exit 1
+
 
 FROM base AS develop
 
