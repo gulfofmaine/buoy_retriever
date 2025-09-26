@@ -60,6 +60,8 @@ Pipelines can be managed from [Dagster UI](http://localhost:3002)
 
 [`s3_timeseries`](./pipeline/s3_timeseries/)
 
+Requires `S3_TS_ACCESS_KEY_ID` and `S3_TS_SECRET_ACCESS_KEY` environment variables for S3 access.
+
 ### Hohonu
 
 [`hohonu`](./pipeline/hohonu/)
