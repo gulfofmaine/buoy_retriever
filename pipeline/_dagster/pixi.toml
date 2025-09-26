@@ -1,0 +1,14 @@
+[workspace]
+authors = ["Alex Kerney <abk@mac.com>"]
+channels = ["conda-forge"]
+name = "_dagster"
+platforms = ["linux-64", "linux-aarch64"]
+version = "0.1.0"
+
+[tasks]
+
+[dependencies]
+dagster = ">=1.11.11,<2"
+dagster-webserver = ">=1.11.11,<2"
+dagster-postgres = ">=1!0.27.11,<1!0.28"
+dagster-graphql = ">=1.11.11,<2"
