@@ -1,0 +1,31 @@
+[build-system]
+build-backend = "hatchling.build"
+requires = [ "hatchling" ]
+
+[project]
+name = "backend"
+version = "0.1.0"
+
+authors = [ { name = "Alex Kerney", email = "abk@mac.com" } ]
+requires-python = ">=3.11"
+classifiers = [
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+]
+dependencies = [  ]
+
+[tool.pixi.workspace]
+channels = [ "conda-forge" ]
+platforms = [ "osx-arm64", "linux-64", "linux-aarch64" ]
+
+# [tool.pixi.pypi-dependencies]
+# backend = { path = ".", editable = true }
+
+[tool.pixi.tasks]
+
+[tool.pixi.dependencies]
+django = ">=5.2.6,<6"
+django-ninja = ">=1.4.3,<2"
+psycopg = ">=3.2.9,<4"
