@@ -1,3 +1,5 @@
+from typing import Generic, TypeVar
+
 from pydantic import BaseModel, Field
 
 
@@ -8,11 +10,16 @@ class DatasetConfigBase(BaseModel):
     """
 
 
-class DatasetBase(BaseModel):
+# Avoid type errors with the generic config
+# See https://docs.pydantic.dev/latest/concepts/models/#generic-models
+ConfigT = TypeVar("ConfigT", bound=DatasetConfigBase)
+
+
+class DatasetBase(BaseModel, Generic[ConfigT]):
     """Dataset"""
 
     slug: str = Field(..., description="Unique dataset slug")
-    config: DatasetConfigBase = Field(
+    config: ConfigT = Field(
         ...,
         description="The configuration for the dataset.",
     )
