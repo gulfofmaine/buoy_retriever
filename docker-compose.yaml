@@ -40,3 +40,94 @@ services:
       - db
       # - cache
       # - queue
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      target: dev
+    command: npm run dev
+    stdin_open: true
+    volumes:
+      - ./frontend:/app:cached
+      - /app/node_modules
+      - /app/.next/
+      - /app/build/
+    ports:
+      - "3000:3000"
+    environment:
+      NEXT_PUBLIC_BACKEND_URL: http://backend:8080
+
+  dagster_postgres:
+    image: timescale/timescaledb-ha:pg17-ts2.21@sha256:4905577929dd1d83da28923e68365b1289ccd8384197c2b4c32f9814f7546319
+    environment:
+      PGDATA: /var/lib/postgresql/data/PGDATA
+    env_file:
+      - ./docker-data/dagster.env
+    volumes:
+      - ./docker-data/dagster_postgres:/var/lib/postgresql/data:cached
+    ports:
+      - "5433:5432"
+
+  dagster_daemon:
+    build: ./pipeline/_dagster
+    command:
+    - dagster-daemon
+    - run
+    env_file:
+    - ./docker-data/dagster.env
+    volumes:
+      - ./services/dagster/workspace.yaml:/home/ioos/workspace.yaml
+      - ./services/dagster/dagster.yaml:/home/ioos/dagster.yaml
+      - ./docker-data/dagster_home/storage:/home/ioos/storage
+    depends_on:
+      - dagster_postgres
+
+  dagster_ui:
+    build: ./pipeline/_dagster
+    env_file:
+    - ./docker-data/dagster.env
+    ports:
+      - "3002:3002"
+    volumes:
+      - ./services/dagster/workspace.yaml:/home/ioos/workspace.yaml
+      - ./services/dagster/dagster.yaml:/home/ioos/dagster.yaml
+      - ./docker-data/dagster_home/storage:/home/ioos/storage
+    depends_on:
+      - dagster_postgres
+      - dagster_daemon
+
+
+
+  s3_timeseries:
+    build:
+      context: .
+      dockerfile: ./pipeline/s3_timeseries/Dockerfile
+      args:
+        IMAGE_TAG: s3_timeseries_dev
+    env_file:
+    - ./docker-data/dagster.env
+    volumes:
+      - ./pipeline/s3_timeseries:/home/ioos:cached
+      - /home/ioos/.pixi
+      - ./common/:/home/ioos/common/:cached
+      - ./docker-data/shared-fs:/mnt/efs/
+    depends_on:
+      - backend
+
+  hohonu:
+    build:
+      context: .
+      dockerfile: ./pipeline/hohonu/Dockerfile
+      args:
+        IMAGE_TAG: hohonu_dev
+    env_file:
+    - ./docker-data/dagster.env
+    - ./docker-data/secret.env
+    volumes:
+      - ./pipeline/hohonu:/home/ioos:cached
+      - /home/ioos/.pixi
+      - ./common/:/home/ioos/common/:cached
+      - ./docker-data/shared-fs:/mnt/efs/
+    depends_on:
+      - backend
