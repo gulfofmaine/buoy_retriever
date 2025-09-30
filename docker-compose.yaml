@@ -105,6 +105,7 @@ services:
         IMAGE_TAG: s3_timeseries_dev
     env_file:
     - ./docker-data/dagster.env
+    - ./docker-data/secret.env
     volumes:
       - ./pipeline/s3_timeseries:/home/ioos:cached
       - /home/ioos/.pixi

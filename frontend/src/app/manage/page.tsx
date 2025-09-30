@@ -32,7 +32,11 @@ export default function ManagePage() {
 
         <ul>
           {data.map((dataset: { slug: string }) => (
-            <li key={dataset.slug}>{dataset.slug}</li>
+            <li key={dataset.slug}>
+              <Link href={`/manage/dataset/${dataset.slug}`}>
+                {dataset.slug}
+              </Link>
+            </li>
           ))}
         </ul>
       </main>

@@ -35,7 +35,7 @@ export default function NewDataset() {
   async function newDataset(formData: FormData) {
     const dataset = {
       slug: formData.get("slug"),
-      runner_id: formData.get("pipeline"),
+      pipeline_id: formData.get("pipeline"),
       config: {},
     };
 
