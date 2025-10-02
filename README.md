@@ -67,3 +67,12 @@ Requires `S3_TS_ACCESS_KEY_ID` and `S3_TS_SECRET_ACCESS_KEY` environment variabl
 [`hohonu`](./pipeline/hohonu/)
 
 Requires a `HOHONU_API_KEY` environment variable for API access.
+
+
+## Testing
+
+Currently there is some testing for common utilities and Hohonu pipelines.
+
+For common, cd into `common/` then `uv run pytest`.
+
+For Hohonu, `docker compose exec hohonu pixi run pytest`.

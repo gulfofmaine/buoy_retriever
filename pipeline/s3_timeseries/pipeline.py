@@ -203,24 +203,19 @@ def defs_for_dataset(dataset: S3TimeseriesDataset) -> dg.Definitions:
     return dg.Definitions(assets=[daily_df, monthly_ds])
 
 
-pipeline = config.PipelineConfig(
-    slug="s3_timeseries",
-    name="S3 Timeseries",
-    description="Fetch time series data from CSV files in S3",
-    dataset_config=S3TimeseriesConfig,
-)
-
-api_client = BackendAPIClient()
-response = api_client.register_pipeline(pipeline)
-
-print(
-    "Created/Updated pipeline configuration:",
-    #   json.dumps(response, indent=2)
-)
-
-
 @dg.definitions
 def build_defs() -> dg.Definitions:
+    """Build definitions for S3 Timeseries pipeline and register with backend"""
+    pipeline = config.PipelineConfig(
+        slug="s3_timeseries",
+        name="S3 Timeseries",
+        description="Fetch time series data from CSV files in S3",
+        dataset_config=S3TimeseriesConfig,
+    )
+
+    api_client = BackendAPIClient()
+    api_client.register_pipeline(pipeline)
+
     datastore, io_managers = io.common_resources(path_stub="s3_timeseries")
 
     credentials = S3Credentials(

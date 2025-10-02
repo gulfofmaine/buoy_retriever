@@ -1,0 +1,253 @@
+name: Build and Push Pixi based Docker Image
+
+on:
+  workflow_call:
+    inputs:
+      working_directory:
+        type: string
+        description: What directory should the image be built from
+        required: true
+      dockerfile_path:
+        type: string
+        description: Path relative to working directory for Dockerfile, defaults to `Dockerfile`
+        required: false
+        default: Dockerfile
+      docker_context:
+        type: string
+        description: Path that Docker should use as a context directory
+        required: false
+        default: .
+      image_name:
+        type: string
+        description: Name of Docker image
+        required: true
+      image_tag:
+        type: string
+        description: Tag for Docker image
+        required: true
+      push_image:
+        type: boolean
+        description: Should the image be pushed to the container registry
+        required: false
+        default: false
+    #   test_dagster_jobs:
+    #     type: boolean
+    #     description: Test if Dagster can load jobs from the repo
+    #     required: false
+    #     default: true
+    #   test_dagster_sensors:
+    #     type: boolean
+    #     description: Test if Dagster can load sensors from the repo
+    #     required: false
+    #     default: true
+    #   test_dagster_schedules:
+    #     type: boolean
+    #     description: Test if Dagster can load schedules from the repo
+    #     required: false
+    #     default: true
+      dagster_repo_path:
+        type: string
+        description: Path to Dagster repository to test
+        required: false
+        default: pipeline.py
+      test_command:
+        type: string
+        description: Command to run tests inside the container, likely `pixi run pytest`
+        required: false
+    secrets:
+      DOCKER_USERNAME:
+        description: Username for Docker Hub
+        required: false
+      DOCKER_TOKEN:
+        description: TOKEN for Docker Hub
+        required: false
+    outputs:
+      image_name:
+        description: Fully qualified image name
+        value: ${{ jobs.build-image.outputs.image_name}}
+      image_ref:
+        description: Docker image reference
+        value: ${{ jobs.build-image.outputs.image_ref }}
+
+  workflow_dispatch:
+    inputs:
+      working_directory:
+        type: string
+        description: What directory should the image be built from
+        required: true
+      dockerfile_path:
+        type: string
+        description: Path relative to working directory for Dockerfile, defaults to `Dockerfile`
+        required: false
+        default: Dockerfile
+      docker_context:
+        type: string
+        description: Path that Docker should use as a context directory
+        required: false
+        default: .
+      image_name:
+        type: string
+        description: Name of Docker image
+        required: true
+      image_tag:
+        type: string
+        description: Tag for Docker image
+        required: true
+      push_image:
+        type: boolean
+        description: Should the image be pushed to the container registry
+        required: false
+        default: false
+    #   test_dagster_jobs:
+    #     type: boolean
+    #     description: Test if Dagster can load jobs from the repo
+    #     required: false
+    #     default: true
+    #   test_dagster_sensors:
+    #     type: boolean
+    #     description: Test if Dagster can load sensors from the repo
+    #     required: false
+    #     default: true
+    #   test_dagster_schedules:
+    #     type: boolean
+    #     description: Test if Dagster can load schedules from the repo
+    #     required: false
+    #     default: true
+      dagster_repo_path:
+        type: string
+        description: Path to Dagster repository to test
+        required: false
+        default: pipeline.py
+      test_command:
+        type: string
+        description: Command to run tests inside the container, likely `pixi run pytest`
+        required: false
+
+jobs:
+  build-image:
+    runs-on: ubuntu-22.04
+    name: Build and push image
+    timeout-minutes: 30
+
+    outputs:
+      image_name: ${{ steps.env_var.outputs.image_name }}
+      image_ref: ${{ steps.env_var.outputs.image_ref }}
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v5
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3.11.1
+
+      - name: Cache Docker layers
+        uses: actions/cache@v4.2.3
+        with:
+          path: /tmp/.buildx-cache
+          key: ohw-docker-buildx-${{ inputs.image_name }}-${{ github.sha }}
+          restore-keys: |
+            ohw-docker-buildx-${{ inputs.image_name }}
+
+      - name: Set Job Environment Variables
+        id: env_var
+        run: |
+          SHA7="${GITHUB_SHA::7}"
+          DOCKER_TAG=$SHA7
+          IMAGE_NAME="gmri/${{ inputs.image_name }}"
+          echo "DOCKER_TAG=${{ inputs.image_tag }}" >> $GITHUB_ENV
+          echo "IMAGE_NAME=${IMAGE_NAME}" >> $GITHUB_ENV
+          echo "image_name=${IMAGE_NAME}" >> $GITHUB_OUTPUT
+          echo "image_ref=${DOCKER_TAG}" >> $GITHUB_OUTPUT
+
+      - name: Build Docker Image
+        uses: docker/build-push-action@v6.18.0
+        with:
+          tags: |
+            ${{ env.IMAGE_NAME }}:${{ env.DOCKER_TAG }}
+          build-args: |
+            IMAGE_TAG=${{ env.IMAGE_NAME }}:${{ env.DOCKER_TAG }}
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache-new
+          push: false
+          load: true
+          file: ${{ inputs.working_directory }}/${{ inputs.dockerfile_path }}
+          context: ${{ inputs.docker_context }}
+
+      - name: Docker image sizes
+        run: |
+          docker images
+
+          echo "### Image sizes" >> $GITHUB_STEP_SUMMARY
+          docker images | grep ${{ env.IMAGE_NAME }} >> $GITHUB_STEP_SUMMARY
+
+      - name: Save Pixi Package list
+        run: |
+          docker run ${{ env.IMAGE_NAME }}:${{ env.DOCKER_TAG }} pixi list > pixi_packages.txt
+
+      - name: Archive Pixi Package List
+        uses: actions/upload-artifact@v4
+        with:
+          name: pixi-environment
+          path: pixi_packages.txt
+
+      - name: Pixi environment info
+        run: |
+          echo "### Pixi Environment" >> $GITHUB_STEP_SUMMARY
+          cat pixi_packages.txt >> $GITHUB_STEP_SUMMARY
+
+      - name: Run tests inside container
+        if: ${{ inputs.test_command }}
+        run: |
+            docker run -e CI=true ${{ env.IMAGE_NAME }}:${{ env.DOCKER_TAG }} /bin/sh -c "${{ inputs.test_command }}"
+
+    #   - name: Test if Dagster can find jobs in repo
+    #     if: ${{ inputs.test_dagster_jobs }}
+    #     shell: bash # explicitly set to catch pipefail
+    #     run: |
+    #       docker run -e DAGSTER_HOME=/home/ioos -e PYTHONWARNINGS=ignore -t ${{ env.IMAGE_NAME }}:${{ env.DOCKER_TAG }} dagster job list -f ${{ inputs. dagster_repo_path }} | tee dagster_jobs.txt
+
+    #   - name: Log Dagster Jobs
+    #     if: ${{ inputs.test_dagster_jobs }}
+    #     run: |
+    #       echo "### Dagster Jobs" >> $GITHUB_STEP_SUMMARY
+    #       cat dagster_jobs.txt >> $GITHUB_STEP_SUMMARY
+
+    #   - name: Test if Dagster can find sensors in repo
+    #     if: ${{ inputs.test_dagster_sensors }}
+    #     shell: bash
+    #     run: |
+    #       docker run -e DAGSTER_HOME=/home/ioos -e PYTHONWARNINGS=ignore -t ${{ env.IMAGE_NAME }}:${{ env.DOCKER_TAG }} dagster sensor list -f ${{ inputs. dagster_repo_path }} | tee dagster_sensors.txt
+
+    #   - name: Log Dagster Sensors
+    #     if: ${{ inputs.test_dagster_sensors }}
+    #     run: |
+    #       echo "### Dagster Sensors" >> $GITHUB_STEP_SUMMARY
+    #       cat dagster_sensors.txt >> $GITHUB_STEP_SUMMARY
+
+    #   - name: Test if Dagster can find schedules in repo
+    #     if: ${{ inputs.test_dagster_schedules }}
+    #     shell: bash
+    #     run: |
+    #       docker run -e DAGSTER_HOME=/home/ioos -e PYTHONWARNINGS=ignore -t ${{ env.IMAGE_NAME }}:${{ env.DOCKER_TAG }} dagster schedule list -f ${{ inputs. dagster_repo_path }} | tee dagster_schedules.txt
+
+    #   - name: Log Dagster Schedules
+    #     if: ${{ inputs.test_dagster_schedules }}
+    #     run: |
+    #       echo "### Dagster Schedules" >> $GITHUB_STEP_SUMMARY
+    #       cat dagster_schedules.txt >> $GITHUB_STEP_SUMMARY
+
+      - name: Log into Docker Hub
+        uses: docker/login-action@v3.5.0
+        if: ${{ inputs.push_image}}
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_TOKEN }}
+
+      - name: Push Docker Image to Docker Hub
+        if: ${{ inputs.push_image }}
+        run: docker push ${{ env.IMAGE_NAME }}:${{ env.DOCKER_TAG }}
+
+      - name: Move Docker Cache
+        run: |
+          rm -rf /tmp/.buildx-cache
+          mv /tmp/.buildx-cache-new /tmp/.buildx-cache

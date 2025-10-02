@@ -77,8 +77,8 @@ services:
     env_file:
     - ./docker-data/dagster.env
     volumes:
-      - ./services/dagster/workspace.yaml:/home/ioos/workspace.yaml
-      - ./services/dagster/dagster.yaml:/home/ioos/dagster.yaml
+      - ./pipeline/_dagster/workspace.yaml:/home/ioos/workspace.yaml
+      - ./pipeline/_dagster/dagster.yaml:/home/ioos/dagster.yaml
       - ./docker-data/dagster_home/storage:/home/ioos/storage
     depends_on:
       - dagster_postgres
@@ -90,8 +90,8 @@ services:
     ports:
       - "3002:3002"
     volumes:
-      - ./services/dagster/workspace.yaml:/home/ioos/workspace.yaml
-      - ./services/dagster/dagster.yaml:/home/ioos/dagster.yaml
+      - ./pipeline/_dagster/workspace.yaml:/home/ioos/workspace.yaml
+      - ./pipeline/_dagster/dagster.yaml:/home/ioos/dagster.yaml
       - ./docker-data/dagster_home/storage:/home/ioos/storage
     depends_on:
       - dagster_postgres

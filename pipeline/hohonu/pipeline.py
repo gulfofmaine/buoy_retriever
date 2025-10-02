@@ -59,23 +59,6 @@ class HohonuDataset(config.DatasetBase):
         )
 
 
-pipeline = config.PipelineConfig(
-    slug="hohonu",
-    name="Hohonu",
-    description="Fetch tide data from Hohonu's API",
-    dataset_config=HohonuConfig,
-)
-
-api_client = BackendAPIClient()
-response = api_client.register_pipeline(pipeline)
-
-print(
-    "Created/Updated pipeline configuration:",
-    # , json.dumps(response, indent=2)
-)
-# print("Datasets for pipeline:", datasets)
-
-
 def defs_for_dataset(dataset: HohonuDataset) -> dg.Definitions:
     """Generate Dagster Definitions for a given dataset"""
 
@@ -186,6 +169,17 @@ def defs_for_dataset(dataset: HohonuDataset) -> dg.Definitions:
 
 @dg.definitions
 def build_defs() -> dg.Definitions:
+    """Build Dagster definitions and register pipeline with backend API"""
+    pipeline = config.PipelineConfig(
+        slug="hohonu",
+        name="Hohonu",
+        description="Fetch tide data from Hohonu's API",
+        dataset_config=HohonuConfig,
+    )
+
+    api_client = BackendAPIClient()
+    api_client.register_pipeline(pipeline)
+
     datastore, io_managers = io.common_resources(
         path_stub="hohonu",
     )
