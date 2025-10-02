@@ -61,7 +61,7 @@ class HohonuApi(ConfigurableResource):
             e.add_note(f"Failed to load daily data for {url}: {response.text}")
             raise e
 
-        return DataResponse.parse_obj(response.json())
+        return DataResponse.model_validate(response.json())
 
 
 class DataDatum(BaseModel):
