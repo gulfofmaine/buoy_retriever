@@ -30,6 +30,28 @@ jobs:
         push: false
         tags: gmri/buoy_retriever_backend:latest
 
+  build_frontend:
+    name: Build Next.js frontend Docker image
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v5
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3.11.1
+
+    - name: Build Frontend
+      uses: docker/build-push-action@v6.18.0
+      with:
+        context: ./frontend
+        push: false
+        tags: gmri/buoy_retriever_frontend:latest
+        build-args: |
+          NEXT_PUBLIC_BACKEND_URL=https://oso.ioos.us
+          NEXT_PUBLIC_SENTRY_DSN=${{ secrets.NEXT_PUBLIC_SENTRY_DSN }}
+
   test_common:
     name: Test common package
     runs-on: ubuntu-24.04
