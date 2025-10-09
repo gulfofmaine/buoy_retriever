@@ -213,7 +213,7 @@ jobs:
       - name: Extract coverage data
         if: ${{ inputs.test_command && inputs.upload_coverage }}
         run: |
-            docker cp test-container:/home/ioos/coverage.xml ./coverage.xml || true
+            docker cp test-container:/home/ioos/coverage.xml ${{ inputs.working_directory }}/coverage.xml || true
 
       - name: Clean up test container
         if: ${{ inputs.test_command }}
