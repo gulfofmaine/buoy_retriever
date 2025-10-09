@@ -101,13 +101,15 @@ class IOManagerBase(dg.ConfigurableIOManager):
     ) -> str:
         """Extract the template for the path desired from the desired path key in asset metadata"""
         try:
-            desired_path: str = context.metadata[tags.DESIRED_PATH]
+            desired_path: str = context.definition_metadata[tags.DESIRED_PATH]
         except KeyError:
             try:
-                desired_path = context.upstream_output.metadata[tags.DESIRED_PATH]
+                desired_path = context.upstream_output.definition_metadata[
+                    tags.DESIRED_PATH
+                ]
             except KeyError as e:
                 raise KeyError(
-                    f"Could not find `io.DESIRED_PATH` in asset output metadata: {context.metadata}",
+                    f"Could not find `io.DESIRED_PATH` in asset output metadata: {context.definition_metadata}",
                 ) from e
         return desired_path
 

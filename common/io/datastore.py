@@ -4,6 +4,7 @@ Shared resource for configuring workflow access to the EFS datastore.
 
 from contextlib import contextmanager
 from pathlib import Path
+from typing import Optional
 
 from dagster import ConfigurableResource
 from pydantic import Field
@@ -17,14 +18,20 @@ class Datastore(ConfigurableResource):
     path_stub: str = Field(
         description="Path within datastore or scratch to store all repo data in",
     )
+    test_path: Optional[str] = Field(None, description="Base path to use for testing")
 
     def dataset_path(self) -> Path:
         """Base path to persist datasets to"""
-        return paths.DATASET_PATH / self.path_stub
+        path = paths.DATASET_PATH / self.path_stub
+        if self.test_path:
+            path = Path(self.test_path) / self.path_stub
+        return path
 
     def scratch_path(self) -> Path:
         """Scratch directory for ephemeral data"""
         scratch_path = paths.SCRATCH_PATH / self.path_stub
+        if self.test_path:
+            scratch_path = Path(self.test_path) / self.path_stub
         scratch_path.mkdir(parents=True, exist_ok=True)
 
         return scratch_path

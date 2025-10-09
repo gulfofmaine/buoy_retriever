@@ -5,6 +5,11 @@ lint.isort.known-local-folder = [ "hohonu_api" ]
 [tool.pytest.ini_options]
 pythonpath = "."
 
+[tool.coverage.run]
+omit = [
+  ".pixi/*",
+]
+
 [tool.pixi.workspace]
 authors = [ "Alex Kerney <abk@mac.com>" ]
 channels = [ "conda-forge" ]
@@ -34,6 +39,7 @@ pyyaml = ">=6.0.2,<7"
 [tool.pixi.feature.dev.dependencies]
 pytest = "*"
 pytest-recording = ">=0.13.4,<0.14"
+pytest-cov = "*"
 
 [tool.pixi.feature.dev.tasks]
 pytest = "pytest -vv --ignore=common --record-mode=once"

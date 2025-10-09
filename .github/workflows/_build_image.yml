@@ -54,6 +54,11 @@ on:
         type: string
         description: Command to run tests inside the container, likely `pixi run pytest`
         required: false
+      upload_coverage:
+        type: boolean
+        description: Upload coverage reports to Codecov
+        required: false
+        default: false
     secrets:
       DOCKER_USERNAME:
         description: Username for Docker Hub
@@ -122,6 +127,11 @@ on:
         type: string
         description: Command to run tests inside the container, likely `pixi run pytest`
         required: false
+      upload_coverage:
+        type: boolean
+        description: Upload coverage reports to Codecov
+        required: false
+        default: false
 
 jobs:
   build-image:
@@ -198,7 +208,27 @@ jobs:
       - name: Run tests inside container
         if: ${{ inputs.test_command }}
         run: |
-            docker run -e CI=true ${{ env.IMAGE_NAME }}:${{ env.DOCKER_TAG }} /bin/sh -c "${{ inputs.test_command }}"
+            docker run --name test-container -e CI=true ${{ env.IMAGE_NAME }}:${{ env.DOCKER_TAG }} /bin/sh -c "${{ inputs.test_command }}"
+
+      - name: Extract coverage data
+        if: ${{ inputs.test_command && inputs.upload_coverage }}
+        run: |
+            docker cp test-container:/home/ioos/coverage.xml ./coverage.xml || true
+
+      - name: Clean up test container
+        if: ${{ inputs.test_command }}
+        run: |
+            docker rm test-container || true
+
+      - name: Upload coverage to Codecov
+        if: ${{ inputs.test_command && inputs.upload_coverage }}
+        uses: codecov/codecov-action@v5
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+        # with:
+        #   files: ./coverage.xml
+        #   fail_ci_if_error: false
+        #   verbose: true
 
     #   - name: Test if Dagster can find jobs in repo
     #     if: ${{ inputs.test_dagster_jobs }}
