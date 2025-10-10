@@ -37,6 +37,9 @@ class Dataset(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     edited = models.DateTimeField(auto_now=True)
 
+    def __str__(self):
+        return self.slug
+
 
 # class DatasetPermissions(models.Model):
 #     dataset = models.ForeignKey(Dataset, on_delete=models.CASCADE)
@@ -71,6 +74,9 @@ class DatasetConfig(models.Model):
         CURRENT = "Active"
 
     state = models.TextField(choices=State, default=State.DRAFT)
+
+    def __str__(self):
+        return f"{self.dataset.slug} - {self.state} ({self.created})"
 
 
 # class Run(models.Model):

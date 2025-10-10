@@ -1,6 +1,4 @@
-"""
-Common paths across services
-"""
+"""Common paths across services"""
 
 import os
 from pathlib import Path

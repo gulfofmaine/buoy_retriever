@@ -1,6 +1,4 @@
-"""
-Load and save NetCDFs with Xarray to datastore
-"""
+"""Load and save NetCDFs with Xarray to datastore"""
 
 from pathlib import Path
 

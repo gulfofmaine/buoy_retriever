@@ -1,4 +1,4 @@
-from typing import Annotated, Type
+from typing import Annotated
 
 from pydantic import BaseModel, Field
 
@@ -18,7 +18,7 @@ class PipelineConfig(BaseModel):
     ]
 
     dataset_config: Annotated[
-        Type[DatasetConfigBase],
+        type[DatasetConfigBase],
         Field(description="The configuration for the dataset."),
     ]
 

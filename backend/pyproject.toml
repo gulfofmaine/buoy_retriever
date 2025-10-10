@@ -16,6 +16,11 @@ classifiers = [
 ]
 dependencies = [  ]
 
+[tool.ruff]
+lint.extend-select = [
+  "DJ", # django specific linting
+]
+
 [tool.pixi.workspace]
 channels = [ "conda-forge" ]
 platforms = [ "linux-64", "linux-aarch64" ]

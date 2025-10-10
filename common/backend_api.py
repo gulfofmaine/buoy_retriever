@@ -1,4 +1,4 @@
-from typing import Annotated, Type
+from typing import Annotated
 
 import httpx
 from pydantic import BaseModel, Field, ValidationError
@@ -39,7 +39,7 @@ class BackendAPIClient(BaseModel):
     def datasets_for_pipeline(
         self,
         pipeline_slug: str,
-        dataset_model: Type[DatasetBase],
+        dataset_model: type[DatasetBase],
     ):
         """Get datasets for a given pipeline slug"""
         url = self.api_endpoint + f"datasets/by-pipeline/{pipeline_slug}"

@@ -1,10 +1,8 @@
-"""
-Shared Dagster asset based IO managers, to allow us to reduce the amount that
+"""Shared Dagster asset based IO managers, to allow us to reduce the amount that
 we have to ponder saving and loading data.
 """
 
 from pathlib import Path
-from typing import Optional
 
 import dagster as dg
 
@@ -67,9 +65,9 @@ OSO_DEV_BUCKET = "ioos-ott-oso-dev-public"
 
 def common_resources(
     path_stub: str,
-    datastore: Optional[Datastore] = None,
+    datastore: Datastore | None = None,
     # s3: Optional[S3FSResource] = None,
-    sync_to_s3_bucket: Optional[str] = None,
+    sync_to_s3_bucket: str | None = None,
     s3_default_access: bool = False,
 ) -> tuple[Datastore, dict[str, dg.ConfigurableResource]]:
     """Return Datastore and a dictionary of common IO Managers.
@@ -79,6 +77,7 @@ def common_resources(
         datastore: The datastore to use. If None, a new one will be created.
         s3: The S3FSResource to use. If None, a new one will be created if needed.
         sync_to_s3_bucket: The S3 bucket to automatically sync outputs to.
+
     """
     if datastore is None:
         datastore = Datastore(path_stub=path_stub)
@@ -110,16 +109,18 @@ def latest_path_from_input_name(
     input_name: str,
     context: dg.OpExecutionContext,
 ) -> Path:
-    """
-    Get the latest materialized path for a given input asset.
+    """Get the latest materialized path for a given input asset.
 
-    Parameters:
+    Parameters
+    ----------
     - input_name (str): Name of input asset to get path for.
     - context (OpExecutionContext): The operation execution context.
 
-    Returns:
+    Returns
+    -------
     - Path: The path metadata from the latest materialization event
     for the input asset.
+
     """
     try:
         from dagster._check.functions import CheckError

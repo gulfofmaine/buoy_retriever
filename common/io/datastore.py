@@ -1,10 +1,7 @@
-"""
-Shared resource for configuring workflow access to the EFS datastore.
-"""
+"""Shared resource for configuring workflow access to the EFS datastore."""
 
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Optional
 
 from dagster import ConfigurableResource
 from pydantic import Field
@@ -18,7 +15,7 @@ class Datastore(ConfigurableResource):
     path_stub: str = Field(
         description="Path within datastore or scratch to store all repo data in",
     )
-    test_path: Optional[str] = Field(None, description="Base path to use for testing")
+    test_path: str | None = Field(None, description="Base path to use for testing")
 
     def dataset_path(self) -> Path:
         """Base path to persist datasets to"""

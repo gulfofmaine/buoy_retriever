@@ -60,7 +60,6 @@ class HohonuDataset(config.DatasetBase):
 
 def defs_for_dataset(dataset: HohonuDataset) -> dg.Definitions:
     """Generate Dagster Definitions for a given dataset"""
-
     common_asset_kwargs = {
         "key_prefix": ["Hohonu", dataset.safe_slug],
         "group_name": dataset.safe_slug,

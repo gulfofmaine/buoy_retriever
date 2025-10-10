@@ -1,4 +1,4 @@
-from typing import Generic, TypeVar
+from typing import TypeVar
 
 from pydantic import BaseModel, Field
 
@@ -15,7 +15,7 @@ class DatasetConfigBase(BaseModel):
 ConfigT = TypeVar("ConfigT", bound=DatasetConfigBase)
 
 
-class DatasetBase(BaseModel, Generic[ConfigT]):
+class DatasetBase[ConfigT](BaseModel):
     """Dataset"""
 
     slug: str = Field(..., description="Unique dataset slug")

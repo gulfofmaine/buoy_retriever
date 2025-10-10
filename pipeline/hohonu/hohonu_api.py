@@ -1,6 +1,4 @@
-"""
-Load data from Hohonu's API
-"""
+"""Load data from Hohonu's API"""
 
 import os
 from datetime import datetime, timedelta

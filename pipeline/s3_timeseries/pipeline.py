@@ -15,7 +15,7 @@ from common.resource.s3fs_resource import S3Credentials, S3FSResource
 
 
 class DayGlob(BaseModel):
-    """Configure glob patterns for daily files in S3"""
+    """Configure glob patterns for daily files in S3."""
 
     day_pattern: Annotated[
         str | None,
@@ -39,7 +39,7 @@ class S3TimeseriesConfig(
     # mappings.OptionalDepthMappingMixin,
     s3_source.S3SourceMixin,
 ):
-    """Configuration for S3 Timeseries Dataset"""
+    """Configuration for S3 Timeseries Dataset."""
 
     start_date: date
 
@@ -59,7 +59,7 @@ class S3TimeseriesConfig(
 
 
 class S3TimeseriesDataset(config.DatasetBase):
-    """S3 Timeseries Dataset"""
+    """S3 Timeseries Dataset."""
 
     config: Annotated[
         S3TimeseriesConfig,
@@ -67,14 +67,14 @@ class S3TimeseriesDataset(config.DatasetBase):
     ]
 
     def daily_partition_path(self):
-        """Path to daily partitions"""
+        """Path to daily partitions."""
         return (
             self.safe_slug
             + "/daily/{partition_key_dt:%Y}/{partition_key_dt:%m}/{partition_key_dt:%Y-%m-%d}.csv"
         )
 
     def monthly_partition_path(self):
-        """Path to monthly partitions"""
+        """Path to monthly partitions."""
         return (
             self.safe_slug
             # + "/monthly/{partition_key_dt:%Y}/"
@@ -85,7 +85,7 @@ class S3TimeseriesDataset(config.DatasetBase):
 
 
 def defs_for_dataset(dataset: S3TimeseriesDataset) -> dg.Definitions:
-    """Definitions for a single dataset"""
+    """Definitions for a single S3 Timeseries dataset."""
     common_asset_kwargs = {
         "key_prefix": ["s3_timeseries", dataset.safe_slug],
         "group_name": dataset.safe_slug,
@@ -108,7 +108,7 @@ def defs_for_dataset(dataset: S3TimeseriesDataset) -> dg.Definitions:
         **common_asset_kwargs,
     )
     def daily_df(context: dg.AssetExecutionContext, s3fs: S3FSResource) -> pd.DataFrame:
-        """Download daily dataframe from S3 for {dataset.slug}"""
+        """Download daily dataframe from S3."""
         partition_date_string = context.asset_partition_key_for_output()
         partition_date = date.fromisoformat(partition_date_string)
         day_glob = f"{dataset.config.s3_source.bucket}{dataset.config.s3_source.prefix}{dataset.config.file_pattern.day_pattern.format(partition_date=partition_date)}"
@@ -157,7 +157,7 @@ def defs_for_dataset(dataset: S3TimeseriesDataset) -> dg.Definitions:
         context: dg.AssetExecutionContext,
         daily_df: dict[str, pd.DataFrame],
     ) -> xr.Dataset:
-        """Monthly NetCDFs"""
+        """Combine daily dataframes into a monthly NetCDF and apply transformations."""
         daily_dfs = []
 
         for df_date, df in daily_df.items():
@@ -205,7 +205,7 @@ def defs_for_dataset(dataset: S3TimeseriesDataset) -> dg.Definitions:
 
 @dg.definitions
 def build_defs() -> dg.Definitions:
-    """Build definitions for S3 Timeseries pipeline and register with backend"""
+    """Build definitions for S3 Timeseries pipeline and register with backend."""
     pipeline = config.PipelineConfig(
         slug="s3_timeseries",
         name="S3 Timeseries",
