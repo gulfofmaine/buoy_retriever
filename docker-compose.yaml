@@ -1,0 +1,42 @@
+services:
+  db:
+    image: timescale/timescaledb-ha:pg17-ts2.21@sha256:4905577929dd1d83da28923e68365b1289ccd8384197c2b4c32f9814f7546319
+    ports:
+      - "5432:5432"
+    env_file:
+      - ./docker-data/secret.env
+    environment:
+      PGDATA: /var/lib/postgresql/data/PGDATA
+    volumes:
+      - ./docker-data/postgres:/var/lib/postgresql/data:cached
+
+  # cache:
+  #   image: redis:6.0.7@sha256:0ab24e410ae42f99f1e861bd351b5ce7ca8c9eec7886c979a8650ba7fc18ad3b
+
+  # queue:
+  #   image: redis:6.0.7@sha256:0ab24e410ae42f99f1e861bd351b5ce7ca8c9eec7886c979a8650ba7fc18ad3b
+
+  backend:
+    build:
+      context: ./backend
+      target: develop
+    image: buoy_retriever_backend
+    command: "python manage.py runserver 0:8080"
+    volumes:
+      - ./backend:/home/uwsgi:cached
+      - /home/uwsgi/.pixi
+      - ./docker-data/media:/media:cached
+      - ./docker-data/static:/static:cached
+    ports:
+      - "8080:8080"
+    env_file:
+      - ./docker-data/secret.env
+    environment:
+      BACKEND_ENV: dev
+      POSTGRES_HOST: db
+      # CACHE_HOST: cache
+      # QUEUE_HOST: queue
+    depends_on:
+      - db
+      # - cache
+      # - queue
