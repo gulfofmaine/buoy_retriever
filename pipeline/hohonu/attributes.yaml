@@ -1,0 +1,98 @@
+global_attributes:
+    cdm_data_type: Point
+    Conventions: COARDS, CF-1.6, ACDD-1.3
+    creator_name: Hannah Barnes
+    creator_type: institution
+    creator_url: https://gmri.org
+    creator_email: hbarnes@gmri.org
+    infoUrl: https://gmri.org/projects/assessing-coastal-flood-risk-maine-communities/
+    institution: Gulf of Maine Research Institute
+    project: NERACOOS
+    project_url: https://neracoos.org
+    publisher_email: info@neracoos.org
+    publisher_url: https://neracoos.org
+    publisher_phone: (603) 319 1785
+    keywords: gauge, water level, mean, meter, mllw, MLLW_feet, MLLW_meter, msl, onset, sea, station, Temp, temperature, tide
+    license: "[standard]"
+    standard_name_vocabulary: CF Standard Name Table v29
+    featureType: TimeSeries
+
+variables:
+  time:
+      standard_name: time
+      long_name: julian day (UT)
+      ioos_category: Time
+      axis: T
+
+
+  latitude:
+      standard_name: latitude
+      long_name: Latitude
+      ioos_category: Location
+      units: degrees_north
+      axis: Y
+
+  longitude:
+      standard_name: longitude
+      long_name: Longitude
+      ioos_category: Location
+      units: degrees_east
+      axis: X
+
+  navd88_meters:
+      standard_name: sea_surface_height_above_geopotential_datum
+      long_name: Sea surface height above geopotential datum
+      ioos_category: Sea Level
+      units: m
+      datum: NAVD88
+
+  navd88_feet:
+      long_name: Sea surface height above geopotential datum
+      ioos_category: Sea Level
+      units: feet
+      datum: NAVD88
+
+  hohonu_forecast_navd88_meters:
+      long_name: Hohonu forecasted Sea surface height above geopotential datum
+      ioos_category: Sea Level
+      units: m
+      datum: NAVD88
+
+  hohonu_forecast_navd88_feet:
+      long_name: Hohonu forecasted Sea surface height above geopotential datum
+      ioos_category: Sea Level
+      units: feet
+      datum: NAVD88
+
+  mhhw_meters:
+      standard_name: tidal_sea_surface_height_above_mean_higher_high_water
+      long_name: Mean Higher High Water height
+      ioos_category: Sea Level
+      units: m
+
+  mhw_meters:
+      long_name: Mean High Water height
+      ioos_category: Sea Level
+      units: m
+
+  mtl_meters:
+      long_name: Mean Tide Level
+      ioos_category: Sea Level
+      units: m
+
+  msl_meters:
+      standard_name: tidal_sea_surface_height_above_mean_sea_level
+      long_name: Mean Sea Level
+      ioos_category: Sea Level
+      units: m
+
+  mlw_meters:
+      long_name: Mean Low Water
+      ioos_category: Sea Level
+      units: m
+
+  mllw_meters:
+      standard_name: tidal_sea_surface_height_above_mean_lower_low_water
+      long_name: Mean Lower Low Water
+      ioos_category: Sea Level
+      units: m

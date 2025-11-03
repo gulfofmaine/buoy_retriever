@@ -30,7 +30,11 @@ Once the secret (/shared) values are set, `docker compose up --build backend` wi
 
 The next steps are to create database tables with `make migrate` and then to create a superuser with `make user`.
 
+Then to see the API docs go to http://localhost:8080/backend/api/docs and access the admin at http://localhost:8080/backend/admin/
+
 I'd also suggest running `prek install` or `pre-commit install` to set up pre-commit hooks.
+
+Once the migrations are run, the frontend and Dagster can be started with `make core`, though there won't be much functionality in either until one of the pipelines (I'd suggest Hohonu after adding an API key) is launched and has registered itself with the backend.
 
 ## Commands
 
@@ -43,5 +47,21 @@ I'd also suggest running `prek install` or `pre-commit install` to set up pre-co
 
 ## Services
 
-- `backend` - Django system administration with API via Django Ninja
+- [`backend`](./backend/) - Django system administration with API via Django Ninja
 - `db` - Timescale DB with PostGIS
+- [`frontend`](./frontend/) - NextJS dataset management
+- [`dagster_ui` and `dagster_daemon`](./pipeline/_dagster/) - Dagster pipeline orchastration
+
+## Pipelines
+
+Pipelines can be managed from [Dagster UI](http://localhost:3002)
+
+### S3 Timeseries
+
+[`s3_timeseries`](./pipeline/s3_timeseries/)
+
+### Hohonu
+
+[`hohonu`](./pipeline/hohonu/)
+
+Requires a `HOHONU_API_KEY` environment variable for API access.

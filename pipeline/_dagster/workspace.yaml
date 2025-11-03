@@ -1,0 +1,9 @@
+load_from:
+- grpc_server:
+    host: s3_timeseries
+    port: 4000
+    location_name: s3_timeseries
+- grpc_server:
+    host: hohonu
+    port: 4000
+    location_name: hohonu
