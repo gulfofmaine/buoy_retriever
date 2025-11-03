@@ -220,3 +220,6 @@ docker-data/shared-fs/
 # Dagster local storage
 pipeline/*/.dagster/
 pipeline/*/storage/
+
+# Shell
+**/.bash_history

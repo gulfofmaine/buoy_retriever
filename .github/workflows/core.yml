@@ -1,4 +1,4 @@
-name: Push
+name: Core
 
 on:
   push:
@@ -29,3 +29,22 @@ jobs:
         context: ./backend
         push: false
         tags: gmri/buoy_retriever_backend:latest
+
+  test_common:
+    name: Test common package
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v5
+
+    - name: Set up Python
+      uses: astral-sh/setup-uv@v6
+      with:
+        working-directory: ./common
+
+    - name: Run tests
+      working-directory: ./common
+      run: |
+        uv run pytest -vv

@@ -1,0 +1,39 @@
+name: Pipeline - S3 Timeseries
+
+on:
+    push:
+        branches:
+            - main
+        paths:
+            - common/**
+            - pipeline/s3_timeseries/**
+    pull_request:
+        paths:
+            - common/**
+            - pipeline/s3_timeseries/**
+    workflow_dispatch:
+
+jobs:
+    shortsha:
+        uses: ./.github/workflows/_shortsha.yml
+
+    build_test_push:
+        needs: [shortsha]
+        uses: ./.github/workflows/_build_image.yml
+        with:
+            working_directory: ./pipeline/s3_timeseries
+            image_name: buoy_retriever_s3_timeseries
+            image_tag: ${{ needs.shortsha.outputs.shortsha }}
+            # push_image: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
+            # test_command: "pixi run pytest"
+
+    # deploy:
+    #     needs: [shortsha, build_test_push]
+    #     uses: ./.github/workflows/bump_dagster_argo.yml
+    #     if: ${{ github.repository == 'gulfofmaine/buoy_retriever' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') }}
+    #     with:
+    #         app_path: ./apps/sea-eagle/s3_timeseries.yaml
+    #         image_tag: ${{ needs.shortsha.outputs.shortsha }}
+    #         image_name: buoy_retriever_s3_timeseries
+    #     secrets:
+    #         GITOPS_TOKEN: ${{ secrets.GITOPS_TOKEN }}
