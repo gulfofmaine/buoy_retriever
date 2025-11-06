@@ -1,5 +1,4 @@
-"""
-A common base class for saving files to the EFS datastore.
+"""A common base class for saving files to the EFS datastore.
 
 This handles transforming an assets desired_path to a saved file.
 
@@ -11,7 +10,7 @@ UPathIOManager make things up on its own.
 from abc import abstractmethod
 from collections.abc import Mapping
 from pathlib import Path
-from typing import Any, Optional, Union
+from typing import Any
 
 import dagster as dg
 import pandas as pd
@@ -25,8 +24,7 @@ from .datastore import Datastore
 
 
 class PartitionedInputError(Exception):
-    """
-    An error that is raised when the input is partitioned
+    """An error that is raised when the input is partitioned
     and we need to make adjustments to handle that.
     """
 
@@ -34,8 +32,7 @@ class PartitionedInputError(Exception):
 
 
 class IOManagerBase(dg.ConfigurableIOManager):
-    """
-    A shared base class for format/tool specific IO Managers
+    """A shared base class for format/tool specific IO Managers
     to be built that can work with the EFS datastore,
     and allows/requires assets to submit desired path template.
 
@@ -55,7 +52,7 @@ class IOManagerBase(dg.ConfigurableIOManager):
     # )
     # s3: dg.ResourceDependency[Optional[S3FSResource]] = None
 
-    def get_path(self, context: Union[dg.InputContext, dg.OutputContext]) -> Path:
+    def get_path(self, context: dg.InputContext | dg.OutputContext) -> Path:
         """Get file path"""
         if (
             isinstance(context, dg.InputContext)
@@ -81,8 +78,8 @@ class IOManagerBase(dg.ConfigurableIOManager):
 
     def get_output_path(
         self,
-        context: Union[dg.InputContext, dg.OutputContext],
-        partition_key: Optional[str] = None,
+        context: dg.InputContext | dg.OutputContext,
+        partition_key: str | None = None,
     ) -> Path:
         """Create path"""
         desired_path = self.desired_path_template(context)
@@ -97,24 +94,26 @@ class IOManagerBase(dg.ConfigurableIOManager):
 
     def desired_path_template(
         self,
-        context: Union[dg.InputContext, dg.OutputContext],
+        context: dg.InputContext | dg.OutputContext,
     ) -> str:
         """Extract the template for the path desired from the desired path key in asset metadata"""
         try:
-            desired_path: str = context.metadata[tags.DESIRED_PATH]
+            desired_path: str = context.definition_metadata[tags.DESIRED_PATH]
         except KeyError:
             try:
-                desired_path = context.upstream_output.metadata[tags.DESIRED_PATH]
+                desired_path = context.upstream_output.definition_metadata[
+                    tags.DESIRED_PATH
+                ]
             except KeyError as e:
                 raise KeyError(
-                    f"Could not find `io.DESIRED_PATH` in asset output metadata: {context.metadata}",
+                    f"Could not find `io.DESIRED_PATH` in asset output metadata: {context.definition_metadata}",
                 ) from e
         return desired_path
 
     def get_path_formatting_context(
         self,
         context: dg.OutputContext,
-        partition_key: Optional[str] = None,
+        partition_key: str | None = None,
     ) -> dict:
         """Create path formatting context from output context"""
         path_context = {
@@ -136,7 +135,8 @@ class IOManagerBase(dg.ConfigurableIOManager):
     def handle_output(self, context: dg.OutputContext, obj: Any) -> None:
         """Call subclass to handle dumping data to datastore.
 
-        It will also handle the S3 sync if the sync_to_s3_bucket or a S3 path is set."""
+        It will also handle the S3 sync if the sync_to_s3_bucket or a S3 path is set.
+        """
         path = self.get_path(context)
         self.dump_to_path(context, obj, path)
 

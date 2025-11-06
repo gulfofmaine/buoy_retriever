@@ -1,0 +1,61 @@
+interactions:
+- request:
+    body: '{"slug":"hohonu","name":"Hohonu","description":"Fetch tide data from Hohonu''s
+      API","config_schema":{"description":"Configuration for Hohonu Dataset","properties":{"station":{"description":"Station
+      name/timeseries_id","title":"Station","type":"string"},"hohonu_id":{"description":"Hohonu
+      station ID","title":"Hohonu Id","type":"string"},"start_date":{"format":"date","title":"Start
+      Date","type":"string"},"latitude":{"description":"Fixed latitude of the station","title":"Latitude","type":"number"},"longitude":{"description":"Fixed
+      longitude of the station","title":"Longitude","type":"number"}},"required":["station","hohonu_id","start_date","latitude","longitude"],"title":"HohonuConfig","type":"object"}}'
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      connection:
+      - keep-alive
+      content-length:
+      - '707'
+      content-type:
+      - application/json
+      host:
+      - localhost:8080
+      user-agent:
+      - python-httpx/0.28.1
+    method: POST
+    uri: http://localhost:8080/backend/api/pipelines/
+  response:
+    body:
+      string: '{"id": 3, "slug": "hohonu", "name": "Hohonu", "config_schema": {"description":
+        "Configuration for Hohonu Dataset", "properties": {"station": {"description":
+        "Station name/timeseries_id", "title": "Station", "type": "string"}, "hohonu_id":
+        {"description": "Hohonu station ID", "title": "Hohonu Id", "type": "string"},
+        "start_date": {"format": "date", "title": "Start Date", "type": "string"},
+        "latitude": {"description": "Fixed latitude of the station", "title": "Latitude",
+        "type": "number"}, "longitude": {"description": "Fixed longitude of the station",
+        "title": "Longitude", "type": "number"}}, "required": ["station", "hohonu_id",
+        "start_date", "latitude", "longitude"], "title": "HohonuConfig", "type": "object"},
+        "description": "Fetch tide data from Hohonu''s API", "created": "2025-09-24T14:50:29.573Z",
+        "edited": "2025-10-08T17:37:13.224Z", "active": true}'
+    headers:
+      Content-Length:
+      - '863'
+      Content-Type:
+      - application/json; charset=utf-8
+      Cross-Origin-Opener-Policy:
+      - same-origin
+      Date:
+      - Wed, 08 Oct 2025 17:37:13 GMT
+      Referrer-Policy:
+      - same-origin
+      Server:
+      - WSGIServer/0.2 CPython/3.13.7
+      Vary:
+      - origin
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+version: 1

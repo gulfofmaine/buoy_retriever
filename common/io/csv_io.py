@@ -1,6 +1,4 @@
-"""
-Load and save CSV files with Pandas to the datastore
-"""
+"""Load and save CSV files with Pandas to the datastore"""
 
 from pathlib import Path
 

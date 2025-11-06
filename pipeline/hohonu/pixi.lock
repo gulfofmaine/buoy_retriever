@@ -437,6 +437,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/noarch/click-8.1.8-pyh707e725_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/colorama-0.4.6-pyhd8ed1ab_1.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/coloredlogs-14.0-pyhd8ed1ab_3.tar.bz2
+      - conda: https://conda.anaconda.org/conda-forge/linux-64/coverage-7.10.7-py313h3dea7bd_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/cryptography-45.0.7-py313hafb0bba_1.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/cyrus-sasl-2.1.28-hd9c7081_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/dagster-1.11.12-pyh742d864_0.conda
@@ -555,6 +556,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/noarch/pyparsing-3.2.5-pyhcf101f3_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/pysocks-1.7.1-pyha55dd90_7.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/pytest-8.4.2-pyhd8ed1ab_0.conda
+      - conda: https://conda.anaconda.org/conda-forge/noarch/pytest-cov-7.0.0-pyhcf101f3_1.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/pytest-recording-0.13.4-pyhe01879c_1.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/python-3.13.7-h2b335a9_100_cp313.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/python-dateutil-2.9.0.post0-pyhe01879c_2.conda
@@ -641,6 +643,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/noarch/click-8.1.8-pyh707e725_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/colorama-0.4.6-pyhd8ed1ab_1.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/coloredlogs-14.0-pyhd8ed1ab_3.tar.bz2
+      - conda: https://conda.anaconda.org/conda-forge/linux-aarch64/coverage-7.10.7-py313hfa222a2_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-aarch64/cryptography-45.0.7-py313hbc6eba2_1.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-aarch64/cyrus-sasl-2.1.28-h6c5dea3_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/dagster-1.11.12-pyh742d864_0.conda
@@ -759,6 +762,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/noarch/pyparsing-3.2.5-pyhcf101f3_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/pysocks-1.7.1-pyha55dd90_7.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/pytest-8.4.2-pyhd8ed1ab_0.conda
+      - conda: https://conda.anaconda.org/conda-forge/noarch/pytest-cov-7.0.0-pyhcf101f3_1.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/pytest-recording-0.13.4-pyhe01879c_1.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-aarch64/python-3.13.7-h23354eb_100_cp313.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/python-dateutil-2.9.0.post0-pyhe01879c_2.conda
@@ -1326,6 +1330,31 @@ packages:
   license_family: MIT
   size: 38867
   timestamp: 1638552219222
+- conda: https://conda.anaconda.org/conda-forge/linux-64/coverage-7.10.7-py313h3dea7bd_0.conda
+  sha256: 1b56d8f5ed42734e56737a98d8d943da48a58e55c5dd1a3142867afb4adef385
+  md5: 2847245cb868cdf87bb7fee7b8605d10
+  depends:
+  - __glibc >=2.17,<3.0.a0
+  - libgcc >=14
+  - python >=3.13,<3.14.0a0
+  - python_abi 3.13.* *_cp313
+  - tomli
+  license: Apache-2.0
+  license_family: APACHE
+  size: 390586
+  timestamp: 1758501129226
+- conda: https://conda.anaconda.org/conda-forge/linux-aarch64/coverage-7.10.7-py313hfa222a2_0.conda
+  sha256: 4fcaaf0291939b1d27fb5e97dbb2482d8e778569d59224c84c851a5800217ab8
+  md5: 17e14ff2f0ccb8ae71287c0cd220beb7
+  depends:
+  - libgcc >=14
+  - python >=3.13,<3.14.0a0
+  - python_abi 3.13.* *_cp313
+  - tomli
+  license: Apache-2.0
+  license_family: APACHE
+  size: 391981
+  timestamp: 1758501805940
 - conda: https://conda.anaconda.org/conda-forge/linux-64/cryptography-45.0.7-py313hafb0bba_1.conda
   sha256: d22b2798369956e8c8d3de5deaf4312c63fdbfbf5764be57b00db52169d77b67
   md5: 5550fcb08b89b0c7d565d39a5f666225
@@ -4067,6 +4096,19 @@ packages:
   license_family: MIT
   size: 276734
   timestamp: 1757011891753
+- conda: https://conda.anaconda.org/conda-forge/noarch/pytest-cov-7.0.0-pyhcf101f3_1.conda
+  sha256: d0f45586aad48ef604590188c33c83d76e4fc6370ac569ba0900906b24fd6a26
+  md5: 6891acad5e136cb62a8c2ed2679d6528
+  depends:
+  - coverage >=7.10.6
+  - pluggy >=1.2
+  - pytest >=7
+  - python >=3.10
+  - python
+  license: MIT
+  license_family: MIT
+  size: 29016
+  timestamp: 1757612051022
 - conda: https://conda.anaconda.org/conda-forge/noarch/pytest-recording-0.13.4-pyhe01879c_1.conda
   sha256: 15ca34a74e41d8f7bc39de2a9ab70e4242719f7437299a3e22848e305b9da039
   md5: cd0a8a0cd0e36705370b3ccf4e70dd2c

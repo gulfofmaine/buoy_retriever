@@ -1,6 +1,4 @@
-"""
-Save and load JSON data to the EFS datastore
-"""
+"""Save and load JSON data to the EFS datastore"""
 
 import json
 from pathlib import Path

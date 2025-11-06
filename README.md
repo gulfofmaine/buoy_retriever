@@ -73,6 +73,6 @@ Requires a `HOHONU_API_KEY` environment variable for API access.
 
 Currently there is some testing for common utilities and Hohonu pipelines.
 
-For common, cd into `common/` then `uv run pytest`.
+For common, cd into `common/` then `uv run pytest`. Add `--cov=.` to see coverage (along with other pytest-cov options).
 
 For Hohonu, `docker compose exec hohonu pixi run pytest`.

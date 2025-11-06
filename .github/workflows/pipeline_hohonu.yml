@@ -25,7 +25,8 @@ jobs:
             image_name: buoy_retriever_hohonu
             image_tag: ${{ needs.shortsha.outputs.shortsha }}
             # push_image: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
-            test_command: "pixi run pytest"
+            test_command: "pixi run pytest --cov=. --cov-report=xml --cov-report=term-missing"
+            upload_coverage: true
 
     # deploy:
     #     needs: [shortsha, build_test_push]
