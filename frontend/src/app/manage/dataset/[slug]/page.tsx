@@ -46,7 +46,11 @@ async function fetchPipeline(id: number): Promise<Pipeline> {
   return (await response.json()) as Pipeline;
 }
 
-export default function Dataset({ params }: { params: { slug: string } }) {
+export default function Dataset({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
   const { slug } = use(params);
   const router = useRouter();
   const { data, error, isLoading, refetch } = useQuery({
@@ -62,7 +66,7 @@ export default function Dataset({ params }: { params: { slug: string } }) {
     isLoading: pipelineLoading,
   } = useQuery({
     queryKey: ["pipeline", pipelineId],
-    queryFn: () => fetchPipeline(pipelineId),
+    queryFn: () => fetchPipeline(pipelineId!),
     enabled: !!pipelineId, // Only run this query if pipelineId is available
   });
 
