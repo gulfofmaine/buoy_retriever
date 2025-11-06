@@ -75,11 +75,11 @@ export default function NewDataset() {
           />
           <label htmlFor="pipeline">Processing pipeline: </label>
           <select name="pipeline">
-            {data.map((pipeline: Pipeline) => (
+            {data?.map((pipeline: Pipeline) => (
               <option key={pipeline.id} value={pipeline.id}>
                 {pipeline.slug}
               </option>
-            ))}
+            )) || []}
           </select>
           <button type="submit">Create dataset</button>
         </form>
