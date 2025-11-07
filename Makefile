@@ -10,7 +10,7 @@ up: down build
 
 # Start core services: backend, frontend, dagster_ui, dagster_daemon
 core:
-	docker compose up --build backend frontend dagster_ui dagster_daemon
+	docker compose up --build backend frontend dagster_ui dagster_daemon spotlight
 
 # Stop and remove all containers
 down:

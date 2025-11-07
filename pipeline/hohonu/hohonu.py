@@ -7,7 +7,7 @@ import pandas as pd
 import xarray as xr
 from pydantic import Field, ValidationError
 
-from common import assets, config, io
+from common import assets, config, io, sentry
 
 from hohonu_api import HohonuApi
 
@@ -81,6 +81,7 @@ def defs_for_dataset(dataset: HohonuDataset) -> dg.Definitions:
         **io.CSV_ASSET_KWARGS,
         **common_asset_kwargs,
     )
+    @sentry.capture_op_exceptions
     def daily_df(
         context: dg.AssetExecutionContext,
         hohonu_api: HohonuApi,
@@ -118,6 +119,7 @@ def defs_for_dataset(dataset: HohonuDataset) -> dg.Definitions:
         **io.NETCDF_ASSET_KWARGS,
         **common_asset_kwargs,
     )
+    @sentry.capture_op_exceptions
     def monthly_ds(
         context: dg.AssetExecutionContext,
         daily_df: dict[str, pd.DataFrame],

@@ -1,0 +1,8 @@
+{
+  "servers": {
+    "spotlight": {
+      "command": "npx",
+      "args": ["-y", "--prefer-online", "@spotlightjs/spotlight@latest", "mcp"]
+    }
+  }
+}
