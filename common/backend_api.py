@@ -1,6 +1,7 @@
 from typing import Annotated
 
 import httpx
+import sentry_sdk
 from pydantic import BaseModel, Field, ValidationError
 
 from .config import DatasetBase, PipelineConfig
@@ -22,19 +23,23 @@ class BackendAPIClient(BaseModel):
 
     def register_pipeline(self, pipeline: PipelineConfig):
         """Create or update a pipeline configuration"""
-        json = pipeline.to_json()
+        with sentry_sdk.start_span(
+            op="register_pipeline",
+            name=f"Register pipeline {pipeline.slug}",
+        ):
+            json = pipeline.to_json()
 
-        url = self.api_endpoint + "pipelines/"
+            url = self.api_endpoint + "pipelines/"
 
-        result = httpx.post(
-            url,
-            json=json,
-            timeout=self.timeout,
-            headers=self.headers(),
-        )
-        result.raise_for_status()
+            result = httpx.post(
+                url,
+                json=json,
+                timeout=self.timeout,
+                headers=self.headers(),
+            )
+            result.raise_for_status()
 
-        return result.json()
+            return result.json()
 
     def datasets_for_pipeline(
         self,
@@ -42,28 +47,32 @@ class BackendAPIClient(BaseModel):
         dataset_model: type[DatasetBase],
     ):
         """Get datasets for a given pipeline slug"""
-        url = self.api_endpoint + f"datasets/by-pipeline/{pipeline_slug}"
+        with sentry_sdk.start_span(
+            op="datasets_for_pipeline",
+            name=f"Get datasets for pipeline {pipeline_slug}",
+        ):
+            url = self.api_endpoint + f"datasets/by-pipeline/{pipeline_slug}"
 
-        result = httpx.get(
-            url,
-            timeout=self.timeout,
-            headers=self.headers(),
-        )
-        result.raise_for_status()
+            result = httpx.get(
+                url,
+                timeout=self.timeout,
+                headers=self.headers(),
+            )
+            result.raise_for_status()
 
-        datasets_json = result.json()
+            datasets_json = result.json()
 
-        datasets = []
+            datasets = []
 
-        for d in datasets_json:
-            try:
-                dataset = dataset_model(**d)
-            except ValidationError as e:
-                print(f"Error validating dataset {d}: {e}")
-                print(
-                    "Post back to message API about error parsing the dataset configuration",
-                )
-                continue
-            datasets.append(dataset)
+            for d in datasets_json:
+                try:
+                    dataset = dataset_model(**d)
+                except ValidationError as e:
+                    print(f"Error validating dataset {d}: {e}")
+                    print(
+                        "Post back to message API about error parsing the dataset configuration",
+                    )
+                    continue
+                datasets.append(dataset)
 
-        return datasets
+            return datasets

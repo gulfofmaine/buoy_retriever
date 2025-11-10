@@ -1,11 +1,17 @@
+import * as Sentry from "@sentry/nextjs";
 import type { Metadata } from "next";
 import "./globals.css";
 import { Providers } from "./providers";
 
-export const metadata: Metadata = {
-  title: "Buoy Retriever",
-  description: "Manage fetching and processing of IOOS data",
-};
+export function generateMetadata(): Metadata {
+  return {
+    title: "Buoy Retriever",
+    description: "Manage fetching and processing of IOOS data",
+    other: {
+      ...Sentry.getTraceData(),
+    },
+  };
+}
 
 export default function RootLayout({
   children,
