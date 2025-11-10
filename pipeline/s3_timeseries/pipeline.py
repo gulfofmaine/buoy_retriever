@@ -8,13 +8,14 @@ import sentry_sdk
 import xarray as xr
 from pydantic import BaseModel, Field
 
-from common import assets, config, io, sentry
+from common import assets, config, io
 from common.backend_api import BackendAPIClient
 from common.config import mappings, s3_source
 from common.readers.pandas_csv import PandasCSVReader
 from common.resource.s3fs_resource import S3Credentials, S3FSResource
+from common.sentry import SentryConfig
 
-sentry.setup_sentry("s3_timeseries")
+sentry = SentryConfig(pipeline_name="s3_timeseries")
 
 
 class DayGlob(BaseModel):
