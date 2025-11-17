@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 import os
 from pathlib import Path
 
+from corsheaders.defaults import default_headers
 import sentry_sdk
 
 sentry_sdk.init(
@@ -50,6 +51,11 @@ DEBUG = os.environ.get("BACKEND_ENV", "").lower() == "dev"
 ALLOWED_HOSTS = ["*"]
 
 CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_HEADERS = (
+    *default_headers,
+    "baggage",
+    "sentry-trace",
+)
 
 
 # Application definition
