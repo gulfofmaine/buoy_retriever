@@ -4,12 +4,100 @@ Setup sentry and use some sane defaults
 
 import functools
 import os
-from typing import TYPE_CHECKING
+from typing import Annotated
 
+import dagster as dg
 import sentry_sdk
+from pydantic import BaseModel, Field
 
-if TYPE_CHECKING:
-    from dagster import OpExecutionContext
+
+class SentryConfig(BaseModel):
+    """Configure Sentry for a pipeline"""
+
+    pipeline_name: Annotated[
+        str,
+        Field(description="Name of the pipeline for Sentry tagging"),
+    ]
+
+    def model_post_init(self, context):
+        """Post init hook to setup Sentry"""
+        self.setup_sentry()
+
+    def setup_sentry(self):
+        """Setup Sentry SDK"""
+        setup_sentry(self.pipeline_name)
+
+    def log_op_context(self, context: dg.OpExecutionContext):
+        """Log Dagster OP context to Sentry"""
+        data = {
+            "op_name": context.op_def.name,
+            "retry_number": context.retry_number,
+            "pipeline_name": self.pipeline_name,
+        }
+
+        try:
+            sentry_sdk.set_tag("job_name", context.job_name)
+            data["job_name"] = context.job_name
+            data["run_config"] = context.run.run_config
+            sentry_sdk.set_tag("run_id", context.run.run_id)
+            data["run_id"] = context.run.run_id
+        except dg.DagsterInvalidPropertyError:
+            pass
+
+        sentry_sdk.add_breadcrumb(
+            category="dagster",
+            message=f"{self.pipeline_name} - {context.op_def.name}",
+            level="info",
+            data=data,
+        )
+        sentry_sdk.set_tag("op_name", context.op_def.name)
+        sentry_sdk.set_tag("pipeline_name", self.pipeline_name)
+
+        sentry_sdk.set_context("dagster_op", data)
+
+    def capture_op_exceptions(self, func):
+        """
+        Captures exceptions thrown by Dagster Ops and forwards them to Sentry
+        before re-throwing them for Dagster.
+
+        Expects ops to receive Dagster context as the first argument,
+        but it will continue if it doesn't (it just won't get as much context).
+
+        It will log a unique ID that can be then entered into Sentry to find
+        the exception.
+
+        This should be used as a decorator between Dagster's `@op`,
+        and the function to be handled.
+
+        @op
+        @sentry.capture_op_exceptions
+        def op_with_error(context):
+            raise Exception("Ahh!")
+        """
+
+        @functools.wraps(func)
+        def wrapped_fn(*args, **kwargs):
+            logger = dg.get_dagster_logger("sentry")
+
+            try:
+                self.log_op_context(args[0])
+            except (AttributeError, IndexError):
+                logger.warning("Sentry did not find execution context as the first arg")
+
+            with sentry_sdk.start_transaction(
+                op=func.__name__,
+                name=f"{self.pipeline_name} op: {func.__name__}",
+            ):
+                try:
+                    return func(*args, **kwargs)
+                except Exception as e:
+                    event_id = sentry_sdk.capture_exception(e)
+                    logger.error(f"Sentry captured an exception. Event ID: {event_id}")
+                    raise e
+
+        return wrapped_fn
+
+    capture_asset_exceptions = capture_op_exceptions
 
 
 def setup_sentry(pipeline_name: str):
@@ -76,79 +164,3 @@ def dagster_before_send(event, hint):
     ):
         return None
     return event
-
-
-def log_op_context(context: "OpExecutionContext"):
-    """
-    Capture Dagster OP context for Sentry Error handling
-    """
-    sentry_sdk.add_breadcrumb(
-        category="dagster",
-        message=f"{context.job_name} - {context.op_def.name}",
-        level="info",
-        data={
-            "run_config": context.run_config,
-            "job_name": context.job_name,
-            "op_name": context.op_def.name,
-            "run_id": context.run_id,
-            "retry_number": context.retry_number,
-        },
-    )
-    sentry_sdk.set_tag("job_name", context.job_name)
-    sentry_sdk.set_tag("op_name", context.op_def.name)
-    sentry_sdk.set_tag("run_id", context.run_id)
-
-    sentry_sdk.set_context(
-        "dagster_op",
-        {
-            "run_config": context.run_config,
-            "job_name": context.job_name,
-            "op_name": context.op_def.name,
-            "run_id": context.run_id,
-            "retry_number": context.retry_number,
-        },
-    )
-
-
-def capture_op_exceptions(func):
-    """
-    Captures exceptions thrown by Dagster Ops and forwards them to Sentry
-    before re-throwing them for Dagster.
-
-    Expects ops to receive Dagster context as the first argument,
-    but it will continue if it doesn't (it just won't get as much context).
-
-    It will log a unique ID that can be then entered into Sentry to find
-    the exception.
-
-    This should be used as a decorator between Dagster's `@op`,
-    and the function to be handled.
-
-    @op
-    @sentry.capture_op_exceptions
-    def op_with_error(context):
-        raise Exception("Ahh!")
-    """
-    from dagster import get_dagster_logger
-
-    @functools.wraps(func)
-    def wrapped_fn(*args, **kwargs):
-        logger = get_dagster_logger("sentry")
-
-        try:
-            log_op_context(args[0])
-        except (AttributeError, IndexError):
-            logger.warn("Sentry did not find execution context as the first arg")
-
-        with sentry_sdk.start_transaction(
-            op=func.__name__,
-            name=f"Dagster op: {func.__name__}",
-        ):
-            try:
-                return func(*args, **kwargs)
-            except Exception as e:
-                event_id = sentry_sdk.capture_exception(e)
-                logger.error(f"Sentry captured an exception. Event ID: {event_id}")
-                raise e
-
-    return wrapped_fn

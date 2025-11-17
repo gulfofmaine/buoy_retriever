@@ -1,13 +1,11 @@
 import dagster as dg
 import sentry_sdk
 
-from common import config, io, sentry
+from common import config, io
 from common.backend_api import BackendAPIClient
 from hohonu import HohonuConfig, HohonuDataset, defs_for_dataset
 
 from hohonu_api import HohonuApi
-
-sentry.setup_sentry("hohonu")
 
 
 @dg.definitions

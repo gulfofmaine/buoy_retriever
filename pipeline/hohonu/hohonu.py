@@ -7,9 +7,12 @@ import pandas as pd
 import xarray as xr
 from pydantic import Field, ValidationError
 
-from common import assets, config, io, sentry
+from common import assets, config, io
+from common.sentry import SentryConfig
 
 from hohonu_api import HohonuApi
+
+sentry = SentryConfig(pipeline_name="hohonu")
 
 
 class HohonuConfig(
