@@ -4,6 +4,7 @@ from typing import Annotated
 
 import dagster as dg
 import pandas as pd
+import sentry_sdk
 import xarray as xr
 from pydantic import BaseModel, Field
 
@@ -12,6 +13,9 @@ from common.backend_api import BackendAPIClient
 from common.config import mappings, s3_source
 from common.readers.pandas_csv import PandasCSVReader
 from common.resource.s3fs_resource import S3Credentials, S3FSResource
+from common.sentry import SentryConfig
+
+sentry = SentryConfig(pipeline_name="s3_timeseries")
 
 
 class DayGlob(BaseModel):
@@ -107,6 +111,7 @@ def defs_for_dataset(dataset: S3TimeseriesDataset) -> dg.Definitions:
         **io.CSV_ASSET_KWARGS,
         **common_asset_kwargs,
     )
+    @sentry.capture_op_exceptions
     def daily_df(context: dg.AssetExecutionContext, s3fs: S3FSResource) -> pd.DataFrame:
         """Download daily dataframe from S3."""
         partition_date_string = context.asset_partition_key_for_output()
@@ -153,6 +158,7 @@ def defs_for_dataset(dataset: S3TimeseriesDataset) -> dg.Definitions:
         **io.NETCDF_ASSET_KWARGS,
         **common_asset_kwargs,
     )
+    @sentry.capture_op_exceptions
     def monthly_ds(
         context: dg.AssetExecutionContext,
         daily_df: dict[str, pd.DataFrame],
@@ -206,39 +212,43 @@ def defs_for_dataset(dataset: S3TimeseriesDataset) -> dg.Definitions:
 @dg.definitions
 def build_defs() -> dg.Definitions:
     """Build definitions for S3 Timeseries pipeline and register with backend."""
-    pipeline = config.PipelineConfig(
-        slug="s3_timeseries",
-        name="S3 Timeseries",
-        description="Fetch time series data from CSV files in S3",
-        dataset_config=S3TimeseriesConfig,
-    )
+    with sentry_sdk.start_transaction(
+        op="build_defs",
+        name="Build S3 Timeseries Pipeline Definitions",
+    ):
+        pipeline = config.PipelineConfig(
+            slug="s3_timeseries",
+            name="S3 Timeseries",
+            description="Fetch time series data from CSV files in S3",
+            dataset_config=S3TimeseriesConfig,
+        )
 
-    api_client = BackendAPIClient()
-    api_client.register_pipeline(pipeline)
+        api_client = BackendAPIClient()
+        api_client.register_pipeline(pipeline)
 
-    datastore, io_managers = io.common_resources(path_stub="s3_timeseries")
+        datastore, io_managers = io.common_resources(path_stub="s3_timeseries")
 
-    credentials = S3Credentials(
-        access_key_id=dg.EnvVar("S3_TS_ACCESS_KEY_ID"),
-        secret_access_key=dg.EnvVar("S3_TS_SECRET_ACCESS_KEY"),
-    )
+        credentials = S3Credentials(
+            access_key_id=dg.EnvVar("S3_TS_ACCESS_KEY_ID"),
+            secret_access_key=dg.EnvVar("S3_TS_SECRET_ACCESS_KEY"),
+        )
 
-    defs = dg.Definitions(
-        resources={
-            "s3_credentials": credentials,
-            "s3fs": S3FSResource(
-                credentials=credentials,
-                region_name="us-east-1",
-            ),
-            "datastore": datastore,
-            **io_managers,
-        },
-    )
+        defs = dg.Definitions(
+            resources={
+                "s3_credentials": credentials,
+                "s3fs": S3FSResource(
+                    credentials=credentials,
+                    region_name="us-east-1",
+                ),
+                "datastore": datastore,
+                **io_managers,
+            },
+        )
 
-    datasets = api_client.datasets_for_pipeline(pipeline.slug, S3TimeseriesDataset)
+        datasets = api_client.datasets_for_pipeline(pipeline.slug, S3TimeseriesDataset)
 
-    for dataset in datasets:
-        dataset_defs = defs_for_dataset(dataset)
-        defs = dg.Definitions.merge(defs, dataset_defs)
+        for dataset in datasets:
+            dataset_defs = defs_for_dataset(dataset)
+            defs = dg.Definitions.merge(defs, dataset_defs)
 
-    return defs
+        return defs

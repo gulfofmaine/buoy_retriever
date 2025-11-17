@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@axdspub/axiom-ui-forms": "^0.3.7",
+    "@sentry/nextjs": "^10.25.0",
     "@tanstack/react-query": "^5.90.2",
     "@tanstack/react-query-devtools": "^5.90.2",
     "clsx": "^2.1.1",

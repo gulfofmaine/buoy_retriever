@@ -13,6 +13,28 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 import os
 from pathlib import Path
 
+from corsheaders.defaults import default_headers
+import sentry_sdk
+
+sentry_sdk.init(
+    dsn=os.environ.get("SENTRY_DSN"),
+    server_name="backend",
+    # Add request headers and IP for users,
+    # see https://docs.sentry.io/platforms/python/data-management/data-collected/ for more info
+    send_default_pii=True,
+    # Set traces_sample_rate to 1.0 to capture 100%
+    # of transactions for tracing.
+    traces_sample_rate=1.0,
+    # To collect profiles for all profile sessions,
+    # set `profile_session_sample_rate` to 1.0.
+    profile_session_sample_rate=1.0,
+    # Profiles will be automatically collected while
+    # there is an active span.
+    profile_lifecycle="trace",
+    # Enable logs to be sent to Sentry
+    enable_logs=True,
+)
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -29,6 +51,11 @@ DEBUG = os.environ.get("BACKEND_ENV", "").lower() == "dev"
 ALLOWED_HOSTS = ["*"]
 
 CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_HEADERS = (
+    *default_headers,
+    "baggage",
+    "sentry-trace",
+)
 
 
 # Application definition
