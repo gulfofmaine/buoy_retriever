@@ -38,6 +38,7 @@ Once the migrations are run, the frontend and Dagster can be started with `make 
 
 ## Commands
 
+- `make core` - Launch fronted, backend, Dagster, Spotlight, and other supporting services.
 - `make up` - Launch all Docker services
 - `make down` - Stop all Docker services
 - `make migrations` - Generate new Django database migration files
@@ -69,7 +70,13 @@ Requires `S3_TS_ACCESS_KEY_ID` and `S3_TS_SECRET_ACCESS_KEY` environment variabl
 Requires a `HOHONU_API_KEY` environment variable for API access.
 
 
-## Testing
+## Development
+
+For error handling, distributed tracing, and profiling, [Spotlight](https://spotlightjs.com/) by Sentry is setup and launches with `make up` or `make core` to http://localhost:8969/
+
+Spotlight is also accessible to Github Copilot and other agents via a MCP server configuration.
+
+### Testing
 
 Currently there is some testing for common utilities and Hohonu pipelines.
 

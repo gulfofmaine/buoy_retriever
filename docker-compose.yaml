@@ -16,6 +16,11 @@ services:
   # queue:
   #   image: redis:6.0.7@sha256:0ab24e410ae42f99f1e861bd351b5ce7ca8c9eec7886c979a8650ba7fc18ad3b
 
+  spotlight:
+    image: ghcr.io/getsentry/spotlight:latest
+    ports:
+      - "8969:8969"
+
   backend:
     build:
       context: ./backend
@@ -30,6 +35,7 @@ services:
     ports:
       - "8080:8080"
     env_file:
+      - ./docker-data/common.env
       - ./docker-data/secret.env
     environment:
       BACKEND_ENV: dev
@@ -104,6 +110,7 @@ services:
       args:
         IMAGE_TAG: s3_timeseries_dev
     env_file:
+    - ./docker-data/common.env
     - ./docker-data/dagster.env
     - ./docker-data/secret.env
     volumes:
@@ -121,6 +128,7 @@ services:
       args:
         IMAGE_TAG: hohonu_dev
     env_file:
+    - ./docker-data/common.env
     - ./docker-data/dagster.env
     - ./docker-data/secret.env
     volumes:
