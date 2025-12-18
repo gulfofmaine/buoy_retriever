@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 
 class SimplifiedDataset(models.Model):
@@ -37,8 +38,33 @@ class Dataset(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     edited = models.DateTimeField(auto_now=True)
 
+    class Meta:
+        permissions = (("publish_dataset", "Can publish dataset"),)
+
     def __str__(self):
         return self.slug
+
+    def can_view(self, user: User) -> bool:
+        """Check if the user has view permission for this dataset."""
+        return user.has_perm("datasets.view_dataset", self)
+
+    def can_edit(self, user: User) -> bool:
+        """Check if the user has edit permission for this dataset."""
+        return user.has_perms(
+            ["datasets.view_dataset", "datasets.change_dataset"],
+            self,
+        )
+
+    def can_publish(self, user: User) -> bool:
+        """Check if the user has publish permission for this dataset."""
+        return user.has_perms(
+            [
+                "datasets.view_dataset",
+                "datasets.change_dataset",
+                "datasets.publish_dataset",
+            ],
+            self,
+        )
 
 
 # class DatasetPermissions(models.Model):
@@ -71,7 +97,7 @@ class DatasetConfig(models.Model):
     class State(models.TextChoices):
         DRAFT = "Draft"
         TESTING = "Testing"
-        CURRENT = "Active"
+        PUBLISHED = "Published"
 
     state = models.TextField(choices=State, default=State.DRAFT)
 
