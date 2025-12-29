@@ -59,6 +59,11 @@ on:
         description: Upload coverage reports to Codecov
         required: false
         default: false
+      upload_tests:
+        type: boolean
+        description: Upload test results to Codecov
+        required: false
+        default: false
     secrets:
       DOCKER_USERNAME:
         description: Username for Docker Hub
@@ -130,6 +135,11 @@ on:
       upload_coverage:
         type: boolean
         description: Upload coverage reports to Codecov
+        required: false
+        default: false
+      upload_tests:
+        type: boolean
+        description: Upload test results to Codecov
         required: false
         default: false
 
@@ -215,11 +225,6 @@ jobs:
         run: |
             docker cp test-container:/home/ioos/coverage.xml ${{ inputs.working_directory }}/coverage.xml || true
 
-      - name: Clean up test container
-        if: ${{ inputs.test_command }}
-        run: |
-            docker rm test-container || true
-
       - name: Upload coverage to Codecov
         if: ${{ inputs.test_command && inputs.upload_coverage }}
         uses: codecov/codecov-action@v5
@@ -229,6 +234,22 @@ jobs:
         #   files: ./coverage.xml
         #   fail_ci_if_error: false
         #   verbose: true
+
+      - name: Extract test results
+        if: ${{ inputs.test_command && inputs.upload_tests }}
+        run: |
+            docker cp test-container:/home/ioos/junit.xml ${{ inputs.working_directory }}/junit.xml || true
+
+      - name: Upload test results to Codecov
+        if: ${{ !cancelled() && inputs.test_command && inputs.upload_tests }}
+        uses: codecov/test-results-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: Clean up test container
+        if: ${{ inputs.test_command }}
+        run: |
+            docker rm test-container || true
 
     #   - name: Test if Dagster can find jobs in repo
     #     if: ${{ inputs.test_dagster_jobs }}
