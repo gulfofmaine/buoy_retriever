@@ -54,11 +54,11 @@ on:
         type: string
         description: Command to run tests inside the container, likely `pixi run pytest`
         required: false
-      upload_coverage:
-        type: boolean
-        description: Upload coverage reports to Codecov
+      coverage_flags:
+        type: string
+        description: Codecov flags to use when uploading coverage
         required: false
-        default: false
+        default: ""
       upload_tests:
         type: boolean
         description: Upload test results to Codecov
@@ -132,11 +132,11 @@ on:
         type: string
         description: Command to run tests inside the container, likely `pixi run pytest`
         required: false
-      upload_coverage:
-        type: boolean
-        description: Upload coverage reports to Codecov
+      coverage_flags:
+        type: string
+        description: Codecov flags to use when uploading coverage
         required: false
-        default: false
+        default: ""
       upload_tests:
         type: boolean
         description: Upload test results to Codecov
@@ -221,15 +221,17 @@ jobs:
             docker run --name test-container -e CI=true ${{ env.IMAGE_NAME }}:${{ env.DOCKER_TAG }} /bin/sh -c "${{ inputs.test_command }}"
 
       - name: Extract coverage data
-        if: ${{ inputs.test_command && inputs.upload_coverage }}
+        if: ${{ inputs.test_command && inputs.coverage_flags != '' }}
         run: |
             docker cp test-container:/home/ioos/coverage.xml ${{ inputs.working_directory }}/coverage.xml || true
 
       - name: Upload coverage to Codecov
-        if: ${{ inputs.test_command && inputs.upload_coverage }}
+        if: ${{ inputs.test_command && inputs.coverage_flags != '' }}
         uses: codecov/codecov-action@v5
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+        with:
+          flags: ${{ inputs.coverage_flags }}
         # with:
         #   files: ./coverage.xml
         #   fail_ci_if_error: false

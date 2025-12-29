@@ -82,6 +82,8 @@ jobs:
       uses: codecov/codecov-action@v5
       env:
         CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+      with:
+        flags: common
 
     - name: Upload test results to Codecov
       if: ${{ !cancelled() }}
