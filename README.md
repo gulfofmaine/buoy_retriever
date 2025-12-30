@@ -55,7 +55,10 @@ Once the migrations are run, the frontend and Dagster can be started with `make 
 
 ## Pipelines
 
-Pipelines can be managed from [Dagster UI](http://localhost:3002)
+Pipelines can be managed from [Dagster UI](http://localhost:3002).
+
+Before they can be started, `BACKEND_API_KEY` needs to be set in `./docker-data/secret.env`.
+This can be created from http://localhost:8080/backend/admin/pipelines/pipelineapikey/
 
 ### S3 Timeseries
 
