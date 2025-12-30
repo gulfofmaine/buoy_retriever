@@ -12,6 +12,8 @@ interactions:
       - localhost:8080
       user-agent:
       - python-httpx/0.28.1
+      x-api-key:
+      - br_fake
     method: GET
     uri: http://localhost:8080/backend/api/datasets/by-pipeline/hohonu
   response:
@@ -31,7 +33,7 @@ interactions:
       Cross-Origin-Opener-Policy:
       - same-origin
       Date:
-      - Wed, 08 Oct 2025 17:42:43 GMT
+      - Tue, 30 Dec 2025 01:23:35 GMT
       Referrer-Policy:
       - same-origin
       Server:

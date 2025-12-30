@@ -21,6 +21,8 @@ interactions:
       - localhost:8080
       user-agent:
       - python-httpx/0.28.1
+      x-api-key:
+      - br_fake
     method: POST
     uri: http://localhost:8080/backend/api/pipelines/
   response:
@@ -35,7 +37,7 @@ interactions:
         "title": "Longitude", "type": "number"}}, "required": ["station", "hohonu_id",
         "start_date", "latitude", "longitude"], "title": "HohonuConfig", "type": "object"},
         "description": "Fetch tide data from Hohonu''s API", "created": "2025-09-24T14:50:29.573Z",
-        "edited": "2025-10-08T17:37:13.224Z", "active": true}'
+        "edited": "2025-12-30T01:23:35.271Z", "active": true}'
     headers:
       Content-Length:
       - '863'
@@ -44,7 +46,7 @@ interactions:
       Cross-Origin-Opener-Policy:
       - same-origin
       Date:
-      - Wed, 08 Oct 2025 17:37:13 GMT
+      - Tue, 30 Dec 2025 01:23:35 GMT
       Referrer-Policy:
       - same-origin
       Server:

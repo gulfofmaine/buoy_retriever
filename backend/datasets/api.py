@@ -1,5 +1,8 @@
+from django.http import HttpRequest
 from django.shortcuts import get_object_or_404
 from ninja import ModelSchema, PatchDict, Router
+
+from pipelines.api import pipeline_api_key_auth
 from pipelines.models import Pipeline
 
 from .models import SimplifiedDataset
@@ -56,7 +59,11 @@ def patch_dataset(request, slug: str, payload: PatchDict[DatasetPostSchema]):
     return dataset
 
 
-@router.get("/by-pipeline/{pipeline_slug}", response=list[DatasetSchema])
-def get_datasets_by_pipeline(request, pipeline_slug: str):
+@router.get(
+    "/by-pipeline/{pipeline_slug}",
+    response=list[DatasetSchema],
+    auth=pipeline_api_key_auth,
+)
+def get_datasets_by_pipeline(request: HttpRequest, pipeline_slug: str):
     """Get all datasets for a specific pipeline"""
     return SimplifiedDataset.objects.filter(pipeline__slug=pipeline_slug)

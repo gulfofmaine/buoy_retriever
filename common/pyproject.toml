@@ -18,12 +18,16 @@ dependencies = [
 dev = [
   "pytest>=8.4.2",
   "pytest-cov>=7",
+  "pytest-env>=1.2",
   "pytest-recording>=0.13.4",
 ]
 
 [tool.pytest.ini_options]
 pythonpath = ".."
 addopts = "--cov=."
+
+[tool.pytest_env]
+BACKEND_API_KEY = { value = "br_fake", skip_if_set = true }
 
 [tool.coverage.run]
 omit = [
