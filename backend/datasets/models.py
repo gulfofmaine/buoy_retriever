@@ -100,7 +100,7 @@ class DatasetConfig(models.Model):
         related_name="configs",
         on_delete=models.CASCADE,
     )
-    config = models.JSONField(default=dict)
+    config = models.JSONField(default=dict, blank=True)
 
     created = models.DateTimeField(auto_now_add=True)
     edited = models.DateTimeField(auto_now=True)
@@ -113,7 +113,16 @@ class DatasetConfig(models.Model):
     state = models.TextField(choices=State, default=State.DRAFT)
 
     def __str__(self):
-        return f"{self.dataset.slug} - {self.state} ({self.created})"
+        return f"{self.dataset.slug} - Config {self.id} - {self.state} ({self.created})"
+
+    def save(self, *args, **kwargs):
+        # Ensure only one TESTING and one PUBLISHED config per dataset
+        if self.state in [self.State.TESTING, self.State.PUBLISHED]:
+            DatasetConfig.objects.filter(
+                dataset=self.dataset,
+                state=self.state,
+            ).exclude(id=self.id).update(state=self.State.DRAFT)
+        super().save(*args, **kwargs)
 
 
 # class Run(models.Model):
