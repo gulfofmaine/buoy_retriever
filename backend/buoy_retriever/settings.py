@@ -57,6 +57,16 @@ CORS_ALLOW_HEADERS = (
     "sentry-trace",
 )
 
+# Use X-Forwarded-Host header for request.get_host()
+USE_X_FORWARDED_HOST = True
+
+# Disable APPEND_SLASH to prevent redirect loops when proxied through NextJS
+# This is safe because we're explicitly adding trailing slashes in our URL patterns
+APPEND_SLASH = False
+
+# Additional proxy-aware settings
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
 
 # Application definition
 
@@ -169,7 +179,8 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = "static/"
+STATIC_URL = "/backend/static/"
+# STATIC_ROOT = BASE_DIR / "staticfiles"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
