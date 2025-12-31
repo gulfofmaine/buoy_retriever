@@ -27,9 +27,7 @@ interface Pipeline {
 }
 
 async function fetchDataset(slug: string): Promise<Dataset> {
-  const response = await fetch(
-    `http://localhost:8080/backend/api/datasets/${slug}`,
-  );
+  const response = await fetch(`/backend/api/datasets/${slug}`);
   if (!response.ok) {
     throw new Error("Network response was not ok");
   }
@@ -37,9 +35,7 @@ async function fetchDataset(slug: string): Promise<Dataset> {
 }
 
 async function fetchPipeline(id: number): Promise<Pipeline> {
-  const response = await fetch(
-    `http://localhost:8080/backend/api/pipelines/${id}`,
-  );
+  const response = await fetch(`/backend/api/pipelines/${id}`);
   if (!response.ok) {
     throw new Error("Network response was not ok");
   }
@@ -85,18 +81,15 @@ export default function Dataset({
     return <div>Error loading pipeline: {pipelineError.message}</div>;
 
   async function updateDataset() {
-    const response = await fetch(
-      `http://localhost:8080/backend/api/datasets/${slug}`,
-      {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          config: formValues,
-        }),
+    const response = await fetch(`/backend/api/datasets/${slug}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
       },
-    );
+      body: JSON.stringify({
+        config: formValues,
+      }),
+    });
 
     if (!response.ok) {
       throw new Error("Failed to update dataset");

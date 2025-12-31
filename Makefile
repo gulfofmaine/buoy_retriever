@@ -14,7 +14,7 @@ core:
 
 # Stop and remove all containers
 down:
-	docker compose -f docker-compose.yaml down
+	docker compose -f docker-compose.yaml down --remove-orphans
 
 # Stop all containers without removing them
 stop:

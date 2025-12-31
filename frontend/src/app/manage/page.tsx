@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 
 async function fetchDatasets() {
-  const response = await fetch("http://localhost:8080/backend/api/datasets/");
+  const response = await fetch("/backend/api/datasets/");
   if (!response.ok) {
     throw new Error("Network response was not ok");
   }
