@@ -3,15 +3,22 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   /* config options here */
-  // rewrites: async () => {
-  //   return [
-  //     {
-  //       source: "/backend/:path*",
-  //       destination: `${process.env.NEXT_PUBLIC_BACKEND_URL}/backend/:path*`,
-  //     },
-  //   ];
-  // },
+  rewrites: async () => {
+    return [
+      {
+        source: "/backend/:path*/",
+        destination: `${process.env.NEXT_PUBLIC_BACKEND_URL}/backend/:path*/`,
+      },
+      {
+        source: "/backend/:path*",
+        destination: `${process.env.NEXT_PUBLIC_BACKEND_URL}/backend/:path*`,
+      },
+    ];
+  },
   output: "standalone",
+  // Disable Next.js automatic trailing slash redirect
+  // skipTrailingSlashRedirect: true,
+  trailingSlash: true,
 };
 
 export default withSentryConfig(nextConfig, {
