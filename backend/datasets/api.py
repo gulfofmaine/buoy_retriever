@@ -8,18 +8,40 @@ from ninja.security import django_auth
 from pipelines.api import pipeline_api_key_auth
 from pipelines.models import Pipeline
 
-from .models import SimplifiedDataset, Dataset
+from .models import SimplifiedDataset, Dataset, DatasetConfig
 
 router = Router()
 
 
-class DatasetSchema(ModelSchema):
+class DatasetCompactSchema(ModelSchema):
     user_can_edit: bool
     user_can_publish: bool
 
     class Meta:
         model = Dataset
         fields = ["slug", "state", "created", "edited"]
+
+
+class DatasetCreateSchema(ModelSchema):
+    pipeline_id: int
+
+    class Meta:
+        model = Dataset
+        fields = ["slug"]
+
+
+class DatasetSchema(ModelSchema):
+    configs: list["DatasetConfigSchema"]
+
+    class Meta:
+        model = Dataset
+        fields = ["id", "slug", "state", "created", "edited"]
+
+
+class DatasetConfigSchema(ModelSchema):
+    class Meta:
+        model = DatasetConfig
+        fields = ["config", "created", "edited", "state", "id"]
 
 
 class SimplifiedDatasetSchema(ModelSchema):
@@ -36,11 +58,7 @@ class DatasetPostSchema(ModelSchema):
         fields = ["slug", "config"]
 
 
-@router.get(
-    "/",
-    response=list[DatasetSchema],
-    auth=django_auth,
-)
+@router.get("/", response=list[DatasetCompactSchema], auth=django_auth)
 def list_datasets(request: HttpRequest):
     """List all datasets"""
     datasets = get_objects_for_user(
@@ -62,14 +80,25 @@ def list_datasets(request: HttpRequest):
     ]
 
 
-@router.post("/", response=SimplifiedDatasetSchema)
-def create_dataset(request: HttpRequest, payload: DatasetPostSchema):
+@router.post(
+    "/",
+    response=DatasetSchema,
+    #  auth=django_auth
+)
+def create_dataset(request: HttpRequest, payload: DatasetCreateSchema):
     """Create a new dataset"""
     pipeline = get_object_or_404(Pipeline, id=payload.pipeline_id)
+    user = request.user
+    print(f"Creating dataset {payload.slug} for pipeline: {pipeline} by user: {user}")
+
     data = payload.dict()
     del data["pipeline_id"]
-    dataset = SimplifiedDataset(**data, pipeline=pipeline)
+
+    dataset = Dataset(**data, pipeline=pipeline)
     dataset.save()
+    dataset.assign_edit_permission(user)
+    config = DatasetConfig(dataset=dataset)
+    config.save()
     return dataset
 
 

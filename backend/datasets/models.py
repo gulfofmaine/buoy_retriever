@@ -1,5 +1,6 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
+from guardian.shortcuts import assign_perm
 
 
 class SimplifiedDataset(models.Model):
@@ -28,6 +29,11 @@ class Dataset(models.Model):
         unique=True,
         help_text="A unique slug to identify this dataset in the admin",
     )
+    pipeline = models.ForeignKey(
+        "pipelines.Pipeline",
+        related_name="datasets",
+        on_delete=models.CASCADE,
+    )
 
     class State(models.TextChoices):
         ACTIVE = "Active"
@@ -55,6 +61,10 @@ class Dataset(models.Model):
             self,
         )
 
+    def assign_edit_permission(self, user_group: User | Group):
+        """Assign edit permission for this dataset to a user or group."""
+        assign_perm("change_dataset", user_group, self)
+
     def can_publish(self, user: User) -> bool:
         """Check if the user has publish permission for this dataset."""
         return user.has_perms(
@@ -66,17 +76,10 @@ class Dataset(models.Model):
             self,
         )
 
-
-# class DatasetPermissions(models.Model):
-#     dataset = models.ForeignKey(Dataset, on_delete=models.CASCADE)
-#     group = models.ForeignKey("auth.Group", on_delete=models.CASCADE)
-
-#     class Permissions(models.TextChoices):
-#         READ = "Read"
-#         OWNER = "Owner"
-#         DATA_MANAGER = "Data Manager"
-
-#     permission = models.TextField(choices=Permissions)
+    def assign_publish_permission(self, user_group: User | Group):
+        """Assign publish permission for this dataset to a user or group."""
+        assign_perm("change_dataset", user_group, self)
+        assign_perm("publish_dataset", user_group, self)
 
 
 class DatasetConfig(models.Model):
@@ -87,9 +90,12 @@ class DatasetConfig(models.Model):
     config should create a new draft config instead.
     """
 
-    dataset = models.ForeignKey(Dataset, on_delete=models.CASCADE)
-    pipeline = models.ForeignKey("pipelines.Pipeline", on_delete=models.CASCADE)
-    config = models.JSONField()
+    dataset = models.ForeignKey(
+        Dataset,
+        related_name="configs",
+        on_delete=models.CASCADE,
+    )
+    config = models.JSONField(default=dict)
 
     created = models.DateTimeField(auto_now_add=True)
     edited = models.DateTimeField(auto_now=True)
