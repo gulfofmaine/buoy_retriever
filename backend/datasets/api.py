@@ -1,16 +1,28 @@
 from django.http import HttpRequest
 from django.shortcuts import get_object_or_404
+from guardian.core import ObjectPermissionChecker
+from guardian.shortcuts import get_objects_for_user
 from ninja import ModelSchema, PatchDict, Router
+from ninja.security import django_auth
 
 from pipelines.api import pipeline_api_key_auth
 from pipelines.models import Pipeline
 
-from .models import SimplifiedDataset
+from .models import SimplifiedDataset, Dataset
 
 router = Router()
 
 
 class DatasetSchema(ModelSchema):
+    user_can_edit: bool
+    user_can_publish: bool
+
+    class Meta:
+        model = Dataset
+        fields = ["slug", "state", "created", "edited"]
+
+
+class SimplifiedDatasetSchema(ModelSchema):
     class Meta:
         model = SimplifiedDataset
         fields = ["slug", "pipeline", "config", "created", "edited"]
@@ -24,14 +36,34 @@ class DatasetPostSchema(ModelSchema):
         fields = ["slug", "config"]
 
 
-@router.get("/", response=list[DatasetSchema])
-def list_datasets(request):
+@router.get(
+    "/",
+    response=list[DatasetSchema],
+    auth=django_auth,
+)
+def list_datasets(request: HttpRequest):
     """List all datasets"""
-    return SimplifiedDataset.objects.all()
+    datasets = get_objects_for_user(
+        request.user,
+        "datasets.view_dataset",
+    )
+    checker = ObjectPermissionChecker(request.user)
+    checker.prefetch_perms(datasets)
+    return [
+        {
+            "slug": d.slug,
+            "state": d.state,
+            "created": d.created,
+            "edited": d.edited,
+            "user_can_edit": d.can_edit(request.user),
+            "user_can_publish": d.can_publish(request.user),
+        }
+        for d in datasets
+    ]
 
 
-@router.post("/", response=DatasetSchema)
-def create_dataset(request, payload: DatasetPostSchema):
+@router.post("/", response=SimplifiedDatasetSchema)
+def create_dataset(request: HttpRequest, payload: DatasetPostSchema):
     """Create a new dataset"""
     pipeline = get_object_or_404(Pipeline, id=payload.pipeline_id)
     data = payload.dict()
@@ -41,14 +73,18 @@ def create_dataset(request, payload: DatasetPostSchema):
     return dataset
 
 
-@router.get("/{slug}", response=DatasetSchema)
-def get_dataset(request, slug: str):
+@router.get("/{slug}", response=SimplifiedDatasetSchema)
+def get_dataset(request: HttpRequest, slug: str):
     """Get a specific dataset by slug"""
     return SimplifiedDataset.objects.get(slug=slug)
 
 
-@router.patch("/{slug}", response=DatasetSchema)
-def patch_dataset(request, slug: str, payload: PatchDict[DatasetPostSchema]):
+@router.patch("/{slug}", response=SimplifiedDatasetSchema)
+def patch_dataset(
+    request: HttpRequest,
+    slug: str,
+    payload: PatchDict[DatasetPostSchema],
+):
     """Update a specific dataset by slug"""
     print(f"Payload: {payload}")
     dataset = SimplifiedDataset.objects.get(slug=slug)
@@ -61,7 +97,7 @@ def patch_dataset(request, slug: str, payload: PatchDict[DatasetPostSchema]):
 
 @router.get(
     "/by-pipeline/{pipeline_slug}",
-    response=list[DatasetSchema],
+    response=list[SimplifiedDatasetSchema],
     auth=pipeline_api_key_auth,
 )
 def get_datasets_by_pipeline(request: HttpRequest, pipeline_slug: str):

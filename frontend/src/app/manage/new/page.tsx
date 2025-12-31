@@ -13,7 +13,7 @@ interface Pipeline {
 }
 
 async function fetchPipelines(): Promise<Pipeline[]> {
-  const response = await fetch("http://localhost:8080/backend/api/pipelines/");
+  const response = await fetch("/backend/api/pipelines/");
   if (!response.ok) {
     throw new Error("Network response was not ok");
   }
@@ -39,16 +39,13 @@ export default function NewDataset() {
       config: {},
     };
 
-    const response = await fetch(
-      "http://localhost:8080/backend/api/datasets/",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(dataset),
+    const response = await fetch("/backend/api/datasets/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
       },
-    );
+      body: JSON.stringify(dataset),
+    });
 
     if (!response.ok) {
       throw new Error("Failed to create dataset");
