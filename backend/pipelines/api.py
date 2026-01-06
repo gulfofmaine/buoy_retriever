@@ -1,7 +1,7 @@
 from django.http import HttpRequest
 from django.shortcuts import get_object_or_404
 from ninja import ModelSchema, Router
-from ninja.security import APIKeyHeader
+from ninja.security import APIKeyHeader, django_auth
 
 from .models import Pipeline, PipelineApiKey
 
@@ -45,7 +45,11 @@ class PipelinePostSchema(ModelSchema):
         fields = ["slug", "name", "config_schema", "description"]
 
 
-@router.get("/", response=list[PipelineSchema], auth=pipeline_api_key_auth)
+@router.get(
+    "/",
+    response=list[PipelineSchema],
+    auth=[pipeline_api_key_auth, django_auth],
+)
 def list_pipelines(request: HttpRequest):
     """List all pipelines"""
     return Pipeline.objects.all()
@@ -83,7 +87,11 @@ def create_update_pipeline(request: HttpRequest, payload: PipelinePostSchema):
 #     return pipeline
 
 
-@router.get("/{id}", response=PipelineSchema, auth=pipeline_api_key_auth)
+@router.get(
+    "/{id}/",
+    response=PipelineSchema,
+    auth=[pipeline_api_key_auth, django_auth],
+)
 def get_pipeline_by_id(request: HttpRequest, id: int):
     """Get a specific pipeline by ID"""
     pipeline = get_object_or_404(Pipeline, id=id)
