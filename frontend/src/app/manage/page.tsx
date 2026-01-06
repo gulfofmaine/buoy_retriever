@@ -1,23 +1,16 @@
 "use client";
-import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 
-async function fetchDatasets() {
-  const response = await fetch("/backend/api/datasets/");
-  if (!response.ok) {
-    throw new Error("Network response was not ok");
-  }
-  return response.json();
-}
+import { useDatasets } from "@/hooks/queries";
 
 export default function ManagePage() {
-  const { data, error, isLoading } = useQuery({
-    queryKey: ["datasets"],
-    queryFn: fetchDatasets,
-  });
+  const { data, error, isLoading } = useDatasets();
 
   if (isLoading) return <div>Loading...</div>;
-  if (error) return <div>Error loading datasets</div>;
+  if (error) {
+    // debugger
+    return <div>Error loading datasets</div>;
+  }
 
   console.log(data);
 
@@ -25,6 +18,7 @@ export default function ManagePage() {
     <div>
       <main>
         <h1>Manage datasets</h1>
+        <h2>Hello</h2>
 
         <Link href="/manage/new">Add new dataset</Link>
 
