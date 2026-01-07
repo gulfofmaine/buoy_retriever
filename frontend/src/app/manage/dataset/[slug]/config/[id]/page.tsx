@@ -1,10 +1,8 @@
 "use client";
 import type { IFormValues } from "@axdspub/axiom-ui-forms";
-// import { useQuery } from "@tanstack/react-query";
 import type { JSONSchema6 } from "json-schema";
 import dynamic from "next/dynamic";
-// import Link from "next/link";
-// import { useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { use, useEffect, useState } from "react";
 
 import { useDataset, usePipeline } from "@/hooks/queries";
@@ -17,13 +15,8 @@ export default function Config({
   params: Promise<{ slug: string; id: string }>;
 }) {
   const { slug, id } = use(params);
-  //   const router = useRouter();
-  const {
-    data,
-    error,
-    isLoading,
-    // refetch
-  } = useDataset(slug);
+  const router = useRouter();
+  const { data, error, isLoading, refetch } = useDataset(slug);
 
   const pipelineId = data?.pipeline;
 
@@ -47,24 +40,24 @@ export default function Config({
   if (error) return <div>Error loading dataset</div>;
   if (pipelineError) return <div>Error loading pipeline</div>;
 
-  //   async function updateConfig() {
-  //     const response = await fetch(`/backend/api/configs/${id}/`, {
-  //       method: "PUT",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //       body: JSON.stringify({
-  //         config: formValues,
-  //       }),
-  //     });
+  async function updateConfig() {
+    const response = await fetch(`/backend/api/configs/${id}/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        config: formValues,
+      }),
+    });
 
-  //     if (!response.ok) {
-  //       throw new Error("Failed to update the config");
-  //     }
+    if (!response.ok) {
+      throw new Error("Failed to update the config");
+    }
 
-  //     refetch();
-  //     router.push(`/manage/dataset/${slug}`);
-  //   }
+    refetch();
+    router.push(`/manage/dataset/${slug}`);
+  }
 
   return (
     <div>
@@ -74,16 +67,21 @@ export default function Config({
         </h1>
         Values: {JSON.stringify(formValues)}
         {pipelineData?.config_schema && formValues ? (
-          <form
-          // action={updateConfig}
-          >
+          <>
+            {/* <form
+         action={updateConfig}
+           > */}
             {pipelineData.slug}
             <Form
               schema={pipelineData.config_schema as JSONSchema6}
               formValueState={[formValues, setFormValues]}
             />
-            <button type="submit">Update config</button>
-          </form>
+            {/* <button type="submit">Update config</button> */}
+            <button type="button" onClick={updateConfig}>
+              Update config
+            </button>
+            {/* </form> */}
+          </>
         ) : null}
       </main>
     </div>
