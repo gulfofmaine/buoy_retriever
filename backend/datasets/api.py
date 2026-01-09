@@ -20,11 +20,6 @@ class DatasetCompactSchema(ModelSchema):
         fields = ["slug", "state", "created", "edited"]
 
 
-# class DatasetCompactPermissionsSchema(DatasetCompactSchema):
-#     user_can_edit: bool
-#     user_can_publish: bool
-
-
 class DatasetCompactPermissionsSchema(Schema):
     user_can_edit: bool
     user_can_publish: bool
@@ -43,6 +38,14 @@ class DatasetCompactPermissionsSchema(Schema):
     def resolve_user_can_publish(obj: Dataset, context) -> bool:
         user = context["request"].user
         return obj.can_publish(user)
+
+
+class DatasetWithConfigSchema(Schema):
+    slug: str
+    config: dict
+    config_state: str
+    # created: str
+    # edited: str
 
 
 class DatasetCreateSchema(ModelSchema):
@@ -206,7 +209,7 @@ def post_config(request: HttpRequest, id: int, payload: DatasetConfigPostSchema)
 
 @config_router.get(
     "by-pipeline/{pipeline_slug}/",
-    response=list[DatasetConfigSchema],
+    response=list[DatasetWithConfigSchema],
     auth=pipeline_api_key_auth,
 )
 def get_configs_by_pipeline(request: HttpRequest, pipeline_slug: str):
@@ -217,4 +220,17 @@ def get_configs_by_pipeline(request: HttpRequest, pipeline_slug: str):
         dataset__state=Dataset.State.ACTIVE,
     ).select_related("dataset")
 
-    return configs
+    datasets = []
+
+    for config in configs:
+        dataset = DatasetCompactSchema.from_orm(config.dataset)
+        dataset_dict = dataset.dict()
+        dataset_dict["config"] = config.config
+        dataset_dict["config_state"] = config.state
+
+        if config.state == DatasetConfig.State.TESTING:
+            dataset_dict["slug"] += "_testing"
+
+        datasets.append(dataset_dict)
+
+    return datasets
