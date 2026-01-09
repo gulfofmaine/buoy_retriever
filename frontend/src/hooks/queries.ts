@@ -1,5 +1,5 @@
 "use client";
-import { useQuery } from "@tanstack/react-query";
+import { skipToken, useQuery } from "@tanstack/react-query";
 
 // Encode the current path to return to after login
 function next(): string {
@@ -82,9 +82,17 @@ export interface Pipeline {
 
 export function usePipeline(id: number | undefined) {
   return useQuery({
-    queryKey: ["pipeline", id!],
+    queryKey: ["pipeline", id],
+    queryFn: id
+      ? () => fetchWithErrorHandling<Pipeline>(`/backend/api/pipelines/${id}/`)
+      : skipToken,
+  });
+}
+
+export function usePipelines() {
+  return useQuery({
+    queryKey: ["pipelines"],
     queryFn: () =>
-      fetchWithErrorHandling<Pipeline>(`/backend/api/pipelines/${id}/`),
-    enabled: !!id,
+      fetchWithErrorHandling<Pipeline[]>("/backend/api/pipelines/"),
   });
 }
