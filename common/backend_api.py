@@ -65,7 +65,7 @@ class BackendAPIClient(BaseModel):
             op="datasets_for_pipeline",
             name=f"Get datasets for pipeline {pipeline_slug}",
         ):
-            url = self.api_endpoint + f"datasets/by-pipeline/{pipeline_slug}"
+            url = self.api_endpoint + f"configs/by-pipeline/{pipeline_slug}/"
 
             result = httpx.get(
                 url,
