@@ -25,7 +25,9 @@ jobs:
             image_name: buoy_retriever_s3_timeseries
             image_tag: ${{ needs.shortsha.outputs.shortsha }}
             # push_image: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
-            # test_command: "pixi run pytest"
+            test_command: "pixi run pytest --cov=. --cov-report=xml --cov-report=term-missing --junitxml=junit.xml -o junit_family=legacy"
+            coverage_flags: s3_timeseries
+            upload_tests: true
 
     # deploy:
     #     needs: [shortsha, build_test_push]
