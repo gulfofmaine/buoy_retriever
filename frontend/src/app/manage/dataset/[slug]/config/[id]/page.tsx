@@ -16,14 +16,14 @@ export default function Config({
 }) {
   const { slug, id } = use(params);
   const router = useRouter();
-  const { data, error, isLoading, refetch } = useDataset(slug);
+  const { data, isPending, isError, refetch } = useDataset(slug);
 
   const pipelineId = data?.pipeline;
 
   const {
     data: pipelineData,
-    error: pipelineError,
-    isLoading: pipelineLoading,
+    isPending: pipelinePending,
+    isError: pipelineIsError,
   } = usePipeline(pipelineId);
 
   const [formValues, setFormValues] = useState<IFormValues>({});
@@ -36,9 +36,9 @@ export default function Config({
     }
   }, [data, id]);
 
-  if (isLoading || pipelineLoading) return <div>Loading...</div>;
-  if (error) return <div>Error loading dataset</div>;
-  if (pipelineError) return <div>Error loading pipeline</div>;
+  if (isPending || pipelinePending) return <div>Loading...</div>;
+  if (isError) return <div>Error loading dataset</div>;
+  if (pipelineIsError) return <div>Error loading pipeline</div>;
 
   async function updateConfig() {
     const response = await fetch(`/backend/api/configs/${id}/`, {
@@ -65,8 +65,11 @@ export default function Config({
         <h1>
           Config {id} for dataset {slug}
         </h1>
-        Values: {JSON.stringify(formValues)}
-        {pipelineData?.config_schema && formValues ? (
+        <details>
+          <summary>Show values</summary>
+          {JSON.stringify(formValues)}
+        </details>
+        {pipelineData.config_schema && formValues ? (
           <>
             {/* <form
          action={updateConfig}
