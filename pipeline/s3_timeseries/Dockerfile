@@ -13,7 +13,7 @@ ENV PYTHONWARNINGS once
 ENV PIXI_FROZEN true
 
 WORKDIR ${HOME}
-COPY ${SOURCE}/pixi.toml ${SOURCE}/pixi.lock ${HOME}/
+COPY ${SOURCE}/pyproject.toml ${SOURCE}/pixi.lock ${HOME}/
 
 RUN --mount=type=cache,id=br_s3_timeseries,target=/home/ioos/.cache/rattler/cache,uid=1000,gid=1000 \
     pixi install -e default
