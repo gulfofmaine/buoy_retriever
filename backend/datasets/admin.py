@@ -2,7 +2,7 @@ from django.contrib import admin
 
 from guardian.admin import GuardedModelAdmin
 
-from .models import Dataset, DatasetConfig, SimplifiedDataset
+from .models import Dataset, DatasetConfig
 
 
 class InlineDatasetConfigAdmin(admin.TabularInline):
@@ -16,4 +16,3 @@ class DatasetAdmin(GuardedModelAdmin):
 
 
 admin.site.register(DatasetConfig)
-admin.site.register(SimplifiedDataset)
