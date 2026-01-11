@@ -26,4 +26,5 @@ urlpatterns = [
     path(f"{prefix}admin/", admin.site.urls),
     path(f"{prefix}api/", api.urls),
     path(f"{prefix}health/", include("health_check.urls")),  # health check endpoints
+    path(prefix, include("django.contrib.auth.urls")),
 ]

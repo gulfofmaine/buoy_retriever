@@ -1,4 +1,4 @@
-from common.config import DatasetBase, DatasetConfigBase
+from common.config import ConfigState, DatasetBase, DatasetConfigBase
 
 
 class DatasetTestConfig(DatasetConfigBase):
@@ -44,4 +44,5 @@ def test_dataset():
     assert dataset.model_dump() == {
         "slug": "test-dataset",
         "config": {"test_field": "test"},
+        "config_state": ConfigState.DRAFT,
     }
