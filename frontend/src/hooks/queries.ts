@@ -6,10 +6,12 @@ function next(): string {
   return `?next=${encodeURIComponent(window.location.pathname)}`;
 }
 
+// Proxied path to the login page
 export function loginUrl(): string {
   return `/backend/login${next()}`;
 }
 
+// Fetch wrapper that handles 401 Unauthorized responses by redirecting to login
 export async function fetchWithErrorHandling<T>(url: string) {
   const response = await fetch(url);
 
@@ -36,6 +38,7 @@ export interface DatasetCompact {
   user_can_publish: boolean;
 }
 
+// Fetch list of datasets with permissions
 export function useDatasets() {
   return useQuery({
     queryKey: ["datasets"],
@@ -62,6 +65,7 @@ export interface Dataset {
   state: string;
 }
 
+// Fetch a specific dataset by slug
 export function useDataset(slug: string) {
   return useQuery({
     queryKey: ["dataset", slug],
@@ -80,6 +84,7 @@ export interface Pipeline {
   updated_at: string;
 }
 
+// Fetch a specific pipeline by ID
 export function usePipeline(id: number | undefined) {
   return useQuery({
     queryKey: ["pipeline", id],
@@ -89,6 +94,7 @@ export function usePipeline(id: number | undefined) {
   });
 }
 
+// Fetch list of pipelines
 export function usePipelines() {
   return useQuery({
     queryKey: ["pipelines"],
