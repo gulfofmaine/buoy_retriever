@@ -35,7 +35,7 @@ class DatasetSchema(ModelSchema):
 
     class Meta:
         model = Dataset
-        fields = ["id", "slug", "state", "created", "edited"]
+        fields = ["id", "slug", "pipeline", "state", "created", "edited"]
 
 
 class DatasetConfigSchema(ModelSchema):
@@ -83,7 +83,7 @@ def list_datasets(request: HttpRequest):
 @router.post(
     "/",
     response=DatasetSchema,
-    #  auth=django_auth
+    auth=django_auth,
 )
 def create_dataset(request: HttpRequest, payload: DatasetCreateSchema):
     """Create a new dataset"""
@@ -102,10 +102,12 @@ def create_dataset(request: HttpRequest, payload: DatasetCreateSchema):
     return dataset
 
 
-@router.get("/{slug}", response=SimplifiedDatasetSchema)
+@router.get("/{slug}/", response=DatasetSchema, auth=django_auth)
 def get_dataset(request: HttpRequest, slug: str):
     """Get a specific dataset by slug"""
-    return SimplifiedDataset.objects.get(slug=slug)
+    dataset = Dataset.objects.prefetch_related("configs").get(slug=slug)
+
+    return dataset
 
 
 @router.patch("/{slug}", response=SimplifiedDatasetSchema)

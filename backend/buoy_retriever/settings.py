@@ -57,6 +57,14 @@ CORS_ALLOW_HEADERS = (
     "sentry-trace",
 )
 
+
+CSRF_TRUSTED_ORIGINS = ["http://localhost:8080", "http://localhost:3000"]
+CSRF_COOKIE_SECURE = False
+CSRF_USE_SESSIONS = False
+
+# Exempt API routes from CSRF protection (Django Ninja handles its own CSRF)
+CSRF_EXEMPT_URLS = [r"^backend/api/"]
+
 # Use X-Forwarded-Host header for request.get_host()
 USE_X_FORWARDED_HOST = True
 
@@ -91,7 +99,7 @@ MIDDLEWARE = [
     "django.contrib.sessions.middleware.SessionMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
-    "django.middleware.csrf.CsrfViewMiddleware",
+    "buoy_retriever.middleware.CustomCsrfMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",

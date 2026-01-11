@@ -40,7 +40,7 @@ class Dataset(models.Model):
         # DEVELOPMENT = "Development"
         DISABLED = "Disabled"
 
-    state = models.TextField(choices=State)
+    state = models.TextField(choices=State, default=State.ACTIVE)
     created = models.DateTimeField(auto_now_add=True)
     edited = models.DateTimeField(auto_now=True)
 
@@ -54,6 +54,10 @@ class Dataset(models.Model):
         """Check if the user has view permission for this dataset."""
         return user.has_perm("datasets.view_dataset", self)
 
+    def assign_view_permission(self, user_group: User | Group):
+        """Assign view permission for this dataset to a user or group."""
+        assign_perm("view_dataset", user_group, self)
+
     def can_edit(self, user: User) -> bool:
         """Check if the user has edit permission for this dataset."""
         return user.has_perms(
@@ -63,6 +67,7 @@ class Dataset(models.Model):
 
     def assign_edit_permission(self, user_group: User | Group):
         """Assign edit permission for this dataset to a user or group."""
+        self.assign_view_permission(user_group)
         assign_perm("change_dataset", user_group, self)
 
     def can_publish(self, user: User) -> bool:
@@ -78,7 +83,7 @@ class Dataset(models.Model):
 
     def assign_publish_permission(self, user_group: User | Group):
         """Assign publish permission for this dataset to a user or group."""
-        assign_perm("change_dataset", user_group, self)
+        self.assign_edit_permission(user_group)
         assign_perm("publish_dataset", user_group, self)
 
 
