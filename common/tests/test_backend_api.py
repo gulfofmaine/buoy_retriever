@@ -70,7 +70,7 @@ def test_can_get_datasets():
     """Test we can get datasets for a pipeline from the backend API"""
     from common.backend_api import BackendAPIClient
 
-    api_client = BackendAPIClient(api_endpoint="http://localhost:8080/backend/api/")
+    api_client = BackendAPIClient(api_endpoint="http://localhost:3000/backend/api/")
     datasets = api_client.datasets_for_pipeline(
         "hohonu",
         HohonuDataset,
