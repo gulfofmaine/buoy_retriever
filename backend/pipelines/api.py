@@ -72,21 +72,6 @@ def create_update_pipeline(request: HttpRequest, payload: PipelinePostSchema):
         return pipeline
 
 
-# @router.patch("/{slug}", response=PipelineSchema)
-# def patch_pipeline(request: HttpRequest, slug: str, payload: PatchDict[PipelinePostSchema]):
-#     pipeline = get_object_or_404(Pipeline, slug=slug)
-#     for attr, value in payload.items():
-#         setattr(pipeline, attr, value)
-#     pipeline.save()
-#     return pipeline
-
-
-# @router.get("/{slug}", response=PipelineSchema)
-# def get_pipeline(request: HttpRequest, slug: str):
-#     pipeline = get_object_or_404(Pipeline, slug=slug)
-#     return pipeline
-
-
 @router.get(
     "/{id}/",
     response=PipelineSchema,

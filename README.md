@@ -30,11 +30,19 @@ Once the secret (/shared) values are set, `docker compose up --build backend` wi
 
 The next steps are to create database tables with `make migrate` and then to create a superuser with `make user`.
 
-Then to see the API docs go to http://localhost:8080/backend/api/docs and access the admin at http://localhost:8080/backend/admin/
+Then to see the API docs go to http://localhost:8080/backend/api/docs/ and access the admin at http://localhost:8080/backend/admin/
 
 I'd also suggest running `prek install` or `pre-commit install` to set up pre-commit hooks.
 
 Once the migrations are run, the frontend and Dagster can be started with `make core`, though there won't be much functionality in either until one of the pipelines (I'd suggest Hohonu after adding an API key) is launched and has registered itself with the backend.
+
+Pipelines will need an API key in order to access the backend.
+Create it at http://localhost:8080/backend/admin/pipelines/pipelineapikey/
+Django will auto-generate a key for you, but I'd suggest replacing it with `br_fake` to make testing easier.
+
+The API key then can be added to `secret.env` as `BACKEND_API_KEY`.
+
+Then `make core` to launch the backend, frontend, Dagster and supporting databases, while leaving individual pipelines for you to launch with `docker compose up --build <pipeline>`.
 
 ## Commands
 

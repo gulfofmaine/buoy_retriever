@@ -2,16 +2,17 @@ from django.http import HttpRequest
 from django.shortcuts import get_object_or_404
 from guardian.core import ObjectPermissionChecker
 from guardian.shortcuts import get_objects_for_user
-from ninja import ModelSchema, PatchDict, Router, Schema
+from ninja import ModelSchema, Router, Schema
+from ninja.errors import AuthorizationError
 from ninja.security import django_auth
 
 from pipelines.api import pipeline_api_key_auth
 from pipelines.models import Pipeline
 
-from .models import SimplifiedDataset, Dataset, DatasetConfig
+from .models import Dataset, DatasetConfig
 
-dataset_router = Router()
-config_router = Router()
+dataset_router = Router(auth=django_auth)
+config_router = Router(auth=django_auth)
 
 
 class DatasetCompactSchema(ModelSchema):
@@ -84,25 +85,7 @@ class DatasetConfigPostSchema(ModelSchema):
         fields = ["config", "state"]
 
 
-class SimplifiedDatasetSchema(ModelSchema):
-    class Meta:
-        model = SimplifiedDataset
-        fields = ["slug", "pipeline", "config", "created", "edited"]
-
-
-class DatasetPostSchema(ModelSchema):
-    pipeline_id: int
-
-    class Meta:
-        model = SimplifiedDataset
-        fields = ["slug", "config"]
-
-
-@dataset_router.get(
-    "/",
-    response=list[DatasetCompactPermissionsSchema],
-    auth=django_auth,
-)
+@dataset_router.get("/", response=list[DatasetCompactPermissionsSchema])
 def list_datasets(request: HttpRequest):
     """List all datasets"""
     datasets = get_objects_for_user(
@@ -111,25 +94,11 @@ def list_datasets(request: HttpRequest):
     )
     checker = ObjectPermissionChecker(request.user)
     checker.prefetch_perms(datasets)
-    # return [
-    #     {
-    #         "slug": d.slug,
-    #         "state": d.state,
-    #         "created": d.created,
-    #         "edited": d.edited,
-    #         "user_can_edit": d.can_edit(request.user),
-    #         "user_can_publish": d.can_publish(request.user),
-    #     }
-    #     for d in datasets
-    # ]
+
     return datasets
 
 
-@dataset_router.post(
-    "/",
-    response=DatasetSchema,
-    auth=django_auth,
-)
+@dataset_router.post("/", response=DatasetSchema)
 def create_dataset(request: HttpRequest, payload: DatasetCreateSchema):
     """Create a new dataset"""
     pipeline = get_object_or_404(Pipeline, id=payload.pipeline_id)
@@ -147,27 +116,13 @@ def create_dataset(request: HttpRequest, payload: DatasetCreateSchema):
     return dataset
 
 
-@dataset_router.get("/{slug}/", response=DatasetSchema, auth=django_auth)
+@dataset_router.get("/{slug}/", response=DatasetSchema)
 def get_dataset(request: HttpRequest, slug: str):
     """Get a specific dataset by slug"""
     dataset = Dataset.objects.prefetch_related("configs").get(slug=slug)
 
-    return dataset
-
-
-@dataset_router.patch("/{slug}", response=SimplifiedDatasetSchema)
-def patch_dataset(
-    request: HttpRequest,
-    slug: str,
-    payload: PatchDict[DatasetPostSchema],
-):
-    """Update a specific dataset by slug"""
-    print(f"Payload: {payload}")
-    dataset = SimplifiedDataset.objects.get(slug=slug)
-    for attr, value in payload.items():
-        setattr(dataset, attr, value)
-    dataset.save()
-    print(f"Updated dataset: {dataset}")
+    if not dataset.can_view(request.user):
+        raise AuthorizationError("You do not have permission to view this dataset.")
     return dataset
 
 
@@ -178,7 +133,6 @@ def patch_dataset(
 )
 def get_datasets_by_pipeline(request: HttpRequest, pipeline_slug: str):
     """Get all datasets for a specific pipeline"""
-    # return SimplifiedDataset.objects.filter(pipeline__slug=pipeline_slug)
     datasets = Dataset.objects.filter(
         pipeline__slug=pipeline_slug,
         configs__state__in=[DatasetConfig.State.PUBLISHED, DatasetConfig.State.TESTING],
@@ -187,20 +141,29 @@ def get_datasets_by_pipeline(request: HttpRequest, pipeline_slug: str):
     return datasets
 
 
-@config_router.get("{id}/", response=DatasetConfigSchema, auth=django_auth)
+@config_router.get("{id}/", response=DatasetConfigSchema)
 def get_config(request: HttpRequest, id: int):
     """Get a specific dataset config by ID"""
     config = get_object_or_404(DatasetConfig, id=id)
-    config.dataset.can_view(request.user)
+
+    if not config.dataset.can_view(request.user):
+        raise AuthorizationError(
+            "You do not have permission to view this dataset config.",
+        )
+
     return config
 
 
-@config_router.post("{id}/", response=DatasetConfigSchema, auth=django_auth)
+@config_router.post("{id}/", response=DatasetConfigSchema)
 def post_config(request: HttpRequest, id: int, payload: DatasetConfigPostSchema):
     """Update a specific dataset config by ID"""
     config = get_object_or_404(DatasetConfig, id=id)
+
     if not config.dataset.can_edit(request.user):
-        raise PermissionError("You do not have permission to edit this dataset config.")
+        raise AuthorizationError(
+            "You do not have permission to edit this dataset config.",
+        )
+
     for attr, value in payload.dict().items():
         setattr(config, attr, value)
     config.save()
