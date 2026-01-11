@@ -9,40 +9,44 @@ interactions:
       connection:
       - keep-alive
       host:
-      - localhost:8080
+      - localhost:3000
       user-agent:
       - python-httpx/0.28.1
       x-api-key:
       - br_fake
     method: GET
-    uri: http://localhost:8080/backend/api/datasets/by-pipeline/hohonu
+    uri: http://localhost:3000/backend/api/configs/by-pipeline/hohonu/
   response:
     body:
-      string: '[{"slug": "hohonu_boothbay_dmr", "pipeline": 3, "config": {"station":
-        "me_tide_boothbay_harbor_dmr", "latitude": 43.8445, "hohonu_id": "hohonu-169",
-        "longitude": -69.6409, "start_date": "2023-12-06"}, "created": "2025-09-24T14:58:25.183Z",
-        "edited": "2025-09-25T19:45:53.970Z"}, {"slug": "hohonu_bath_me", "pipeline":
-        3, "config": {"station": "hohonu_bath_me", "latitude": 43.8943, "hohonu_id":
+      string: '[{"slug": "hohonu_bath_me", "config": {"station": "hohonu_bath_me",
+        "latitude": 43.8943, "hohonu_id": "hohonu-118", "longitude": -69.8148, "start_date":
+        "2022-11-08T00:00:00.000Z"}, "config_state": "Published"}, {"slug": "hohonu_bath_me_testing",
+        "config": {"station": "hohonu_bath_me", "latitude": 43.8943, "hohonu_id":
         "hohonu-118", "longitude": -69.8148, "start_date": "2022-11-08T00:00:00.000Z"},
-        "created": "2025-09-25T19:57:16.758Z", "edited": "2025-09-25T19:58:08.063Z"}]'
+        "config_state": "Testing"}, {"slug": "hohonu_boothbay_dmr", "config": {"station":
+        "me_tide_boothbay_harbor_dmr", "latitude": 43.8445, "hohonu_id": "hohonu-169",
+        "longitude": -69.6409, "start_date": "2023-12-06T00:00:00.000Z"}, "config_state":
+        "Published"}]'
     headers:
-      Content-Length:
-      - '552'
-      Content-Type:
-      - application/json; charset=utf-8
-      Cross-Origin-Opener-Policy:
-      - same-origin
-      Date:
-      - Tue, 30 Dec 2025 01:23:35 GMT
-      Referrer-Policy:
-      - same-origin
-      Server:
-      - WSGIServer/0.2 CPython/3.13.7
       Vary:
-      - origin
-      X-Content-Type-Options:
+      - origin, Accept-Encoding
+      connection:
+      - keep-alive
+      content-length:
+      - '657'
+      content-type:
+      - application/json; charset=utf-8
+      cross-origin-opener-policy:
+      - same-origin
+      date:
+      - Sat, 10 Jan 2026 02:17:45 GMT
+      referrer-policy:
+      - same-origin
+      server:
+      - WSGIServer/0.2 CPython/3.13.7
+      x-content-type-options:
       - nosniff
-      X-Frame-Options:
+      x-frame-options:
       - DENY
     status:
       code: 200
