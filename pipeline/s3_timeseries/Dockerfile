@@ -28,6 +28,8 @@ COPY ${SOURCE}/*.py \
     ${SOURCE}/*.yaml \
     ${HOME}/
 
+COPY ${SOURCE}/tests/ ${HOME}/tests/
+
 # COPY ${SOURCE}/platforms \
 #     ${HOME}/platforms
 
