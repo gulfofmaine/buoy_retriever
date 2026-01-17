@@ -1,6 +1,10 @@
 [tool.pytest.ini_options]
 pythonpath = "."
 
+[tool.pytest_env]
+S3_TS_ACCESS_KEY_ID = { value = "testing", skip_if_set = true }
+S3_TS_SECRET_ACCESS_KEY = { value = "testing", skip_if_set = true }
+
 [tool.coverage.run]
 omit = [
   ".pixi/*",
@@ -35,6 +39,7 @@ pytest = "*"
 pytest-recording = ">=0.13.4,<0.14"
 pytest-cov = "*"
 moto = ">=5.1.16,<6"
+pytest-env = ">=1.2.0,<2"
 
 [tool.pixi.feature.dev.tasks]
 pytest = "pytest -vv --ignore=common --record-mode=once"

@@ -559,6 +559,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/noarch/pysocks-1.7.1-pyha55dd90_7.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/pytest-9.0.1-pyhcf101f3_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/pytest-cov-7.0.0-pyhcf101f3_1.conda
+      - conda: https://conda.anaconda.org/conda-forge/noarch/pytest-env-1.2.0-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/pytest-recording-0.13.4-pyhe01879c_1.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/python-3.13.9-hc97d973_101_cp313.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/python-dateutil-2.9.0.post0-pyhe01879c_2.conda
@@ -780,6 +781,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/noarch/pysocks-1.7.1-pyha55dd90_7.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/pytest-9.0.1-pyhcf101f3_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/pytest-cov-7.0.0-pyhcf101f3_1.conda
+      - conda: https://conda.anaconda.org/conda-forge/noarch/pytest-env-1.2.0-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/pytest-recording-0.13.4-pyhe01879c_1.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-aarch64/python-3.13.9-h4c0d347_101_cp313.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/python-dateutil-2.9.0.post0-pyhe01879c_2.conda
@@ -5223,6 +5225,17 @@ packages:
   license_family: MIT
   size: 29016
   timestamp: 1757612051022
+- conda: https://conda.anaconda.org/conda-forge/noarch/pytest-env-1.2.0-pyhd8ed1ab_0.conda
+  sha256: 44aec7ebfb5a90e0d65e49008816deebef590237ef4d01c89c66daf734ccd04a
+  md5: a130128c458c3357208fe688b222f7de
+  depends:
+  - pytest >=8.4.2
+  - python >=3.10
+  - tomli >=2.2.1
+  license: MIT
+  license_family: MIT
+  size: 12002
+  timestamp: 1760052382929
 - conda: https://conda.anaconda.org/conda-forge/noarch/pytest-recording-0.13.4-pyhe01879c_1.conda
   sha256: 15ca34a74e41d8f7bc39de2a9ab70e4242719f7437299a3e22848e305b9da039
   md5: cd0a8a0cd0e36705370b3ccf4e70dd2c
