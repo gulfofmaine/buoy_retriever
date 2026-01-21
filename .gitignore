@@ -223,3 +223,6 @@ pipeline/*/storage/
 
 # Shell
 **/.bash_history
+
+# vim
+*.swp

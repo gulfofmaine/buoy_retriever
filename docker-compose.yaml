@@ -2,13 +2,18 @@ services:
   db:
     image: timescale/timescaledb-ha:pg17-ts2.21@sha256:4905577929dd1d83da28923e68365b1289ccd8384197c2b4c32f9814f7546319
     ports:
-      - "5432:5432"
+      - "${BUOY_RETRIEVER_DB_PORT:-5432}:5432"
     env_file:
       - ./docker-data/secret.env
     environment:
       PGDATA: /var/lib/postgresql/data/PGDATA
     volumes:
       - ./docker-data/postgres:/var/lib/postgresql/data:cached
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 2s
+      timeout: 5s
+      retries: 5
 
   # cache:
   #   image: redis:6.0.7@sha256:0ab24e410ae42f99f1e861bd351b5ce7ca8c9eec7886c979a8650ba7fc18ad3b
@@ -19,7 +24,7 @@ services:
   spotlight:
     image: ghcr.io/getsentry/spotlight:latest
     ports:
-      - "8969:8969"
+      - "${BUOY_RETRIEVER_SPOTLIGHT_PORT:-8969}:8969"
 
   backend:
     build:
@@ -33,7 +38,7 @@ services:
       - ./docker-data/media:/media:cached
       - ./docker-data/static:/static:cached
     ports:
-      - "8080:8080"
+      - "${BUOY_RETRIEVER_BACKEND_PORT:-8080}:8080"
     env_file:
       - ./docker-data/common.env
       - ./docker-data/secret.env
@@ -43,7 +48,8 @@ services:
       # CACHE_HOST: cache
       # QUEUE_HOST: queue
     depends_on:
-      - db
+      db:
+        condition: service_healthy
       # - cache
       # - queue
 
@@ -60,7 +66,7 @@ services:
       - /app/.next/
       - /app/build/
     ports:
-      - "3000:3000"
+      - "${BUOY_RETRIEVER_FRONTEND_PORT:-3000}:3000"
     environment:
       NEXT_PUBLIC_BACKEND_URL: http://backend:8080
 
@@ -73,7 +79,12 @@ services:
     volumes:
       - ./docker-data/dagster_postgres:/var/lib/postgresql/data:cached
     ports:
-      - "5433:5432"
+      - "${BUOY_RETRIEVER_DAGSTER_DB_PORT:-5433}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 2s
+      timeout: 5s
+      retries: 5
 
   dagster_daemon:
     build: ./pipeline/_dagster
@@ -87,21 +98,24 @@ services:
       - ./pipeline/_dagster/dagster.yaml:/home/ioos/dagster.yaml
       - ./docker-data/dagster_home/storage:/home/ioos/storage
     depends_on:
-      - dagster_postgres
+      dagster_postgres:
+        condition: service_healthy
 
   dagster_ui:
     build: ./pipeline/_dagster
     env_file:
     - ./docker-data/dagster.env
     ports:
-      - "3002:3002"
+      - "${BUOY_RETRIEVER_DAGSTER_UI_PORT:-3002}:3002"
     volumes:
       - ./pipeline/_dagster/workspace.yaml:/home/ioos/workspace.yaml
       - ./pipeline/_dagster/dagster.yaml:/home/ioos/dagster.yaml
       - ./docker-data/dagster_home/storage:/home/ioos/storage
     depends_on:
-      - dagster_postgres
-      - dagster_daemon
+      dagster_postgres:
+        condition: service_healthy
+      dagster_daemon:
+        condition: service_started
 
   s3_timeseries:
     build:
@@ -119,7 +133,8 @@ services:
       - ./common/:/home/ioos/common/:cached
       - ./docker-data/shared-fs:/mnt/efs/
     depends_on:
-      - backend
+      backend:
+        condition: service_started
 
   hohonu:
     build:
@@ -137,4 +152,5 @@ services:
       - ./common/:/home/ioos/common/:cached
       - ./docker-data/shared-fs:/mnt/efs/
     depends_on:
-      - backend
+      backend:
+        condition: service_started
