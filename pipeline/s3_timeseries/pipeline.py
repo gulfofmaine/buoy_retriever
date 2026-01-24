@@ -199,6 +199,8 @@ def defs_for_dataset(dataset: S3TimeseriesDataset) -> dg.Definitions:  # noqa: C
                     f"Column name collision after renaming for data on {df_date}, trying to squish duplicates",
                 )
                 df = df.groupby(df.columns, axis=1).first()
+
+            df = clean_up_dtypes_and_nas(df, na_values="NAN")
             daily_dfs.append(df)
 
         df = pd.concat(daily_dfs, ignore_index=True)
@@ -367,3 +369,20 @@ def build_defs() -> dg.Definitions:
             defs = dg.Definitions.merge(defs, dataset_defs)
 
         return defs
+
+
+def clean_up_dtypes_and_nas(
+    df: pd.DataFrame,
+    na_values: None | str | list[str] = None,
+) -> pd.DataFrame:
+    """Clean up data types and NA values in a dataframe"""
+    if na_values is not None:
+        df = df.replace(na_values, pd.NA).dropna()
+
+    for c in df.columns:
+        try:
+            df[c] = pd.to_numeric(df[c])
+        except Exception as e:
+            print(f"Unable to convert column {c}: {e}")
+
+    return df

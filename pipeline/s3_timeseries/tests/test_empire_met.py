@@ -143,3 +143,30 @@ def test_monthly_asset(defs, dataset_config):
     snapshot = xr.load_dataset(snapshot_path)
 
     xr.testing.assert_equal(ds, snapshot)
+
+
+def test_monthly_asset_with_nans(defs, dataset_config):
+    monthly_ds = test_utils.get_asset_by_name(defs, "monthly_ds")
+    context = dg.build_asset_context(partition_key="2025-10-01")
+
+    daily_df = {
+        "2025-10-12": pd.read_csv(
+            "tests/test_data/empire_met/2025-10-12.csv",
+            parse_dates=["datetime"],
+        ),
+        "2025-10-13": pd.read_csv(
+            "tests/test_data/empire_met/2025-10-13.csv",
+            parse_dates=["datetime"],
+        ),
+    }
+
+    ds = monthly_ds(context, daily_df=daily_df)
+
+    assert isinstance(ds, xr.Dataset)
+    snapshot_path = (
+        "tests/test_data/empire_met/test_empire_met_monthly_asset_with_nans.nc"
+    )
+    # ds.to_netcdf(snapshot_path)
+    snapshot = xr.load_dataset(snapshot_path)
+
+    xr.testing.assert_equal(ds, snapshot)
