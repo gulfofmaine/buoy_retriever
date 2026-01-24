@@ -80,6 +80,9 @@ Spotlight is also accessible to Github Copilot and other agents via a MCP server
 
 Currently there is some testing for common utilities and Hohonu pipelines.
 
-For common, cd into `common/` then `uv run pytest`. Add `--cov=.` to see coverage (along with other pytest-cov options).
+`make test-all` to try to test everything.
 
-For Hohonu, `docker compose exec hohonu pixi run pytest`.
+- Common - `make test-common` or cd into `common/` then `uv run pytest`. Add `--cov=.` to see coverage (along with other pytest-cov options).
+- Pipelines
+  - S3 Timeseries - `make test-s3-timeseries` for more isolated tests, or `docker compose exec/run s3_timeseries pixi run pytest` which will mount volumes (in case snapshots need to be updated).
+  - Hohonu - `make test-hohonu` for a more isolated test, or  `docker compose exec/run hohonu pixi run pytest` will mount volumes (in case snapshots need to be updated).
