@@ -68,7 +68,7 @@ on:
         type: string
         description: Docker build target stage (for multi-stage builds)
         required: false
-        default: ""
+        default: "base"
     secrets:
       DOCKER_USERNAME:
         description: Username for Docker Hub
@@ -151,7 +151,7 @@ on:
         type: string
         description: Docker build target stage (for multi-stage builds)
         required: false
-        default: ""
+        default: "base"
 
 jobs:
   build-image:

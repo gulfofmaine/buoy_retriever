@@ -36,6 +36,7 @@ ENV IMAGE_TAG=${IMAGE_TAG:-unknown}
 
 ENTRYPOINT ["/bin/bash", "/shell-hook.sh"]
 
+# Default command for both base and test stages
 CMD [ "dagster", "code-server", "start", "-p", "4000", "-f", "pipeline.py", "-h", "0.0.0.0" ]
 
 # Test stage - includes test files for running tests in CI
