@@ -145,9 +145,16 @@ def defs_for_dataset(dataset: S3TimeseriesDataset) -> dg.Definitions:  # noqa: C
                 df = dataset.config.reader.read_df(f)
                 daily_dfs.append(df)
         df = pd.concat(daily_dfs)
-        df["datetime"] = pd.to_datetime(df["datetime"])
-        df = df.sort_values("datetime")
-        df = df.reset_index()
+
+        # some flexibility in datetime/time column name
+        for col_name in ["datetime", "time"]:
+            try:
+                df[col_name] = pd.to_datetime(df[col_name])
+                df = df.sort_values(col_name)
+            except KeyError:
+                pass
+
+        df = df.reset_index(drop=True)
 
         return df
 
@@ -254,8 +261,6 @@ def defs_for_dataset(dataset: S3TimeseriesDataset) -> dg.Definitions:  # noqa: C
             if not new_s3_keys:
                 return dg.SkipReason("No new files found in S3.")
 
-            context.update_cursor(new_s3_keys[-1].get("LastModified").isoformat())
-
             existing_partitions = set()
             known_partitions = set(daily_partitions.get_partition_keys())
             for run in context.instance.get_runs(
@@ -301,6 +306,9 @@ def defs_for_dataset(dataset: S3TimeseriesDataset) -> dg.Definitions:  # noqa: C
                             context.log.info(
                                 f"Skipping partition {dt} as it is not a known partition",
                             )
+
+            latest_key_dt = max(key.get("LastModified") for key in new_s3_keys)
+            context.update_cursor(latest_key_dt.isoformat())
 
     dataset_assets = [daily_df, monthly_ds]
 
