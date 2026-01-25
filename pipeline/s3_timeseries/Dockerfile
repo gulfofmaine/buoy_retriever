@@ -1,5 +1,5 @@
 #syntax=docker/dockerfile:1.7
-FROM ghcr.io/prefix-dev/pixi:0.43.3-jammy@sha256:a47be96e31621c1d2fbbfd41546acb96d8877622060782dd3405aacdbe495132
+FROM ghcr.io/prefix-dev/pixi:0.43.3-jammy@sha256:a47be96e31621c1d2fbbfd41546acb96d8877622060782dd3405aacdbe495132 AS base
 
 ENV PYTHON_USER ioos
 ENV HOME /home/${PYTHON_USER}
@@ -28,8 +28,6 @@ COPY ${SOURCE}/*.py \
     ${SOURCE}/*.yaml \
     ${HOME}/
 
-COPY ${SOURCE}/tests/ ${HOME}/tests/
-
 # COPY ${SOURCE}/platforms \
 #     ${HOME}/platforms
 
@@ -38,5 +36,9 @@ ENV IMAGE_TAG=${IMAGE_TAG:-unknown}
 
 ENTRYPOINT ["/bin/bash", "/shell-hook.sh"]
 
-
 CMD [ "dagster", "code-server", "start", "-p", "4000", "-f", "pipeline.py", "-h", "0.0.0.0" ]
+
+# Test stage - includes test files for running tests in CI
+FROM base AS test
+
+COPY ${SOURCE}/tests/ ${HOME}/tests/

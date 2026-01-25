@@ -64,6 +64,11 @@ on:
         description: Upload test results to Codecov
         required: false
         default: false
+      build_target:
+        type: string
+        description: Docker build target stage (for multi-stage builds)
+        required: false
+        default: ""
     secrets:
       DOCKER_USERNAME:
         description: Username for Docker Hub
@@ -142,6 +147,11 @@ on:
         description: Upload test results to Codecov
         required: false
         default: false
+      build_target:
+        type: string
+        description: Docker build target stage (for multi-stage builds)
+        required: false
+        default: ""
 
 jobs:
   build-image:
@@ -186,6 +196,7 @@ jobs:
             ${{ env.IMAGE_NAME }}:${{ env.DOCKER_TAG }}
           build-args: |
             IMAGE_TAG=${{ env.IMAGE_NAME }}:${{ env.DOCKER_TAG }}
+          target: ${{ inputs.build_target }}
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache-new
           push: false
