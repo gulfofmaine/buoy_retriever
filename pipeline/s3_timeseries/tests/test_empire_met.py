@@ -1,14 +1,9 @@
-import os
-
-import boto3
 import dagster as dg
 import pandas as pd
 import pytest
 import xarray as xr
-from moto import mock_aws
 
 from common import io, test_utils
-from common.resource.s3fs_resource import S3Credentials, S3FSResource
 from pipeline import S3TimeseriesDataset, defs_for_dataset
 
 
@@ -40,28 +35,6 @@ def defs(dataset_config):
 def test_can_build_defs(defs):
     assert defs is not None
     assert len(defs.assets) == 2
-
-
-@pytest.fixture
-def s3_credentials():
-    return S3Credentials(
-        access_key_id=os.environ["S3_TS_ACCESS_KEY_ID"],
-        secret_access_key=os.environ["S3_TS_SECRET_ACCESS_KEY"],
-    )
-
-
-@pytest.fixture
-def s3_resource(s3_credentials):
-    return S3FSResource(
-        credentials=s3_credentials,
-        region_name="us-east-1",
-    )
-
-
-@pytest.fixture
-def mocked_s3():
-    with mock_aws():
-        yield boto3.client("s3", region_name="us-east-1")
 
 
 def test_sensor(defs, mocked_s3, s3_credentials):

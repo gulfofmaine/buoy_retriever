@@ -1,4 +1,10 @@
+import os
+
+import boto3
 import pytest
+from moto import mock_aws
+
+from common.resource.s3fs_resource import S3Credentials, S3FSResource
 
 
 def pytest_addoption(parser):
@@ -23,3 +29,25 @@ def pytest_collection_modifyitems(config, items):
         for item in items:
             if "aws" in item.keywords:
                 item.add_marker(skip_aws)
+
+
+@pytest.fixture
+def s3_credentials():
+    return S3Credentials(
+        access_key_id=os.environ["S3_TS_ACCESS_KEY_ID"],
+        secret_access_key=os.environ["S3_TS_SECRET_ACCESS_KEY"],
+    )
+
+
+@pytest.fixture
+def s3_resource(s3_credentials):
+    return S3FSResource(
+        credentials=s3_credentials,
+        region_name="us-east-1",
+    )
+
+
+@pytest.fixture
+def mocked_s3():
+    with mock_aws():
+        yield boto3.client("s3", region_name="us-east-1")
