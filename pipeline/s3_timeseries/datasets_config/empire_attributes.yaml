@@ -1,0 +1,59 @@
+global_attributes:
+    title: Empire Metocean Buoy, Timeseries Data
+    acknowledgement: This dataset is part of a MetOcean Cyberinfrastructure supported by the Integrated Ocean Observing System (IOOS) to streamline integration of data from offshore operations.
+    comment:  Empire Metocean Buoy developed and deployed by Woods Hole Group
+    contributor_name: Woods Hole Group
+    contributor_address: 107 Waterhouse Rd, Bourne, MA 02532
+    contributor_url: https://www.woodsholegroup.com/
+    contributor_email: rnewell at woodsholegroup
+    creator_country: USA
+    creator_name:  Empire Wind
+    creator_address:  34 35th Sreet Suite A415, Brooklyn, NY 11232
+    creator_state: New York
+    creator_URL:  https://www.empirewind.com/
+    creator_email: empirewind at equinor.com
+    institution: Empire Wind
+    creator_sector: industry
+    geospatial_lat_max: 40.3192
+    geospatial_lat_min: 40.3192
+    geospatial_lon_max: -73.4459
+    geospatial_lon_min: -73.4459
+    id: EW1
+    infoURL: https://www.empirewind.com/
+    license: The data may be used and redistributed for free but is not intended for legal use, since it may contain inaccuracies. Neither the data Contributor, Empire Wind, Equinor, NOAA, nor the United States Government, nor any of their employees or contractors, makes any warranty, express or implied, including warranties of merchantability and fitness for a particular purpose, or assumes any legal liability for the accuracy, completeness, or usefulness, of this information.
+    platform_name: Empire Wind Metocean Buoy
+    processing_level: raw dataset, no qc provided
+    project: Empire Wind
+    publisher_country: USA
+    publisher_email: devops at rpsgroup.com, info at neracoos.org
+    publisher_institution: MARACOOS, NERACOOS
+    publisher_name: MARACOOS, NERACOOS
+    publisher_phone: (401) 789-6224, (603) 319-1785
+    publisher_type: institution
+    publisher_url: https://www.maracoos.org, https://www.neracoos.org
+    summary:  This dataset contains observations to support further understanding of metocean conditions off the coast of New York. Data is collected from a floating wave buoy and the dataset includes  measurements of sea temperature, conductivity, current speed, current direction, wave height, wave direction, and wave period, air temperature, atmospheric pressure, relative humidity, visibility, surface wind speed,  surface wind direction, and surface wind gust.
+
+    infoUrl: https://www.empirewind.com/
+    cdm_data_type: TimeSeries
+    featureType: timeSeries
+    cdm_timeseries_variables: 'station,longitude,latitude'
+    standard_name_vocabulary: CF Standard Name Table v90
+variable_attributes:
+  time:
+      ioos_category: Time
+      standard_name: time
+      axis: T
+  station:
+      cf_role: timeseries_id
+      standard_name: platform_name
+      ioos_category: Identifier
+  latitude:
+      standard_name: latitude
+      units: degrees_north
+      long_name: Latitude
+      ioos_category: Location
+  longitude:
+      standard_name: longitude
+      units: degrees_east
+      long_name: Longitude
+      ioos_category: Location
