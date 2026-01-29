@@ -24,4 +24,5 @@ class PandasCSVReader(BaseModel):
     def read_df(self, file_path) -> pd.DataFrame:
         """Read a CSV file from S3 into a Pandas DataFrame"""
         reader_kwargs = self.model_dump()
+        
         return pd.read_csv(file_path, **reader_kwargs)

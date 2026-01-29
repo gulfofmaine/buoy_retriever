@@ -73,5 +73,37 @@ class OptionalDepthMappingMixin:
         list[DepthGroup] | None,
         Field(
             description="Depth mappings for variables with multiple depth levels",
+            
         ),
     ] = None
+
+
+    
+    
+class ProfileDepthMappings(BaseModel):
+    depth : Annotated [
+        float,
+        Field( 
+           description="Optional- fixed depth for the mapping."
+        )
+        ] = None
+  
+    mappings : Annotated [
+        dict[str,str],
+         Field(
+            description="Maps input variables to output variables at the current depth ",
+        )
+        ]
+
+    
+
+class OptionalProfileDepthMixin:
+    ''' Mixin to add profile depth mappings configuration to a dataset'''
+
+    profile_data: Annotated[
+        list[ProfileDepthMappings], 
+         Field(
+            description="Mapping for variables with multiple depth levels",
+        )
+        ] =None
+    

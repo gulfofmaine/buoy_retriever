@@ -1,0 +1,42 @@
+global_attributes:
+    standard_name_vocabulary: CF Standard Name Table v90
+    processing_leve: raw dataset, no qc provided
+    license: >
+      The data may be used and redistributed for free but is not intended
+      for legal use, since it may contain inaccuracies. Neither the data
+      Contributor, Orsted, NOAA, nor the United States Government, nor any
+      of their employees or contractors, makes any warranty, express or
+      implied, including warranties of merchantability and fitness for a
+      particular purpose, or assumes any legal liability for the accuracy,
+      completeness, or usefulness, of this information
+    project: South Fork Wind
+    inforURL: https://southforkwind.com
+    publisher_country: USA
+    publisher_institution: MARACOOS,NERACOOS
+    publisher_name: MARACOOS,NERACOOS
+    publisher_phone: (401) 789-6224, (603) 319-1785
+    publisher_type: instiution
+    summary: >
+     This dataset contains observations to support further understanding of metocean
+     conditions off the coast of New York, Rhode Island and Southeastern Massachusetts. 
+     Data is collected from a floating lidar buoy and the dataset includes  measurements 
+     of sea temperature (surface and sea floor), current speed, current direction, 
+     wave height, wave direction, and wave period, air temperature, atmospheric pressure, 
+     relative humidity, visibility, surface wind speed,  surface wind direction, and surface wind gust.
+    instrument: Campbell Scientific MetSENS 500, Campbell Scientific CS120 Visibility Sensor, Garmin GPS16X-HVS, Seaview SVS-603b, Nortek Aquadopp Profiler Z-Cell 600kHz
+    acknowledgement: >
+     This dataset is part of a MetOcean Cyberinfrastructure supported by the Integrated 
+     Ocean Observing System (IOOS) to streamline integration of data from offshore operations.
+    contributor_name: Woods Hole Group
+    contributor_address: 107 Waterhouse Rd, Bourne, MA 02532
+    contributor_url: https://www.woodsholegroup.com/
+    contributor_email: dwalsh at woodsholegroup.com
+    creator_country: USA
+    creator_name: South Fork Wind
+    creator_address: 107 Waterhouse Rd, Bourne, MA 02532
+    creator_state: New York
+    creator_URL: https://southforkwind.com
+    creator_email: info at southforkwind.com
+    institution: South Fork Wind - a partnership between Orsted and Global Infrastructure Partners
+    creator_sector: industry
+    platform_name: South Fork Wind
