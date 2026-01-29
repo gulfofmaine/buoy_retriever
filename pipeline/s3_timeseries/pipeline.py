@@ -179,12 +179,11 @@ def defs_for_dataset(dataset: S3TimeseriesDataset) -> dg.Definitions:
                     daily_dfs.append(df)
                     indx_var = "datetime"
         df = pd.concat(daily_dfs)
-<<<<<<< HEAD
-=======
+
         df["datetime"] = pd.to_datetime(df["datetime"])
         df = df.sort_values(indx_var)
         df = df.reset_index()
->>>>>>> 8108196... Update to s3 pipeline to work with south fork and empire datasets
+
 
         return df
 
