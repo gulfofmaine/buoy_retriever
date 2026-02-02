@@ -8,7 +8,7 @@ function next(): string {
 
 // Proxied path to the login page
 export function loginUrl(): string {
-  return `/backend/login${next()}`;
+  return `/backend/login/${next()}`;
 }
 
 // Fetch wrapper that handles 401 Unauthorized responses by redirecting to login
@@ -70,7 +70,7 @@ export function useDataset(slug: string) {
   return useQuery({
     queryKey: ["dataset", slug],
     queryFn: () =>
-      fetchWithErrorHandling<Dataset>(`/backend/api/datasets/${slug}`),
+      fetchWithErrorHandling<Dataset>(`/backend/api/datasets/${slug}/`),
   });
 }
 

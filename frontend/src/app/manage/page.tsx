@@ -21,7 +21,7 @@ export default function ManagePage() {
         <h2>Existing datasets</h2>
 
         <ul>
-          {data ? (
+          {data?.length > 0 ? (
             data.map((dataset: { slug: string }) => (
               <li key={dataset.slug}>
                 <Link href={`/manage/dataset/${dataset.slug}`}>
