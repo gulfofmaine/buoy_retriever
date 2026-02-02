@@ -164,9 +164,9 @@ def defs_for_dataset(dataset: S3TimeseriesDataset) -> dg.Definitions:
                             df[split_conv.output_variables[n_var]] = splt_col[n_var]
                            
                             
-                        df.drop(split_conv.source_variable,axis=1,inplace=True)
+                        df = df.drop(split_conv.source_variable,axis=1)
                 if dataset.config.drop_vars is not None:   
-                    df.drop(columns=dataset.config.drop_vars,inplace =True)
+                    df = df.drop(columns=dataset.config.drop_vars)
                     
                 if dataset.config.dataset_type =='profile':
                     # Translate the profile data from multiple columns for each variable (CurSpd1, curSpd2,..curSpdN) to
@@ -182,7 +182,7 @@ def defs_for_dataset(dataset: S3TimeseriesDataset) -> dg.Definitions:
       
                         
                         df_depth = df[keep].copy()
-                        df_depth.rename(columns=depth.mappings,inplace=True)
+                        df_depth = df_depth.rename(columns=depth.mappings)
                         
                         if depth.depth is not None: 
                             df_depth['depth'] = float(depth.depth)

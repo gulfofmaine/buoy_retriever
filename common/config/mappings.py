@@ -80,11 +80,11 @@ class OptionalDepthMappingMixin:
 
 
 class SplitOperator(BaseModel):
-    ''' Takes the source variable, splits it on the seperator and  maps the resulting array to new variables'''
+    ''' Takes the source variable, splits it on the separator and  maps the resulting array to new variables'''
     
     sep : Annotated [
         str,
-        Field(description="The seperator")]
+        Field(description="The separator")]
     
     output_variables : Annotated[
         dict[int,str],
@@ -102,7 +102,7 @@ class SplitOperations(BaseModel):
 
 
 class VariableConverterMixIn:
-    ''' Mixin to add column coversion rules to a dataset '''
+    ''' Mixin to add column conversion rules to a dataset '''
     variable_converter : Annotated [
         SplitOperations,
         Field(
