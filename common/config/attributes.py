@@ -36,7 +36,7 @@ class NcAttributes(BaseModel):
     def add_attributes_from_yaml(self):
     
         if self.additional_attributes_path is not None:
-            with open(self.additional_attributes_path, 'r') as file:
+            with Path.open(self.additional_attributes_path, 'r') as file:
                 data = yaml.safe_load(file)
             if 'global_attributes' in data:
                 self.global_attributes = data['global_attributes'] | self.global_attributes
