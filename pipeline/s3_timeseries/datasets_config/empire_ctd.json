@@ -1,1 +1,62 @@
-{"reader": {"sep": ";", "comment": "#"}, "station": "Empire Wind 1", "latitude": 40.319, "longitude": -73.4461, "s3_source": {"bucket": "ott-empire", "prefix": "/"}, "attributes": {"variables": {"Cond": {"units": "S m-1", "long_name": "Conductivity", "ncei_name": "WATER CONDUCTIVITY", "ioos_category": "Physical Oceanography", "standard_name": "sea_water_electrical_conductivity", "standard_name_url": "https://vocab.nerc.ac.uk/collection/P07/current/CFSN0394", "coverage_content_type": "physicalMeasurement"}, "Pres": {"units": "dbar", "long_name": "Water Pressure", "standard_name": "sea_water_pressure"}, "Sali": {"units": "1", "long_name": "Salinity", "ncei_name": "SALINITY", "nodc_name": "SALINITY", "ioos_category": "Salinity", "standard_name": "sea_water_practical_salinity", "standard_name_url": "https://vocab.nerc.ac.uk/collection/P07/current/IADIHDIJ/", "coverage_content_type": "physicalMeasurement"}, "CTD_WTmp": {"unit": "C", "long_name": "Water Temperature", "ncei_name": "WATER TEMPERATURE", "ioos_category": "Temperature", "standard_name": "sea_water_temperature", "standard_name_url": "https://vocab.nerc.ac.uk/collection/P07/current/CFSN0335", "coverage_content_type": "physicalMeasurement"}}, "additional_attributes_path": "datasets_config/empire_attributes.yaml"}, "start_date": "2025-07-02", "dataset_type": "timeseries", "file_pattern": {"day_pattern": "EW01_ctd_{partition_date:%Y%m%d}_*.txt"}, "variable_mappings": [{"output": "time", "source": "datetime"}]}
+{
+  "reader": {
+    "sep": ";",
+    "comment": "#"
+  },
+  "station": "Empire Wind 1",
+  "latitude": 40.319,
+  "longitude": -73.4461,
+  "s3_source": {
+    "bucket": "ott-empire",
+    "prefix": "/"
+  },
+  "attributes": {
+    "variables": {
+      "Cond": {
+        "units": "S m-1",
+        "long_name": "Conductivity",
+        "ncei_name": "WATER CONDUCTIVITY",
+        "ioos_category": "Physical Oceanography",
+        "standard_name": "sea_water_electrical_conductivity",
+        "standard_name_url": "https://vocab.nerc.ac.uk/collection/P07/current/CFSN0394",
+        "coverage_content_type": "physicalMeasurement"
+      },
+      "Pres": {
+        "units": "dbar",
+        "long_name": "Water Pressure",
+        "standard_name": "sea_water_pressure"
+      },
+      "Sali": {
+        "units": "1",
+        "long_name": "Salinity",
+        "ncei_name": "SALINITY",
+        "nodc_name": "SALINITY",
+        "ioos_category": "Salinity",
+        "standard_name": "sea_water_practical_salinity",
+        "standard_name_url": "https://vocab.nerc.ac.uk/collection/P07/current/IADIHDIJ/",
+        "coverage_content_type": "physicalMeasurement"
+      },
+      "CTD_WTmp": {
+        "unit": "C",
+        "long_name": "Water Temperature",
+        "ncei_name": "WATER TEMPERATURE",
+        "ioos_category": "Temperature",
+        "standard_name": "sea_water_temperature",
+        "standard_name_url": "https://vocab.nerc.ac.uk/collection/P07/current/CFSN0335",
+        "coverage_content_type": "physicalMeasurement"
+      }
+    },
+    "additional_attributes_path": "datasets_config/empire_attributes.yaml"
+  },
+  "start_date": "2025-07-02",
+  "dataset_type": "timeseries",
+  "file_pattern": {
+    "day_pattern": "EW01_ctd_{partition_date:%Y%m%d}_*.txt"
+  },
+  "variable_mappings": [
+    {
+      "output": "time",
+      "source": "datetime"
+    }
+  ]
+}

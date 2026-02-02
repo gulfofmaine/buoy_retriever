@@ -84,21 +84,25 @@ class SplitOperator(BaseModel):
     
     sep : Annotated [
         str,
-        Field(description="The separator")]
+        Field(description="The separator"),
+    ]
     
     output_variables : Annotated[
         dict[int,str],
-        Field(description="Mapping of index number to output variable." )]
+        Field(description="Mapping of index number to output variable." ),
+    ]
     
     
     source_variable : Annotated[
         str,
-        Field(description="The source variable to split into multiple columns")]
+        Field(description="The source variable to split into multiple columns"),
+    ]
              
 class SplitOperations(BaseModel):
     split_operations : Annotated[
         list[SplitOperator],
-        Field(description="List of variables to split into multiple variables")]
+        Field(description="List of variables to split into multiple variables"),
+    ]
 
 
 class VariableConverterMixIn:
@@ -106,7 +110,7 @@ class VariableConverterMixIn:
     variable_converter : Annotated [
         SplitOperations,
         Field(
-            description="Split variable converter")
+            description="Split variable converter"),
         ] =None                       
 
     
@@ -116,15 +120,15 @@ class ProfileDepthMappings(BaseModel):
         float,
         Field( 
            description="Optional- fixed depth for the mapping."
-        )
-        ] = None
+        ),
+    ] = None
   
     mappings : Annotated [
         dict[str,str],
          Field(
             description="Maps input variables to output variables at the current depth ",
-        )
-        ]
+        ),
+    ]
 
     
 
@@ -135,6 +139,6 @@ class OptionalProfileDepthMixin:
         list[ProfileDepthMappings], 
          Field(
             description="Mapping for variables with multiple depth levels",
-        )
-        ] =None
+        ),
+    ] =None
     
