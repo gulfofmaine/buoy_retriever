@@ -15,6 +15,7 @@ class PandasCSVReader(BaseModel):
     comment: Annotated[str | None, Field(description="CSV line comment character")] = (
         None
     )
+    na_values: str = "None"
     # delim_whitespace
     # skiprows
     # sep

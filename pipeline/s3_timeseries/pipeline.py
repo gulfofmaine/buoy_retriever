@@ -42,7 +42,8 @@ class S3TimeseriesConfig(
     mappings.VariableMappingMixin,
     mappings.OptionalProfileDepthMixin,
     s3_source.S3SourceMixin,
-    attributes.AttributeConfigMixin
+    attributes.AttributeConfigMixin,
+    mappings.VariableConverterMixIn
 ):
     """Configuration for S3 Timeseries Dataset."""
 
@@ -52,6 +53,9 @@ class S3TimeseriesConfig(
 
     dataset_type: Annotated[str, Field(description="Dateset type (timeseries or profile)")]
 
+       
+    source_time_var : str = "datetime"
+    
     file_pattern: Annotated[DayGlob, Field(description="Source file name pattern")]
     drop_vars : Annotated[list[str],        
             Field(
@@ -149,10 +153,21 @@ def defs_for_dataset(dataset: S3TimeseriesDataset) -> dg.Definitions:
             context.log.debug(f"Reading {day_f}")
             with s3fs.fs.open(day_f, "rb") as f:
 
-                    
+               
                 df = dataset.config.reader.read_df(f)
-                if dataset.config.drop_vars is not None:
+
+                if dataset.config.variable_converter is not None:
+                    for split_conv in dataset.config.variable_converter.split_operations:
+                        splt_col =df[split_conv.source_variable].str.split(split_conv.sep, expand=True)
+                        for n_var in split_conv.output_variables:
+
+                            df[split_conv.output_variables[n_var]] = splt_col[n_var]
+                           
+                            
+                        df.drop(split_conv.source_variable,axis=1,inplace=True)
+                if dataset.config.drop_vars is not None:   
                     df.drop(columns=dataset.config.drop_vars,inplace =True)
+                    
                 if dataset.config.dataset_type =='profile':
                     # Translate the profile data from multiple columns for each variable (CurSpd1, curSpd2,..curSpdN) to
                     # two columns: curSpd, depth
@@ -173,14 +188,14 @@ def defs_for_dataset(dataset: S3TimeseriesDataset) -> dg.Definitions:
                             df_depth['depth'] = float(depth.depth)
                         
                         daily_dfs.append(df_depth)
-                        indx_var = ["datetime","depth"]
+                        indx_var = [dataset.config.source_time_var,"depth"]
 
                 else:       
                     daily_dfs.append(df)
-                    indx_var = "datetime"
+                    indx_var = dataset.config.source_time_var
         df = pd.concat(daily_dfs)
 
-        df["datetime"] = pd.to_datetime(df["datetime"])
+        df[dataset.config.source_time_var] = pd.to_datetime(df[dataset.config.source_time_var])
         df = df.sort_values(indx_var)
         df = df.reset_index()
 
