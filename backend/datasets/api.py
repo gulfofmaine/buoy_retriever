@@ -82,7 +82,7 @@ class DatasetConfigSchema(ModelSchema):
 class DatasetConfigPostSchema(ModelSchema):
     class Meta:
         model = DatasetConfig
-        fields = ["config", "state"]
+        fields = ["config"]
 
 
 @dataset_router.get("/", response=list[DatasetCompactPermissionsSchema])
