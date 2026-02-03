@@ -1,6 +1,6 @@
 services:
   db:
-    image: timescale/timescaledb-ha:pg17-ts2.21@sha256:4905577929dd1d83da28923e68365b1289ccd8384197c2b4c32f9814f7546319
+    image: timescale/timescaledb-ha:pg17-ts2.21@sha256:a2f4731fd341e93a96fdc49f21137db0ec27bd3d72a5dab241fec2b344f2f54c
     ports:
       - "${BUOY_RETRIEVER_DB_PORT:-5432}:5432"
     env_file:
@@ -71,7 +71,7 @@ services:
       NEXT_PUBLIC_BACKEND_URL: http://backend:8080
 
   dagster_postgres:
-    image: timescale/timescaledb-ha:pg17-ts2.21@sha256:4905577929dd1d83da28923e68365b1289ccd8384197c2b4c32f9814f7546319
+    image: timescale/timescaledb-ha:pg17-ts2.21@sha256:a2f4731fd341e93a96fdc49f21137db0ec27bd3d72a5dab241fec2b344f2f54c
     environment:
       PGDATA: /var/lib/postgresql/data/PGDATA
     env_file:
