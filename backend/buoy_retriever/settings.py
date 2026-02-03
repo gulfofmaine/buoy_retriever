@@ -58,6 +58,24 @@ CORS_ALLOW_HEADERS = (
 )
 
 
+CSRF_TRUSTED_ORIGINS = ["http://localhost:8080", "http://localhost:3000"]
+CSRF_COOKIE_SECURE = False
+CSRF_USE_SESSIONS = False
+
+# Exempt API routes from CSRF protection (Django Ninja handles its own CSRF)
+CSRF_EXEMPT_URLS = [r"^backend/api/"]
+
+# Use X-Forwarded-Host header for request.get_host()
+USE_X_FORWARDED_HOST = True
+
+# Disable APPEND_SLASH to prevent redirect loops when proxied through NextJS
+# This is safe because we're explicitly adding trailing slashes in our URL patterns
+APPEND_SLASH = False
+
+# Additional proxy-aware settings
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -70,6 +88,7 @@ INSTALLED_APPS = [
     "health_check",
     "health_check.db",
     "corsheaders",
+    "guardian",
     "account",
     "datasets",
     "pipelines",
@@ -80,7 +99,7 @@ MIDDLEWARE = [
     "django.contrib.sessions.middleware.SessionMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
-    "django.middleware.csrf.CsrfViewMiddleware",
+    "buoy_retriever.middleware.CustomCsrfMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
@@ -146,6 +165,12 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# Enable Django Guardian for object level permissions
+AUTHENTICATION_BACKENDS = (
+    "django.contrib.auth.backends.ModelBackend",  # this is default
+    "guardian.backends.ObjectPermissionBackend",
+)
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
@@ -162,7 +187,8 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = "static/"
+STATIC_URL = "/backend/static/"
+# STATIC_ROOT = BASE_DIR / "staticfiles"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field

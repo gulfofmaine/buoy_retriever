@@ -1,5 +1,5 @@
 from .attributes import AttributeConfigMixin, NcAttributes
-from .dataset import DatasetBase, DatasetConfigBase
+from .dataset import ConfigState, DatasetBase, DatasetConfigBase
 from .pipeline import PipelineConfig
 
 __all__ = [
@@ -7,5 +7,6 @@ __all__ = [
     "NcAttributes",
     "DatasetBase",
     "DatasetConfigBase",
+    "ConfigState",
     "PipelineConfig",
 ]
