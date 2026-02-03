@@ -15,6 +15,7 @@ from hohonu_api import HohonuApi
 def vcr_config():
     return {
         "filter_headers": [("Authorization", "FAKE")],
+        "ignore_hosts": ["spotlight"],
     }
 
 
