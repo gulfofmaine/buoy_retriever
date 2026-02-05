@@ -73,5 +73,72 @@ class OptionalDepthMappingMixin:
         list[DepthGroup] | None,
         Field(
             description="Depth mappings for variables with multiple depth levels",
+            
         ),
     ] = None
+
+
+
+class SplitOperator(BaseModel):
+    ''' Takes the source variable, splits it on the separator and  maps the resulting array to new variables'''
+    
+    sep : Annotated [
+        str,
+        Field(description="The separator"),
+    ]
+    
+    output_variables : Annotated[
+        dict[int,str],
+        Field(description="Mapping of index number to output variable." ),
+    ]
+    
+    
+    source_variable : Annotated[
+        str,
+        Field(description="The source variable to split into multiple columns"),
+    ]
+             
+class SplitOperations(BaseModel):
+    split_operations : Annotated[
+        list[SplitOperator],
+        Field(description="List of variables to split into multiple variables"),
+    ]
+
+
+class VariableConverterMixIn:
+    ''' Mixin to add column conversion rules to a dataset '''
+    variable_converter : Annotated [
+        SplitOperations,
+        Field(
+            description="Split variable converter"),
+        ] =None                       
+
+    
+    
+class ProfileDepthMappings(BaseModel):
+    depth : Annotated [
+        float,
+        Field( 
+           description="Optional- fixed depth for the mapping."
+        ),
+    ] = None
+  
+    mappings : Annotated [
+        dict[str,str],
+         Field(
+            description="Maps input variables to output variables at the current depth ",
+        ),
+    ]
+
+    
+
+class OptionalProfileDepthMixin:
+    ''' Mixin to add profile depth mappings configuration to a dataset'''
+
+    profile_data: Annotated[
+        list[ProfileDepthMappings], 
+         Field(
+            description="Mapping for variables with multiple depth levels",
+        ),
+    ] =None
+    

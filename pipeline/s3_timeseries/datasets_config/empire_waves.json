@@ -1,0 +1,109 @@
+{
+  "reader": {
+    "sep": ";",
+    "comment": "#"
+  },
+  "station": "Empire Wind 1",
+  "latitude": 40.319,
+  "longitude": -73.4461,
+  "s3_source": {
+    "bucket": "ott-empire",
+    "prefix": "/"
+  },
+  "attributes": {
+    "variables": {
+      "Hmax": {
+        "unit": "m",
+        "long_name": "Maximum Wave Height",
+        "ncei_name": "WAVE HEIGHT - MAXIMUM",
+        "ioos_category": "Surface Waves",
+        "standard_name": "sea_surface_wave_maximum_height",
+        "standard_name_url": "https://vocab.nerc.ac.uk/collection/P07/current/NQS0CMX",
+        "coverage_content_type": "physicalMeasurement"
+      },
+      "Wdir": {
+        "units": "degrees",
+        "long_name": "Wave Direction Swell 2",
+        "ioos_category": "Surface Waves",
+        "standard_name": "sea_surface_swell_wave_from_direction"
+      },
+      "HpSea": {
+        "unit": "m",
+        "long_name": "Significant Wave Height",
+        "ncei_name": "WAVE HEIGHT - SIGNIFICANT",
+        "ioos_category": "Surface Waves",
+        "standard_name": "sea_surface_wave_significant_height",
+        "standard_name_url": "https://vocab.nerc.ac.uk/collection/P07/current/CFSN0385",
+        "coverage_content_type": "physicalMeasurement"
+      },
+      "TpSea": {
+        "unit": "s",
+        "long_name": "Dominant Wave Period",
+        "ncei_name": "WAVE PERIOD - DOMINANT",
+        "ioos_category": "Surface Waves",
+        "standard_name": "sea_surface_wave_period_at_variance_spectral_density_maximum",
+        "standard_name_url": "vocab.nerc.ac.uk/collection/P07/current/CFV13N31",
+        "coverage_content_type": "physicalMeasurement"
+      },
+      "TzSea": {
+        "unit": "s",
+        "long_name": "Mean Wave Period",
+        "ioos_category": "Surface Waves",
+        "standard_name": "sea_surface_wave_mean_period"
+      },
+      "WdirSea": {
+        "units": "degree",
+        "long_name": "Mean Wave Direction",
+        "ncei_name": "WAVE DIRECTION - Average",
+        "ioos_category": "Surface Waves",
+        "standard_name": "sea_surface_wave_from_direction",
+        "standard_name_url": "https://vocab.nerc.ac.uk/collection/P07/current/CFSM0384",
+        "coverage_content_type": "physicalMeasurement"
+      },
+      "HsSwell1": {
+        "unit": "m",
+        "long_name": "Sig Wave Height Swell 1"
+      },
+      "HsSwell2": {
+        "unit": "m",
+        "long_name": "Sig Wave Height Swell 2"
+      },
+      "TpSwell1": {
+        "unit": "s",
+        "long_name": "Peak Wave Period Swell 1"
+      },
+      "TpSwell2": {
+        "unit": "s",
+        "long_name": "Peak Wave Period Swell 2"
+      },
+      "TzSwell1": {
+        "unit": "s",
+        "long_name": "Mean Wave Period Swell 1"
+      },
+      "TzSwell2": {
+        "unit": "s",
+        "long_name": "Mean Wave Period Swell 2"
+      },
+      "WdirSwell1": {
+        "unit": "degrees",
+        "long_name": "Wave Direction Swell 1"
+      },
+      "WdirSwell2": {
+        "unit": "degrees",
+        "long_name": "Wave Direction Swell 2"
+      }
+    },
+    "additional_attributes_path": "datasets_config/empire_attributes.yaml"
+  },
+  "start_date": "2025-07-02",
+  "dataset_type": "timeseries",
+  "file_pattern": {
+    "day_pattern": "EW01_wave_ioos_{partition_date:%Y%m%d}_*.txt"
+  },
+  "variable_mappings": [
+    {
+      "output": "time",
+      "source": "datetime"
+    }
+  ]
+}

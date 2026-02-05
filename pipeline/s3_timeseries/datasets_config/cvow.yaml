@@ -1,0 +1,84 @@
+global_attributes:
+    title: CVOW Wave Buoy, Timeseries Data
+    acknowledgement: This dataset is part of a MetOcean Cyberinfrastructure supported by the Integrated Ocean Observing System (IOOS) to streamline integration of data from offshore operations.
+    comment: CVOW Wave Rider Buoy deployed by DEME Offshore US
+    contributor_name: DEME Offshore US
+    contributor_address: 150 Boush St, Norfolk, Suite 1000, VA 23510
+    contributor_url: www.deme-group.com
+    contributor_email: de.beuf.hendrik at deme-group.com
+    creator_country: USA
+    creator_name: Coastal Virginia Offshore Wind
+    creator_address: 500 Orapax Street, Norfolk, VA 23507
+    creator_state: Virginia
+    creator_URL: https://coastalvawind.com/
+    creator_email: cvowops@dominionenergy.com
+    institution: Virginia Electric and Power Company, d/b/a Dominion Energy Virginia
+    creator_sector: industry
+    geospatial_lat_max: 36.93842989
+    geospatial_lat_min: 36.93842989
+    geospatial_lon_max: -75.4423258
+    geospatial_lon_min: -75.4423258
+    id: CVOW_WR1
+    infoUrl: https://coastalvawind.com/
+    license: The data may be used and redistributed for free but is not intended for legal use, since it may contain inaccuracies. Neither the data Contributor, Dominion, NOAA, nor the United States Government, nor any of their employees or contractors, makes any warranty, express or implied, including warranties of merchantability and fitness for a particular purpose, or assumes any legal liability for the accuracy, completeness, or usefulness, of this information.
+    platform_name: CVOW_WR1
+    processing_level: raw dataset, no qc provided
+    project: Coastal Virginia Offshore Wind
+    publisher_country: USA
+    publisher_email: devops at rpsgroup.com, info at neracoos.org
+    publisher_institution: MARACOOS, NERACOOS
+    publisher_name: MARACOOS, NERACOOS
+    publisher_phone: (401) 789-6224, (603) 319-1785
+    publisher_type: institution
+    publisher_url: https://www.maracoos.org, https://www.neracoos.org
+    summary: This dataset contains observations to support further understanding of metocean conditions off the coast of Virginia. Data is collected from a wave rider buoy and the dataset includes  measurements of wave peak height, wave significant height,  wave peak direction, and wave significant period.
+    Instrument: Datawell DWR4 (https://datawell.nl/products/directional-waverider-4/)
+    cdm_data_type: TimeSeries
+    featureType: timeSeries
+    cdm_timeseries_variables: 'station,longitude,latitude'
+variable_attributes:
+    time:
+       ioos_category: Time
+       long_name: Time
+       short_name: time
+       standard_name: time
+    station:
+       ioos_category: Identifier
+       long_name: Station CVOW Wave Buoy
+       cf_role: timeseries_id
+    WATER_CURRENT_MEAN_DIRECTION:
+       standard_name: sea_water_velocity_to_direction
+       long_name: Current direction at water surface
+       ioos_category: currents
+       units: degree
+    WATER_CURRENT_MEAN_SPEED:
+       standard_name: sea_water_speed
+       long_name: Current speed
+       ioos_category: currents
+       units: m s-1
+    WATER_TEMPERATURE:
+       ioos_category: Water Property
+       standard_name: sea_water_temperature
+       long_name: Sea Water Temperature
+       units: degree_Celsius
+    WAVE_MEAN_DIRECTION:
+       long_name: mean wave direction
+       standard_name: sea_surface_wave_mean_from_direction
+       units: degrees
+       ioos_category: Surface Waves
+    WAVE_PEAK_PERIOD:
+       long_name: peak period
+       standard_name: sea_surface_wave_period_at_variance_spectral_density_maximum
+       units: seconds
+       ioos_category: Surface Waves
+    WAVE_PERIOD:
+       long_name: mean wave period
+       standard_name: sea_surface_wave_mean_period
+       units: seconds
+       ioos_category: Surface Waves
+    WAVE_SIGNIFICANT_HEIGHT:
+       long_name: significant wave height
+       standard_name: sea_surface_wave_significant_height
+       units: m
+       ioos_category: Surface Waves
+

@@ -1,0 +1,164 @@
+{
+  "reader": {
+    "sep": ";",
+    "comment": "#"
+  },
+  "station": "SFW01",
+  "latitude": 41.0775,
+  "longitude": -71.1855,
+  "s3_source": {
+    "bucket": "ott-south-fork-wind",
+    "prefix": "/"
+  },
+  "attributes": {
+    "variables": {
+      "Hs": {
+        "name": "sig_wave_height",
+        "units": "m",
+        "long_name": "significant wave height",
+        "instrument": "Seaview SVS-603b",
+        "standard_name": "sea_surface_wave_significant_height"
+      },
+      "Tp": {
+        "name": "peak_period",
+        "units": "seconds",
+        "long_name": "peak period",
+        "instrument": "Seaview SVS-603b",
+        "standard_name": "sea_surface_wave_period_at_variance_spectral_density_maximum"
+      },
+      "Tz": {
+        "name": "mean_wave_period",
+        "units": "seconds",
+        "long_name": "mean wave period",
+        "instrument": "Seaview SVS-603b",
+        "standard_name": "sea_surface_wave_mean_period"
+      },
+      "Hmax": {
+        "name": "max_wave_height",
+        "units": "m",
+        "long_name": "maximum wave height",
+        "instrument": "Seaview SVS-603b",
+        "standard_name": "sea_surface_wave_maximum_height"
+      },
+      "Wdir": {
+        "name": "mean_wave_direction",
+        "units": "degrees",
+        "long_name": "mean wave direction",
+        "instrument": "Seaview SVS-603b",
+        "standard_name": "sea_surface_wave_mean_from_direction"
+      },
+      "time": {
+        "standard_name": "time"
+      },
+      "HsSea": {
+        "name": "sig_wave_height_sea",
+        "units": "m",
+        "long_name": "significant wave height wind sea component",
+        "instrument": "Seaview SVS-603b",
+        "standard_name": "sea_surface_wind_wave_significant_height"
+      },
+      "TpSea": {
+        "name": "peak_wave_period_sea",
+        "units": "seconds",
+        "long_name": "peak period wind sea component",
+        "instrument": "Seaview SVS-603b",
+        "standard_name": "sea_surface_wind_wave_period_at_variance_spectral_density_maximum"
+      },
+      "TzSea": {
+        "name": "mean_wave_period_sea",
+        "units": "seconds",
+        "long_name": "mean period wind sea component",
+        "instrument": "Seaview SVS-603b",
+        "standard_name": "sea_surface_wind_wave_mean_period"
+      },
+      "WdirSea": {
+        "name": "wave_direction_sea",
+        "units": "degrees",
+        "long_name": "mean wave direction wind sea component",
+        "instrument": "Seaview SVS-603b",
+        "standard_name": "sea_surface_wind_wave_mean_direction"
+      },
+      "station": {
+        "cf_role": "timeseries_id",
+        "long_name": "Station SFW01-waves",
+        "standard_name": "platform_name"
+      },
+      "HsSwell1": {
+        "name": "sig_wave_height_swell_1",
+        "units": "m",
+        "long_name": "significant Wave Height  1st swell component",
+        "instrument": "Seaview SVS-603b",
+        "standard_name": "sea_surface_primary_swell_wave_significant_height"
+      },
+      "HsSwell2": {
+        "name": "sig_wave_height_swell_2",
+        "units": "m",
+        "long_name": "significant wave height 2nd swell component",
+        "instrument": "Seaview SVS-603b",
+        "standard_name": "sea_surface_secondary_swell_significant_height"
+      },
+      "TpSwell1": {
+        "name": "peak_wave_period_swell_1",
+        "units": "seconds",
+        "long_name": "peak period 1st swell component",
+        "instrument": "Seaview SVS-603b",
+        "standard_name": "sea_surface_primary_swell_wave_period_at_variance_spectral_density_maximum"
+      },
+      "TpSwell2": {
+        "name": "peak_wave_period_swell_2",
+        "units": "seconds",
+        "long_name": "peak period 2nd swell component",
+        "instrument": "Seaview SVS-603b",
+        "standard_name": "sea_surface_secondary_swell_wave_period_at_variance_spectral_density_maximum"
+      },
+      "TzSwell1": {
+        "name": "mean_wave_period_swell_1",
+        "units": "seconds",
+        "long_name": "mean period 1st swell componnent",
+        "instrument": "Seaview SVS-603b",
+        "standard_name": "sea_surface_primary_swell_wave_mean_period"
+      },
+      "TzSwell2": {
+        "name": "mean_wave_period_swell_2",
+        "units": "seconds",
+        "long_name": "mean period 2nd swell component",
+        "instrument": "Seaview SVS-603b",
+        "standard_name": "sea_surface_secondary_swell_wave_mean_period"
+      },
+      "latitude": {
+        "units": "degrees_north",
+        "standard_name": "latitude"
+      },
+      "longitude": {
+        "units": "degrees_east",
+        "standard_name": "longitude"
+      },
+      "WdirSwell1": {
+        "name": "wave_direction_swell_1",
+        "units": "degrees",
+        "long_name": "mean wave direction  1st swell component",
+        "instrument": "Seaview SVS-603b",
+        "standard_name": "sea_surface_primary_swell_wave_from_direction"
+      },
+      "WdirSwell2": {
+        "name": "wave_direction_swell_2",
+        "units": "degrees",
+        "long_name": "wave direction 2nd swell component",
+        "instrument": "Seaview SVS-603b",
+        "standard_name": "sea_surface_secondary_swell_wave_from_direction"
+      }
+    },
+    "additional_attributes_path": "datasets_config/south_fork_attributes.yaml"
+  },
+  "start_date": "2025-07-03",
+  "dataset_type": "timeseries",
+  "file_pattern": {
+    "day_pattern": "SFW01_WB_02_wave_{partition_date:%Y%m%d}_*.txt"
+  },
+  "variable_mappings": [
+    {
+      "output": "time",
+      "source": "datetime"
+    }
+  ]
+}

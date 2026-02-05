@@ -1,0 +1,104 @@
+{
+  "reader": {
+    "sep": ";",
+    "comment": "#"
+  },
+  "station": "Empire Wind 1",
+  "latitude": 40.319,
+  "longitude": -73.4461,
+  "s3_source": {
+    "bucket": "ott-empire",
+    "prefix": "/"
+  },
+  "attributes": {
+    "variables": {
+      "MetSENS_RH_Avg": {
+        "units": "1",
+        "long_name": "Relative Humidity",
+        "ioos_category": "Meteorology",
+        "standard_name": "relative_humidity",
+        "coverage_content_type": "physicalMeasurement"
+      },
+      "MetS3SecGst_Max": {
+        "long_name": "Wind Speed Gust",
+        "ncei_name": "WIND GUST",
+        "ioos_category": "Wind",
+        "standard_name": "wind_speed_of_gust",
+        "standard_name_url": "https://vocab.nerc.ac.uk/collection/P07/current/CFSN0039",
+        "coverage_content_type": "physicalMeasurement"
+      },
+      "MetSENS_WSpd_Avg": {
+        "units": "m/s",
+        "long_name": "Wind Speed",
+        "ncei_name": "WIND SPEED",
+        "ioos_category": "Wind",
+        "standard_name": "wind_speed",
+        "standard_name_url": "https://vocab.nerc.ac.uk/collection/P07/current/CFSN0038",
+        "coverage_content_type": "physicalMeasurement"
+      },
+      "MetSENS_WSpd_Std": {
+        "units": "m/s",
+        "long_name": "Std Dev Wind Speed"
+      },
+      "MetSENS_ATemp_Avg": {
+        "unit": "C",
+        "long_name": "Air Temperature",
+        "ncei_name": "AIR TEMPERATURE",
+        "ioos_category": " Meteorology",
+        "standard_name": "air_temperature",
+        "standard_name_url": "https://vocab.nerc.ac.uk/collection/P07/current/CFSN0023",
+        "coverage_content_type": "physicalMeasurement"
+      },
+      "MetSENS_BPress_Avg": {
+        "units": "Pa",
+        "long_name": "Barometric Pressure",
+        "ncei_name": "PRESSURE - BAROMETRIC",
+        "ioos_category": "Meteorology",
+        "standard_name": "air_pressure",
+        "standard_name_url": "https://vocab.nerc.ac.uk/collection/P07/current/CFSN0015",
+        "coverage_content_type": "physicalMeasurement"
+      },
+      "MetSENS_Dwpoint_Avg": {
+        "unit": "C",
+        "long_name": "Dew Point Temperature",
+        "ioos_category": "Meteorology",
+        "standard_name": "dew_point_temperature",
+        "coverage_content_type": "physicalMeasurement"
+      },
+      "MetSENS_WDir_From_Avg": {
+        "units": "degree",
+        "comment": "Wind direction is the direction from which wind is blowing. It is a meteorological convention (degrees clockwise from North). (IOOS)",
+        "long_name": "Wind From Direction",
+        "ncei_name": "WIND DIRECTION",
+        "ioos_category": "Wind",
+        "standard_name": "wind_from_direction",
+        "standard_name_url": "https://vocab.nerc.ac.uk/collection/P07/current/CFSN0036",
+        "coverage_content_type": "physicalMeasurement"
+      },
+      "MetSENS_WDir_From_Std": {
+        "units": "Degrees",
+        "long_name": "Std Dev Wind Direction"
+      }
+    },
+    "additional_attributes_path": "datasets_config/empire_attributes.yaml"
+  },
+  "start_date": "2025-07-02",
+  "dataset_type": "timeseries",
+  "file_pattern": {
+    "day_pattern": "EW01_met_{partition_date:%Y%m%d}_*.txt"
+  },
+  "variable_mappings": [
+    {
+      "output": "time",
+      "source": "datetime"
+    },
+    {
+      "output": "latitude",
+      "source": "Latitude_Avg"
+    },
+    {
+      "output": "longitude",
+      "source": "Longitude_Avg"
+    }
+  ]
+}
