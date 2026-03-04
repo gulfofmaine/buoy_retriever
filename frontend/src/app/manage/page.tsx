@@ -1,25 +1,15 @@
 "use client";
-import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 
-async function fetchDatasets() {
-  const response = await fetch("http://localhost:8080/backend/api/datasets/");
-  if (!response.ok) {
-    throw new Error("Network response was not ok");
-  }
-  return response.json();
-}
+import { useDatasets } from "@/hooks/queries";
 
 export default function ManagePage() {
-  const { data, error, isLoading } = useQuery({
-    queryKey: ["datasets"],
-    queryFn: fetchDatasets,
-  });
+  const { data, isError, isPending } = useDatasets();
 
-  if (isLoading) return <div>Loading...</div>;
-  if (error) return <div>Error loading datasets</div>;
-
-  console.log(data);
+  if (isPending) return <div>Loading...</div>;
+  if (isError) {
+    return <div>Error loading datasets</div>;
+  }
 
   return (
     <div>
@@ -31,13 +21,17 @@ export default function ManagePage() {
         <h2>Existing datasets</h2>
 
         <ul>
-          {data.map((dataset: { slug: string }) => (
-            <li key={dataset.slug}>
-              <Link href={`/manage/dataset/${dataset.slug}`}>
-                {dataset.slug}
-              </Link>
-            </li>
-          ))}
+          {data?.length > 0 ? (
+            data.map((dataset: { slug: string }) => (
+              <li key={dataset.slug}>
+                <Link href={`/manage/dataset/${dataset.slug}`}>
+                  {dataset.slug}
+                </Link>
+              </li>
+            ))
+          ) : (
+            <li>No datasets available</li>
+          )}
         </ul>
       </main>
     </div>

@@ -1,3 +1,4 @@
+from enum import Enum
 from typing import TypeVar
 
 from pydantic import BaseModel, Field
@@ -15,6 +16,14 @@ class DatasetConfigBase(BaseModel):
 ConfigT = TypeVar("ConfigT", bound=DatasetConfigBase)
 
 
+class ConfigState(str, Enum):
+    """State of the dataset configuration"""
+
+    DRAFT = "Draft"
+    TESTING = "Testing"
+    PUBLISHED = "Published"
+
+
 class DatasetBase[ConfigT](BaseModel):
     """Dataset"""
 
@@ -23,6 +32,8 @@ class DatasetBase[ConfigT](BaseModel):
         ...,
         description="The configuration for the dataset.",
     )
+
+    config_state: ConfigState = ConfigState.DRAFT
 
     @property
     def safe_slug(self) -> str:

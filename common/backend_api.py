@@ -7,9 +7,23 @@ from pydantic import BaseModel, Field, ValidationError
 from .config import DatasetBase, PipelineConfig
 
 
+def api_client_key():
+    """Retrieve the backend API key from environment variable"""
+    import os
+
+    api_key = os.environ["BACKEND_API_KEY"]
+    return api_key
+
+
 class BackendAPIClient(BaseModel):
     api_endpoint: str = "http://backend:8080/backend/api/"
-    # api_key: str
+    api_key: Annotated[
+        str,
+        Field(
+            description="API key for authenticating with backend API",
+            default_factory=api_client_key,
+        ),
+    ]
     timeout: Annotated[
         int,
         Field(
@@ -19,7 +33,7 @@ class BackendAPIClient(BaseModel):
 
     def headers(self):
         """Add API key to headers"""
-        return {}
+        return {"X-API-KEY": self.api_key}
 
     def register_pipeline(self, pipeline: PipelineConfig):
         """Create or update a pipeline configuration"""
@@ -51,7 +65,7 @@ class BackendAPIClient(BaseModel):
             op="datasets_for_pipeline",
             name=f"Get datasets for pipeline {pipeline_slug}",
         ):
-            url = self.api_endpoint + f"datasets/by-pipeline/{pipeline_slug}"
+            url = self.api_endpoint + f"configs/by-pipeline/{pipeline_slug}/"
 
             result = httpx.get(
                 url,
