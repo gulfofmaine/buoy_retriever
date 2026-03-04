@@ -1,11 +1,14 @@
-from datetime import date
+from datetime import date, datetime
 from textwrap import dedent
 from typing import Annotated
 
+import boto3
 import dagster as dg
 import pandas as pd
 import sentry_sdk
 import xarray as xr
+from dagster_aws.s3.sensor import get_objects
+from parse import parse
 from pydantic import BaseModel, Field
 
 from common import assets, config, io
@@ -88,7 +91,7 @@ class S3TimeseriesDataset(config.DatasetBase):
         )
 
 
-def defs_for_dataset(dataset: S3TimeseriesDataset) -> dg.Definitions:
+def defs_for_dataset(dataset: S3TimeseriesDataset) -> dg.Definitions:  # noqa: C901
     """Definitions for a single S3 Timeseries dataset."""
     common_asset_kwargs = {
         "key_prefix": ["s3_timeseries", dataset.safe_slug],
@@ -116,7 +119,13 @@ def defs_for_dataset(dataset: S3TimeseriesDataset) -> dg.Definitions:
         """Download daily dataframe from S3."""
         partition_date_string = context.asset_partition_key_for_output()
         partition_date = date.fromisoformat(partition_date_string)
-        day_glob = f"{dataset.config.s3_source.bucket}{dataset.config.s3_source.prefix}{dataset.config.file_pattern.day_pattern.format(partition_date=partition_date)}"
+        day_glob = (
+            dataset.config.s3_source.bucket
+            + dataset.config.s3_source.prefix
+            + dataset.config.file_pattern.day_pattern.format(
+                partition_date=partition_date,
+            )
+        )
 
         context.log.info(
             f"Reading daily data for {partition_date_string} from S3 with glob: {day_glob}",
@@ -136,6 +145,16 @@ def defs_for_dataset(dataset: S3TimeseriesDataset) -> dg.Definitions:
                 df = dataset.config.reader.read_df(f)
                 daily_dfs.append(df)
         df = pd.concat(daily_dfs)
+
+        # some flexibility in datetime/time column name
+        for col_name in ["datetime", "time"]:
+            try:
+                df[col_name] = pd.to_datetime(df[col_name])
+                df = df.sort_values(col_name)
+            except KeyError:
+                pass
+
+        df = df.reset_index(drop=True)
 
         return df
 
@@ -206,7 +225,103 @@ def defs_for_dataset(dataset: S3TimeseriesDataset) -> dg.Definitions:
 
         return ds
 
-    return dg.Definitions(assets=[daily_df, monthly_ds])
+    daily_job = dg.define_asset_job(
+        f"update_{dataset.safe_slug}_daily",
+        selection=[daily_df],
+    )
+
+    @dg.sensor(
+        job=daily_job,
+        name=dataset.safe_slug + "_s3_sensor",
+        minimum_interval_seconds=5 * 60,
+    )
+    def s3_sensor(context: dg.SensorEvaluationContext, s3_credentials: S3Credentials):
+        """Sensor to detect new files for a day in S3."""
+        with sentry_sdk.start_transaction(
+            op=f"{dataset.safe_slug}_s3_sensor",
+            name=f"S3 Sensor for {dataset.safe_slug}",
+        ):
+            since_time = context.cursor or None
+            if since_time:
+                since_time = datetime.fromisoformat(since_time)
+
+            client = boto3.client(
+                "s3",
+                aws_access_key_id=s3_credentials.access_key_id,
+                aws_secret_access_key=s3_credentials.secret_access_key,
+            )
+            file_start = dataset.config.file_pattern.day_pattern.split("{")[0]
+
+            new_s3_keys = get_objects(
+                bucket=dataset.config.s3_source.bucket,
+                prefix=file_start,
+                since_last_modified=since_time,
+                client=client,
+            )
+            if not new_s3_keys:
+                return dg.SkipReason("No new files found in S3.")
+
+            existing_partitions = set()
+            known_partitions = set(daily_partitions.get_partition_keys())
+            for run in context.instance.get_runs(
+                filters=dg.RunsFilter(
+                    job_name=daily_job.name,
+                    statuses=[
+                        dg.DagsterRunStatus.QUEUED,
+                        dg.DagsterRunStatus.STARTING,
+                        dg.DagsterRunStatus.STARTED,
+                        dg.DagsterRunStatus.NOT_STARTED,
+                    ],
+                ),
+            ):
+                try:
+                    existing_partitions.add(run.tags["dagster/partition"])
+                except KeyError:
+                    pass
+
+            for key in new_s3_keys:
+                object_key = key.get("Key")
+
+                object_name = object_key.removeprefix(dataset.config.s3_source.prefix)
+                name_pattern = dataset.config.file_pattern.day_pattern.replace(
+                    "*",
+                    "{}",
+                )
+                result = parse(name_pattern, object_name)
+                dt = result.named["partition_date"].strftime("%Y-%m-%d")
+
+                if dt not in existing_partitions:
+                    last_modified = key.get("LastModified")
+
+                    if since_time is None or last_modified > since_time:
+                        existing_partitions.add(dt)
+                        run_key = f"{dt}_{last_modified.isoformat()}"
+
+                        if dt in known_partitions:
+                            yield dg.RunRequest(
+                                run_key=run_key,
+                                partition_key=dt,
+                            )
+                        else:
+                            context.log.info(
+                                f"Skipping partition {dt} as it is not a known partition",
+                            )
+
+            latest_key_dt = max(key.get("LastModified") for key in new_s3_keys)
+            context.update_cursor(latest_key_dt.isoformat())
+
+    dataset_assets = [daily_df, monthly_ds]
+
+    return dg.Definitions(
+        assets=dataset_assets,
+        sensors=[
+            s3_sensor,
+            dg.AutomationConditionSensorDefinition(
+                dataset.safe_slug + "_automation_sensor",
+                target=dataset_assets,
+            ),
+        ],
+    )
 
 
 @dg.definitions

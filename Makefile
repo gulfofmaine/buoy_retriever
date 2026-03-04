@@ -51,3 +51,16 @@ user:
 # Open a Django shell inside the backend container
 shell:
 	docker compose exec backend pixi run python manage.py shell
+
+test-common:
+	cd common; uv run pytest --cov=.
+
+test-hohonu:
+	docker build -f pipeline/hohonu/Dockerfile -t buoy_retriever-hohonu .
+	docker run buoy_retriever-hohonu pixi run pytest --cov=.
+
+test-s3-timeseries:
+	docker build -f pipeline/s3_timeseries/Dockerfile -t buoy_retriever-s3_timeseries .
+	docker run buoy_retriever-s3_timeseries pixi run pytest --cov=.
+
+test-all: test-common test-s3-timeseries test-hohonu
