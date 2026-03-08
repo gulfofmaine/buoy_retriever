@@ -1,14 +1,9 @@
-import os
-
-import boto3
 import dagster as dg
 import pandas as pd
 import pytest
 import xarray as xr
-from moto import mock_aws
 
 from common import io, test_utils
-from common.resource.s3fs_resource import S3Credentials, S3FSResource
 from pipeline import S3TimeseriesDataset, defs_for_dataset
 
 
@@ -40,28 +35,6 @@ def defs(dataset_config):
 def test_can_build_defs(defs):
     assert defs is not None
     assert len(defs.assets) == 2
-
-
-@pytest.fixture
-def s3_credentials():
-    return S3Credentials(
-        access_key_id=os.environ["S3_TS_ACCESS_KEY_ID"],
-        secret_access_key=os.environ["S3_TS_SECRET_ACCESS_KEY"],
-    )
-
-
-@pytest.fixture
-def s3_resource(s3_credentials):
-    return S3FSResource(
-        credentials=s3_credentials,
-        region_name="us-east-1",
-    )
-
-
-@pytest.fixture
-def mocked_s3():
-    with mock_aws():
-        yield boto3.client("s3", region_name="us-east-1")
 
 
 def test_sensor(defs, mocked_s3, s3_credentials):
@@ -139,6 +112,33 @@ def test_monthly_asset(defs, dataset_config):
 
     assert isinstance(ds, xr.Dataset)
     snapshot_path = "tests/test_data/empire_met/test_empire_met_monthly_asset.nc"
+    # ds.to_netcdf(snapshot_path)
+    snapshot = xr.load_dataset(snapshot_path)
+
+    xr.testing.assert_equal(ds, snapshot)
+
+
+def test_monthly_asset_with_nans(defs, dataset_config):
+    monthly_ds = test_utils.get_asset_by_name(defs, "monthly_ds")
+    context = dg.build_asset_context(partition_key="2025-10-01")
+
+    daily_df = {
+        "2025-10-12": pd.read_csv(
+            "tests/test_data/empire_met/2025-10-12.csv",
+            parse_dates=["datetime"],
+        ),
+        "2025-10-13": pd.read_csv(
+            "tests/test_data/empire_met/2025-10-13.csv",
+            parse_dates=["datetime"],
+        ),
+    }
+
+    ds = monthly_ds(context, daily_df=daily_df)
+
+    assert isinstance(ds, xr.Dataset)
+    snapshot_path = (
+        "tests/test_data/empire_met/test_empire_met_monthly_asset_with_nans.nc"
+    )
     # ds.to_netcdf(snapshot_path)
     snapshot = xr.load_dataset(snapshot_path)
 
