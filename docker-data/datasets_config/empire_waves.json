@@ -93,7 +93,7 @@
         "long_name": "Wave Direction Swell 2"
       }
     },
-    "additional_attributes_path": "datasets_config/empire_attributes.yaml"
+    "additional_attributes_path": "/mnt/datasets_config/empire_attributes.yaml"
   },
   "start_date": "2025-07-02",
   "dataset_type": "timeseries",

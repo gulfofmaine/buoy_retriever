@@ -64,7 +64,7 @@ class S3TimeseriesConfig(
             Field(
             description="Variables to drop from the dataset",
             default_factory=list,
-        ),] = None
+        ),] 
     latitude: Annotated[
         float | None,
         Field(description="Fixed latitude of the station"),
@@ -130,10 +130,7 @@ def defs_for_dataset(dataset: S3TimeseriesDataset) -> dg.Definitions:  # noqa: C
         """Download daily dataframe from S3."""
         partition_date_string = context.asset_partition_key_for_output()
         partition_date = date.fromisoformat(partition_date_string)
-<<<<<<< HEAD
-=======
 
->>>>>>> Update to s3 pipeline to work with south fork and empire datasets
         day_glob = (
             dataset.config.s3_source.bucket
             + dataset.config.s3_source.prefix
@@ -205,17 +202,6 @@ def defs_for_dataset(dataset: S3TimeseriesDataset) -> dg.Definitions:  # noqa: C
         df = df.sort_values(indx_var)
         df = df.reset_index()
 
-
-        # some flexibility in datetime/time column name
-        for col_name in ["datetime", "time"]:
-            try:
-                df[col_name] = pd.to_datetime(df[col_name])
-                df = df.sort_values(col_name)
-            except KeyError:
-                pass
-
-        df = df.reset_index(drop=True)
-
         return df
 
     @dg.asset(
@@ -243,6 +229,7 @@ def defs_for_dataset(dataset: S3TimeseriesDataset) -> dg.Definitions:  # noqa: C
         daily_df: dict[str, pd.DataFrame],
     ) -> xr.Dataset:
         """Combine daily dataframes into a monthly NetCDF and apply transformations."""
+      
         daily_dfs = []
 
         for df_date, df in daily_df.items():
@@ -293,6 +280,7 @@ def defs_for_dataset(dataset: S3TimeseriesDataset) -> dg.Definitions:  # noqa: C
 
 
         dataset.config.attributes.apply_to_dataset(ds)
+        
         return ds
 
     daily_job = dg.define_asset_job(

@@ -132,6 +132,7 @@ services:
       - /home/ioos/.pixi
       - ./common/:/home/ioos/common/:cached
       - ./docker-data/shared-fs:/mnt/efs/
+      - ./docker-data/datasets_config:/mnt/datasets_config
     depends_on:
       backend:
         condition: service_started
