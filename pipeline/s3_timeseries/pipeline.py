@@ -47,6 +47,7 @@ class S3TimeseriesConfig(
     s3_source.S3SourceMixin,
     attributes.AttributeConfigMixin,
     mappings.VariableConverterMixIn
+
 ):
     """Configuration for S3 Timeseries Dataset."""
 
@@ -56,15 +57,18 @@ class S3TimeseriesConfig(
 
     dataset_type: Annotated[str, Field(description="Dateset type (timeseries or profile)")]
 
-       
+
     source_time_var : str = "datetime"
     
+
     file_pattern: Annotated[DayGlob, Field(description="Source file name pattern")]
     drop_vars : Annotated[list[str],        
             Field(
             description="Variables to drop from the dataset",
             default_factory=list,
+
         ),] 
+
     latitude: Annotated[
         float | None,
         Field(description="Fixed latitude of the station"),
@@ -156,7 +160,7 @@ def defs_for_dataset(dataset: S3TimeseriesDataset) -> dg.Definitions:  # noqa: C
             context.log.debug(f"Reading {day_f}")
             with s3fs.fs.open(day_f, "rb") as f:
 
-               
+
                 df = dataset.config.reader.read_df(f)
 
                 if dataset.config.variable_converter is not None:
@@ -171,6 +175,7 @@ def defs_for_dataset(dataset: S3TimeseriesDataset) -> dg.Definitions:  # noqa: C
                 if dataset.config.drop_vars is not None:   
                     df = df.drop(columns=dataset.config.drop_vars)
                     
+
                 if dataset.config.dataset_type =='profile':
                     # Translate the profile data from multiple columns for each variable (CurSpd1, curSpd2,..curSpdN) to
                     # two columns: curSpd, depth
@@ -185,17 +190,21 @@ def defs_for_dataset(dataset: S3TimeseriesDataset) -> dg.Definitions:  # noqa: C
       
                         
                         df_depth = df[keep].copy()
+
                         df_depth = df_depth.rename(columns=depth.mappings)
+
                         
                         if depth.depth is not None: 
                             df_depth['depth'] = float(depth.depth)
                         
                         daily_dfs.append(df_depth)
+
                         indx_var = [dataset.config.source_time_var,"depth"]
 
                 else:       
                     daily_dfs.append(df)
                     indx_var = dataset.config.source_time_var
+
         df = pd.concat(daily_dfs)
 
         df[dataset.config.source_time_var] = pd.to_datetime(df[dataset.config.source_time_var])
@@ -280,7 +289,7 @@ def defs_for_dataset(dataset: S3TimeseriesDataset) -> dg.Definitions:  # noqa: C
 
 
         dataset.config.attributes.apply_to_dataset(ds)
-        
+
         return ds
 
     daily_job = dg.define_asset_job(

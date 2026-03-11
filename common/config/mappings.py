@@ -79,6 +79,7 @@ class OptionalDepthMappingMixin:
 
 
 
+
 class SplitOperator(BaseModel):
     ''' Takes the source variable, splits it on the separator and  maps the resulting array to new variables'''
     
@@ -113,6 +114,7 @@ class VariableConverterMixIn:
             description="Split variable converter"),
         ] =None                       
 
+
     
     
 class ProfileDepthMappings(BaseModel):
@@ -120,15 +122,19 @@ class ProfileDepthMappings(BaseModel):
         float,
         Field( 
            description="Optional- fixed depth for the mapping."
+
         ),
     ] = None
+
   
     mappings : Annotated [
         dict[str,str],
          Field(
             description="Maps input variables to output variables at the current depth ",
+
         ),
     ]
+
 
     
 
@@ -139,6 +145,8 @@ class OptionalProfileDepthMixin:
         list[ProfileDepthMappings], 
          Field(
             description="Mapping for variables with multiple depth levels",
+
         ),
     ] =None
+
     
