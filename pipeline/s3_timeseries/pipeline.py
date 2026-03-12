@@ -1,3 +1,4 @@
+import logging
 from datetime import date, datetime
 from textwrap import dedent
 from typing import Annotated
@@ -55,7 +56,7 @@ class S3TimeseriesConfig(
 
     reader: PandasCSVReader
 
-    dataset_type: Annotated[str, Field(description="Dateset type (timeseries or profile)")]
+    dataset_type: Annotated[str, Field(description="Dateset type (timeseries or profile)")] = "timeseries"
 
 
     source_time_var : str = "datetime"
@@ -209,7 +210,7 @@ def defs_for_dataset(dataset: S3TimeseriesDataset) -> dg.Definitions:  # noqa: C
 
         df[dataset.config.source_time_var] = pd.to_datetime(df[dataset.config.source_time_var])
         df = df.sort_values(indx_var)
-        df = df.reset_index()
+        df = df.reset_index(drop=True)
 
         return df
 
@@ -255,6 +256,21 @@ def defs_for_dataset(dataset: S3TimeseriesDataset) -> dg.Definitions:  # noqa: C
                     f"Column name collision after renaming for data on {df_date}, trying to squish duplicates",
                 )
                 df = df.groupby(df.columns, axis=1).first()
+
+            # Avoid attempting to convert the time column to numeric inside
+            # clean_up_dtypes_and_nas, which causes unnecessary exceptions.
+            if "time" in df.columns:
+                time_col = df["time"]
+                df_wo_time = df.drop(columns=["time"])
+                df_wo_time = clean_up_dtypes_and_nas(
+                    df_wo_time,
+                    na_values="NAN",
+                    logger=context.log,
+                )
+                df_wo_time["time"] = time_col
+                df = df_wo_time
+            else:
+                df = clean_up_dtypes_and_nas(df, na_values="NAN", logger=context.log)
             daily_dfs.append(df)
 
         df = pd.concat(daily_dfs, ignore_index=True)
@@ -278,7 +294,7 @@ def defs_for_dataset(dataset: S3TimeseriesDataset) -> dg.Definitions:  # noqa: C
             ds["longitude"] = dataset.config.longitude
 
         ds = ds.set_coords(["station", "latitude", "longitude"])
-        ds = ds.drop_vars("index")
+
         # apply attributes
 
         ds["time"].encoding.update(
@@ -434,3 +450,25 @@ def build_defs() -> dg.Definitions:
             defs = dg.Definitions.merge(defs, dataset_defs)
 
         return defs
+
+
+def clean_up_dtypes_and_nas(
+    df: pd.DataFrame,
+    na_values: None | str | list[str] = None,
+    logger: logging.Logger | None = None,
+) -> pd.DataFrame:
+    """Clean up data types and NA values in a dataframe"""
+    df = df.copy()
+    if not logger:
+        logger = logging.getLogger(__name__)
+    if na_values is not None:
+        df = df.replace(na_values, pd.NA).dropna()
+
+    for c in df.columns:
+        try:
+            df[c] = pd.to_numeric(df[c])
+        except (ValueError, TypeError) as e:
+            if logger:
+                logger.warning(f"Could not convert column {c} to numeric: {e}")
+
+    return df
