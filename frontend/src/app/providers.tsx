@@ -7,6 +7,8 @@ import {
 } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
+import { TooltipProvider } from "@/components/ui/tooltip";
+
 function makeQueryClient() {
   return new QueryClient({
     defaultOptions: {
@@ -34,7 +36,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
   const queryClient = getQueryClient();
   return (
     <QueryClientProvider client={queryClient}>
-      {children}
+      <TooltipProvider>{children}</TooltipProvider>
       <ReactQueryDevtools />
     </QueryClientProvider>
   );

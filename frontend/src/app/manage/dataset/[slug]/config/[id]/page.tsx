@@ -4,7 +4,7 @@ import type { JSONSchema6 } from "json-schema";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import { use, useEffect, useState } from "react";
-
+import { Button } from "@/components/ui/button";
 import { useDataset, usePipeline } from "@/hooks/queries";
 
 const Form = dynamic(() => import("./form"), { ssr: false });
@@ -60,33 +60,32 @@ export default function Config({
   }
 
   return (
-    <div>
-      <main>
-        <h1>
-          Config {id} for dataset {slug}
-        </h1>
-        <details>
-          <summary>Show values</summary>
-          {JSON.stringify(formValues)}
-        </details>
-        {pipelineData.config_schema && formValues ? (
-          <>
-            {/* <form
+    <>
+      <h1>
+        Config {id} for dataset {slug}
+      </h1>
+      <details>
+        <summary>Show values</summary>
+        {JSON.stringify(formValues)}
+      </details>
+      {pipelineData.config_schema && formValues ? (
+        <>
+          {/* <form
          action={updateConfig}
            > */}
-            {pipelineData.slug}
-            <Form
-              schema={pipelineData.config_schema as JSONSchema6}
-              formValueState={[formValues, setFormValues]}
-            />
-            {/* <button type="submit">Update config</button> */}
+          {pipelineData.slug}
+          <Form
+            schema={pipelineData.config_schema as JSONSchema6}
+            formValueState={[formValues, setFormValues]}
+          />
+          <Button asChild className="mt-4">
             <button type="button" onClick={updateConfig}>
               Update config
             </button>
-            {/* </form> */}
-          </>
-        ) : null}
-      </main>
-    </div>
+          </Button>
+          {/* </form> */}
+        </>
+      ) : null}
+    </>
   );
 }
