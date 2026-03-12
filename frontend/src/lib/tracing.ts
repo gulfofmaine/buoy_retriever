@@ -12,6 +12,6 @@ export function sentryFetchHeaders() {
 
   return {
     "sentry-trace": sentryTraceHeader,
-    "baggage": sentryBaggageHeader,
+    baggage: sentryBaggageHeader,
   };
 }
