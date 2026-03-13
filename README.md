@@ -98,3 +98,24 @@ Currently there is some testing for common utilities and Hohonu pipelines.
   - S3 Timeseries - `make test-s3-timeseries` for more isolated tests, or `docker compose exec/run s3_timeseries pixi run pytest` which will mount volumes (in case snapshots need to be updated).
     - To run tests with real AWS data, include the `--aws` to `pytest`. This requires AWS credentials that can access the buckets.
   - Hohonu - `make test-hohonu` for a more isolated test, or  `docker compose exec/run hohonu pixi run pytest` will mount volumes (in case snapshots need to be updated).
+
+### Formatting/linting
+
+Various formatters and linters are configured as pre-commit hooks and in Github Actions.
+
+The linters and formatters defined in [.pre-commit-config.yaml](.pre-commit-config.yaml).
+
+- General file validity/sanity checks from pre-commit-hooks
+- Codespell
+- Trailing commas (minimizes diffs)
+- Bandit for security
+- Gitleaks to make sure we don't check various tokens in
+- Shellcheck for shell scripts
+- Django Upgrade to apply Django standard practices
+- PyProject format
+- Ruff for general Python linting and checking (config in [ruff.toml](ruff.toml) but can be overridden or extended in subfolders via a local `ruff.toml` or `pyproject.toml`)
+- Biome for general Javascript linting and checking (config in [biome.json](biome.json))
+
+They can be manually run using [prek](https://prek.j178.dev/) (or [pre-commit](https://pre-commit.com/)) using `prek run --all-files`.
+
+They will [automatically be run](https://prek.j178.dev/quickstart/#3-wire-hooks-into-git-automatically) when trying to `git commit` by running `prek install` once to set the repo up.
