@@ -15,6 +15,7 @@ class PandasCSVReader(BaseModel):
     comment: Annotated[str | None, Field(description="CSV line comment character")] = (
         None
     )
+    na_values: str = "None"
     # delim_whitespace
     # skiprows
     # sep
@@ -24,4 +25,5 @@ class PandasCSVReader(BaseModel):
     def read_df(self, file_path) -> pd.DataFrame:
         """Read a CSV file from S3 into a Pandas DataFrame"""
         reader_kwargs = self.model_dump()
+        
         return pd.read_csv(file_path, **reader_kwargs)

@@ -2,6 +2,7 @@ from pathlib import Path
 from typing import Annotated, Any
 
 import xarray as xr
+import yaml
 from pydantic import BaseModel, Field
 
 # Xarray has typed attributes as dict[Any, Any]
@@ -24,6 +25,24 @@ class NcAttributes(BaseModel):
         dict[str, Attributes],
         Field(description="Variable-specific attributes", default_factory=dict),
     ]
+
+    additional_attributes_path: Annotated[
+        str,
+        Field(
+            description="Path to the file that defines additional attributes for source",
+        ),
+    ] = None
+
+    def add_attributes_from_yaml(self):
+        if self.additional_attributes_path is not None:
+            with Path.open(self.additional_attributes_path, "r") as file:
+                data = yaml.safe_load(file)
+            if "global_attributes" in data:
+                self.global_attributes = (
+                    data["global_attributes"] | self.global_attributes
+                )
+            if "variable_attributes" in data:
+                self.variables = data["variable_attributes"] | self.variables
 
     def apply_to_dataset(self, ds: xr.Dataset):
         """Apply the configured attributes to an xarray Dataset"""
