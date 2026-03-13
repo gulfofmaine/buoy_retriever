@@ -18,14 +18,14 @@ global_attributes:
     publisher_type: instiution
     summary: >
      This dataset contains observations to support further understanding of metocean
-     conditions off the coast of New York, Rhode Island and Southeastern Massachusetts. 
-     Data is collected from a floating lidar buoy and the dataset includes  measurements 
-     of sea temperature (surface and sea floor), current speed, current direction, 
-     wave height, wave direction, and wave period, air temperature, atmospheric pressure, 
+     conditions off the coast of New York, Rhode Island and Southeastern Massachusetts.
+     Data is collected from a floating lidar buoy and the dataset includes  measurements
+     of sea temperature (surface and sea floor), current speed, current direction,
+     wave height, wave direction, and wave period, air temperature, atmospheric pressure,
      relative humidity, visibility, surface wind speed,  surface wind direction, and surface wind gust.
     instrument: Campbell Scientific MetSENS 500, Campbell Scientific CS120 Visibility Sensor, Garmin GPS16X-HVS, Seaview SVS-603b, Nortek Aquadopp Profiler Z-Cell 600kHz
     acknowledgement: >
-     This dataset is part of a MetOcean Cyberinfrastructure supported by the Integrated 
+     This dataset is part of a MetOcean Cyberinfrastructure supported by the Integrated
      Ocean Observing System (IOOS) to streamline integration of data from offshore operations.
     contributor_name: Woods Hole Group
     contributor_address: 107 Waterhouse Rd, Bourne, MA 02532

@@ -14,11 +14,11 @@ from pydantic import BaseModel, Field
 
 from common import assets, config, io
 from common.backend_api import BackendAPIClient
-from common.config import mappings, s3_source, attributes
+from common.config import attributes, mappings, s3_source
 from common.readers.pandas_csv import PandasCSVReader
 from common.resource.s3fs_resource import S3Credentials, S3FSResource
 from common.sentry import SentryConfig
-import yaml
+
 sentry = SentryConfig(pipeline_name="s3_timeseries")
 
 
@@ -47,8 +47,7 @@ class S3TimeseriesConfig(
     mappings.OptionalProfileDepthMixin,
     s3_source.S3SourceMixin,
     attributes.AttributeConfigMixin,
-    mappings.VariableConverterMixIn
-
+    mappings.VariableConverterMixIn,
 ):
     """Configuration for S3 Timeseries Dataset."""
 
@@ -56,19 +55,21 @@ class S3TimeseriesConfig(
 
     reader: PandasCSVReader
 
-    dataset_type: Annotated[str, Field(description="Dateset type (timeseries or profile)")] = "timeseries"
+    dataset_type: Annotated[
+        str,
+        Field(description="Dateset type (timeseries or profile)"),
+    ] = "timeseries"
 
-
-    source_time_var : str = "datetime"
-    
+    source_time_var: str = "datetime"
 
     file_pattern: Annotated[DayGlob, Field(description="Source file name pattern")]
-    drop_vars : Annotated[list[str],        
-            Field(
+    drop_vars: Annotated[
+        list[str],
+        Field(
             description="Variables to drop from the dataset",
             default_factory=list,
-
-        ),] 
+        ),
+    ]
 
     latitude: Annotated[
         float | None,
@@ -147,7 +148,7 @@ def defs_for_dataset(dataset: S3TimeseriesDataset) -> dg.Definitions:  # noqa: C
         context.log.info(
             f"Reading daily data for {partition_date_string} from S3 with glob: {day_glob}",
         )
-       
+
         s3_keys = s3fs.fs.glob(day_glob)
         s3_keys.sort()
 
@@ -155,60 +156,62 @@ def defs_for_dataset(dataset: S3TimeseriesDataset) -> dg.Definitions:  # noqa: C
         context.add_output_metadata({"Source S3 keys": dg.MetadataValue.json(s3_keys)})
 
         daily_dfs = []
-    
 
         for day_f in s3_keys:
             context.log.debug(f"Reading {day_f}")
             with s3fs.fs.open(day_f, "rb") as f:
-
-
                 df = dataset.config.reader.read_df(f)
 
                 if dataset.config.variable_converter is not None:
-                    for split_conv in dataset.config.variable_converter.split_operations:
-                        splt_col =df[split_conv.source_variable].str.split(split_conv.sep, expand=True)
+                    for (
+                        split_conv
+                    ) in dataset.config.variable_converter.split_operations:
+                        splt_col = df[split_conv.source_variable].str.split(
+                            split_conv.sep,
+                            expand=True,
+                        )
                         for n_var in split_conv.output_variables:
-
                             df[split_conv.output_variables[n_var]] = splt_col[n_var]
-                           
-                            
-                        df = df.drop(split_conv.source_variable,axis=1)
-                if dataset.config.drop_vars is not None:   
-                    df = df.drop(columns=dataset.config.drop_vars)
-                    
 
-                if dataset.config.dataset_type =='profile':
+                        df = df.drop(split_conv.source_variable, axis=1)
+                if dataset.config.drop_vars is not None:
+                    df = df.drop(columns=dataset.config.drop_vars)
+
+                if dataset.config.dataset_type == "profile":
                     # Translate the profile data from multiple columns for each variable (CurSpd1, curSpd2,..curSpdN) to
                     # two columns: curSpd, depth
-                    
-                    all_profile_vars = [var for depth_conf in dataset.config.profile_data for var in depth_conf.mappings.keys()]
+
+                    all_profile_vars = [
+                        var
+                        for depth_conf in dataset.config.profile_data
+                        for var in depth_conf.mappings.keys()
+                    ]
 
                     non_profile_vars = df.columns.difference(all_profile_vars).tolist()
-                    
+
                     for depth in dataset.config.profile_data:
-                        
                         keep = non_profile_vars + list(depth.mappings.keys())
-      
-                        
+
                         df_depth = df[keep].copy()
 
                         df_depth = df_depth.rename(columns=depth.mappings)
 
-                        
-                        if depth.depth is not None: 
-                            df_depth['depth'] = float(depth.depth)
-                        
+                        if depth.depth is not None:
+                            df_depth["depth"] = float(depth.depth)
+
                         daily_dfs.append(df_depth)
 
-                        indx_var = [dataset.config.source_time_var,"depth"]
+                        indx_var = [dataset.config.source_time_var, "depth"]
 
-                else:       
+                else:
                     daily_dfs.append(df)
                     indx_var = dataset.config.source_time_var
 
         df = pd.concat(daily_dfs)
 
-        df[dataset.config.source_time_var] = pd.to_datetime(df[dataset.config.source_time_var])
+        df[dataset.config.source_time_var] = pd.to_datetime(
+            df[dataset.config.source_time_var],
+        )
         df = df.sort_values(indx_var)
         df = df.reset_index(drop=True)
 
@@ -239,7 +242,7 @@ def defs_for_dataset(dataset: S3TimeseriesDataset) -> dg.Definitions:  # noqa: C
         daily_df: dict[str, pd.DataFrame],
     ) -> xr.Dataset:
         """Combine daily dataframes into a monthly NetCDF and apply transformations."""
-      
+
         daily_dfs = []
 
         for df_date, df in daily_df.items():
@@ -274,12 +277,11 @@ def defs_for_dataset(dataset: S3TimeseriesDataset) -> dg.Definitions:  # noqa: C
             daily_dfs.append(df)
 
         df = pd.concat(daily_dfs, ignore_index=True)
-        if dataset.config.dataset_type =='profile':
-            indx_var = ["time","depth"]
+        if dataset.config.dataset_type == "profile":
+            indx_var = ["time", "depth"]
         else:
             indx_var = "time"
-        
-        
+
         df = df.sort_values(indx_var)
         df = df.drop_duplicates(subset=indx_var)
         df["time"] = pd.to_datetime(df["time"])
@@ -298,11 +300,14 @@ def defs_for_dataset(dataset: S3TimeseriesDataset) -> dg.Definitions:  # noqa: C
         # apply attributes
 
         ds["time"].encoding.update(
-            {"units": "seconds since 1970-01-01T00:00:00Z", "calendar": "gregorian", "standard_name":"time"},
+            {
+                "units": "seconds since 1970-01-01T00:00:00Z",
+                "calendar": "gregorian",
+                "standard_name": "time",
+            },
         )
 
         dataset.config.attributes.add_attributes_from_yaml()
-
 
         dataset.config.attributes.apply_to_dataset(ds)
 

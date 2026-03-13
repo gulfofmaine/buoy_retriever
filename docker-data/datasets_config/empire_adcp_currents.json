@@ -5,9 +5,7 @@
   },
   "station": "Empire Wind 1",
   "latitude": 40.319,
-  "drop_vars": [
-    "ZCel_WTmp"
-  ],
+  "drop_vars": ["ZCel_WTmp"],
   "longitude": -73.4461,
   "s3_source": {
     "bucket": "ott-empire",

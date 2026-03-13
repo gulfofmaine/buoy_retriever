@@ -1,9 +1,10 @@
 {
-  "reader": {"sep": ";","comment": "#"},
+  "reader": { "sep": ";", "comment": "#" },
   "station": "Empire Wind 1",
   "latitude": null,
-  "s3_source": {"bucket": "ott-empire","prefix": "/"},
-  "attributes": {"variables": {
+  "s3_source": { "bucket": "ott-empire", "prefix": "/" },
+  "attributes": {
+    "variables": {
       "MetSENS_RH_Avg": {
         "units": "1",
         "long_name": "Relative Humidity",
@@ -76,10 +77,10 @@
   },
   "start_date": "2025-07-02",
   "dataset_type": "timeseries",
-  "file_pattern": {"day_pattern": "EW01_met_{partition_date:%Y%m%d}_*.txt"},
+  "file_pattern": { "day_pattern": "EW01_met_{partition_date:%Y%m%d}_*.txt" },
   "variable_mappings": [
-    {"output": "time","source": "datetime"},
-    {"output": "latitude","source": "Latitude_Avg"},
-    {"output": "longitude","source": "Longitude_Avg"}
+    { "output": "time", "source": "datetime" },
+    { "output": "latitude", "source": "Latitude_Avg" },
+    { "output": "longitude", "source": "Longitude_Avg" }
   ]
 }

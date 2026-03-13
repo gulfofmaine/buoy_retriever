@@ -5,9 +5,7 @@
   },
   "station": "SFW01",
   "latitude": 41.0775,
-  "drop_vars": [
-    "ZCel_WTmp"
-  ],
+  "drop_vars": ["ZCel_WTmp"],
   "longitude": -71.1855,
   "s3_source": {
     "bucket": "ott-south-fork-wind",

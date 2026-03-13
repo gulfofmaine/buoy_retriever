@@ -114,7 +114,7 @@
       "TzSwell1": {
         "name": "mean_wave_period_swell_1",
         "units": "seconds",
-        "long_name": "mean period 1st swell componnent",
+        "long_name": "mean period 1st swell component",
         "instrument": "Seaview SVS-603b",
         "standard_name": "sea_surface_primary_swell_wave_mean_period"
       },
