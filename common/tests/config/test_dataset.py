@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from common.config import ConfigState, DatasetBase, DatasetConfigBase
 
 
@@ -46,3 +48,12 @@ def test_dataset():
         "config": {"test_field": "test"},
         "config_state": ConfigState.DRAFT,
     }
+
+
+def test_dataset_from_fixture():
+    path = Path("docker-data/test-data/s3_timeseries/fixtures/empire_met_frontend.json")
+    created_dt_str = "2026-01-05T21:15:24.530Z"
+    dataset = DatasetTest.from_fixture(path, created_dt_str)
+    assert dataset.slug == "empire-met-frontend"
+    assert dataset.config_state == ConfigState.DRAFT
+    assert dataset.config.test_field == "test"

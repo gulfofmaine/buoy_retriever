@@ -1,0 +1,100 @@
+[
+  {
+    "model": "datasets.dataset",
+    "fields": {
+      "slug": "empire_met_frontend",
+      "pipeline": "s3_timeseries",
+      "state": "Active",
+      "created": "2026-01-05T21:15:24.482Z",
+      "edited": "2026-01-09T01:31:27.934Z"
+    }
+  },
+  {
+    "model": "datasets.datasetconfig",
+    "pk": 9,
+    "fields": {
+      "dataset": "empire_met_frontend",
+      "config": {
+        "reader": {
+          "sep": ";",
+          "comment": "#"
+        },
+        "station": "EW1-met",
+        "latitude": null,
+        "s3_source": {
+          "bucket": "ott-empire",
+          "prefix": "/"
+        },
+        "start_date": "2025-07-03",
+        "file_pattern": {
+          "day_pattern": "EW01_met_{partition_date:%Y%m%d}_*.txt"
+        },
+        "variable_mappings": [
+          {
+            "output": "time",
+            "source": "datetime"
+          },
+          {
+            "output": "time",
+            "source": "datetime"
+          },
+          {
+            "output": "latitude",
+            "source": "Latitude_Avg"
+          },
+          {
+            "output": "longitude",
+            "source": "Longitude_Avg"
+          }
+        ]
+      },
+      "created": "2026-01-09T01:31:15.453Z",
+      "edited": "2026-01-09T01:31:27.935Z",
+      "state": "Published"
+    }
+  },
+  {
+    "model": "datasets.datasetconfig",
+    "pk": 8,
+    "fields": {
+      "dataset": "empire_met_frontend",
+      "config": {
+        "reader": {
+          "sep": ";",
+          "comment": "#"
+        },
+        "station": "EW1-met",
+        "latitude": null,
+        "s3_source": {
+          "bucket": "ott-empire",
+          "prefix": "/"
+        },
+        "start_date": "2025-07-03",
+        "file_pattern": {
+          "day_pattern": "EW01_met_{partition_date:%Y%m%d}_*.txt"
+        },
+        "variable_mappings": [
+          {
+            "output": "time",
+            "source": "datetime"
+          },
+          {
+            "output": "time",
+            "source": "datetime"
+          },
+          {
+            "output": "latitude",
+            "source": "Latitude_Avg"
+          },
+          {
+            "output": "longitude",
+            "source": "Longitude_Avg"
+          }
+        ]
+      },
+      "created": "2026-01-05T21:15:24.530Z",
+      "edited": "2026-01-09T20:23:56.877Z",
+      "state": "Draft"
+    }
+  }
+]
