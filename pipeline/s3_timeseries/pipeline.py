@@ -163,17 +163,15 @@ def defs_for_dataset(dataset: S3TimeseriesDataset) -> dg.Definitions:  # noqa: C
                 df = dataset.config.reader.read_df(f)
 
                 if dataset.config.variable_converter is not None:
-                    for (
-                        split_conv
-                    ) in dataset.config.variable_converter.split_operations:
-                        splt_col = df[split_conv.source_variable].str.split(
-                            split_conv.sep,
-                            expand=True,
-                        )
-                        for n_var in split_conv.output_variables:
-                            df[split_conv.output_variables[n_var]] = splt_col[n_var]
-
-                        df = df.drop(split_conv.source_variable, axis=1)
+                    for split_conv in dataset.config.variable_converter:
+                        if isinstance(split_conv, mappings.SplitOperator):
+                            splt_col = df[split_conv.source_variable].str.split(
+                                split_conv.sep,
+                                expand=True,
+                            )
+                            for n_var in split_conv.output_variables:
+                                df[split_conv.output_variables[n_var]] = splt_col[n_var]
+                            df = df.drop(split_conv.source_variable, axis=1)
                 if dataset.config.drop_vars is not None:
                     df = df.drop(columns=dataset.config.drop_vars)
 
@@ -449,7 +447,6 @@ def build_defs() -> dg.Definitions:
         )
 
         datasets = api_client.datasets_for_pipeline(pipeline.slug, S3TimeseriesDataset)
-
         for dataset in datasets:
             dataset_defs = defs_for_dataset(dataset)
             defs = dg.Definitions.merge(defs, dataset_defs)

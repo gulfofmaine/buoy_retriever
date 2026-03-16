@@ -73,16 +73,14 @@
       "source": "CVOW WRB03_DWR4_OSS PRV_HRD_150 PRV WAVE SIGNIFICANT HEIGHT  (m) (nodatamode_repeat)"
     }
   ],
-  "variable_converter": {
-    "split_operations": [
-      {
-        "sep": ":",
-        "source_variable": "CVOW WRB03_DWR4_OSS PRV_HRD_150 PRV LOCATION  () (last)",
-        "output_variables": {
-          "0": "latitude",
-          "2": "longitude"
-        }
+  "variable_converter": [
+    {
+      "sep": ":",
+      "source_variable": "CVOW WRB03_DWR4_OSS PRV_HRD_150 PRV LOCATION  () (last)",
+      "output_variables": {
+        "0": "latitude",
+        "2": "longitude"
       }
-    ]
-  }
+    }
+  ]
 }

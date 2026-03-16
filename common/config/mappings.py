@@ -8,11 +8,15 @@ class VarMap(BaseModel):
 
     source: Annotated[
         str,
-        Field(description="The source variable name in the input data"),
+        Field(
+            description="The source variable name in the input data",
+        ),
     ]
     output: Annotated[
         str,
-        Field(description="The output variable name in the dataset"),
+        Field(
+            description="The output variable name in the dataset",
+        ),
     ]
 
 
@@ -33,11 +37,15 @@ class DepthMap(BaseModel):
 
     source_variable: Annotated[
         str,
-        Field(description="The source variable name in the input data"),
+        Field(
+            description="The source variable name in the input data",
+        ),
     ]
     depth: Annotated[
         int,
-        Field(description="The depth (in meters) for this variable"),
+        Field(
+            description="The depth (in meters) for this variable",
+        ),
     ]
 
 
@@ -46,11 +54,15 @@ class DepthGroup(BaseModel):
 
     output_variable: Annotated[
         str,
-        Field(description="The output variable name in the dataset"),
+        Field(
+            description="The output variable name in the dataset",
+        ),
     ]
     depths: Annotated[
         list[DepthMap],
-        Field(description="List of source variables and their corresponding depths"),
+        Field(
+            description="List of source variables and their corresponding depths",
+        ),
     ]
 
 
@@ -82,24 +94,22 @@ class SplitOperator(BaseModel):
 
     sep: Annotated[
         str,
-        Field(description="The separator"),
+        Field(
+            description="The separator",
+        ),
     ]
 
     output_variables: Annotated[
         dict[int, str],
-        Field(description="Mapping of index number to output variable."),
+        Field(
+            description="Mapping of index number to output variable.",
+        ),
     ]
-
     source_variable: Annotated[
         str,
-        Field(description="The source variable to split into multiple columns"),
-    ]
-
-
-class SplitOperations(BaseModel):
-    split_operations: Annotated[
-        list[SplitOperator],
-        Field(description="List of variables to split into multiple variables"),
+        Field(
+            description="The source variable to split into multiple columns",
+        ),
     ]
 
 
@@ -107,9 +117,9 @@ class VariableConverterMixIn:
     """Mixin to add column conversion rules to a dataset"""
 
     variable_converter: Annotated[
-        SplitOperations,
+        list[SplitOperator],
         Field(
-            description="Split variable converter",
+            description="List of variable conversion steps",
         ),
     ] = None
 
