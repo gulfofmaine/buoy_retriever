@@ -24,7 +24,8 @@ repos:
         exclude: |
           (?x)^(
           frontend/package-lock.json|
-          docker-data/datasets_config/s3_pipeline/.*\.json
+          docker-data/datasets_config/s3_pipeline/.*\.json|
+          pipeline/s3_timeseries/tests/test_data
           )$
 
   - repo: https://github.com/asottile/add-trailing-comma
