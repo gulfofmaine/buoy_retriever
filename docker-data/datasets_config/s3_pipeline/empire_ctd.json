@@ -46,7 +46,7 @@
         "coverage_content_type": "physicalMeasurement"
       }
     },
-    "additional_attributes_path": "/mnt/datasets_config/empire_attributes.yaml"
+    "additional_attributes_file": "empire_attributes.yaml"
   },
   "start_date": "2025-07-02",
   "dataset_type": "timeseries",

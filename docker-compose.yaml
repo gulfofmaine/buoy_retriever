@@ -127,12 +127,13 @@ services:
     - ./docker-data/common.env
     - ./docker-data/dagster.env
     - ./docker-data/secret.env
+    - ./docker-data/s3_pipeline.env
     volumes:
       - ./pipeline/s3_timeseries:/home/ioos:cached
       - /home/ioos/.pixi
       - ./common/:/home/ioos/common/:cached
       - ./docker-data/shared-fs:/mnt/efs/
-      - ./docker-data/datasets_config:/mnt/datasets_config
+      - ./docker-data/datasets_config/s3_pipeline/metadata/:/mnt/datasets_config/metadata
     depends_on:
       backend:
         condition: service_started

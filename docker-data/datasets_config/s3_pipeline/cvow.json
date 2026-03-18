@@ -35,7 +35,7 @@
     "prefix": "/"
   },
   "attributes": {
-    "additional_attributes_path": "/mnt/datasets_config/cvow.yaml"
+    "additional_attributes_file": "cvow.yaml"
   },
   "start_date": "2025-05-02",
   "dataset_type": "timeseries",

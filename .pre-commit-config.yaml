@@ -21,7 +21,11 @@ repos:
         args:
           - --quiet-level=2
           # - --uri-ignore-words-list=BA
-        exclude: frontend/package-lock.json
+        exclude: |
+          (?x)^(
+          frontend/package-lock.json|
+          docker-data/datasets_config/s3_pipeline/.*\.json
+          )$
 
   - repo: https://github.com/asottile/add-trailing-comma
     rev: v3.2.0

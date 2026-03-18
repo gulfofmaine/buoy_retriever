@@ -3,197 +3,188 @@
     "sep": ";",
     "comment": "#"
   },
-  "station": "SFW01",
-  "latitude": 41.0775,
+  "station": "Empire Wind 1",
+  "latitude": 40.319,
   "drop_vars": ["ZCel_WTmp"],
-  "longitude": -71.1855,
+  "longitude": -73.4461,
   "s3_source": {
-    "bucket": "ott-south-fork-wind",
+    "bucket": "ott-empire",
     "prefix": "/"
   },
   "attributes": {
     "variables": {
-      "time": {
-        "standard_name": "time"
-      },
       "depth": {
-        "units": "meters",
+        "axis": "Z",
+        "units": "m",
         "positive": "down",
+        "long_name": "Depth",
+        "ioos_category": "Location",
         "standard_name": "depth"
       },
       "CurrSpd": {
-        "name": "current speed",
-        "units": "m/s",
-        "long_name": "current_speed",
-        "instrument": "Nortek Aquadopp Profiler Z-Cell 600kHz",
-        "standard_name": "sea_water_speed"
-      },
-      "station": {
-        "cf_role": "timeseries_id",
-        "long_name": "Station SFW01-current",
-        "standard_name": "platform_name"
-      },
-      "latitude": {
-        "units": "degrees_north",
-        "standard_name": "latitude"
+        "units": "m s-1",
+        "long_name": "Current Speed",
+        "ncei_name": "CURRENT METER - SPEED",
+        "ioos_category": "Currents",
+        "standard_name": "sea_water_speed",
+        "standard_name_url": "https://vocab.nerc.ac.uk/collection/P07/current/CFSN0334",
+        "coverage_content_type": "physicalMeasurement"
       },
       "CurrDirTo": {
-        "name": "current_direction",
         "units": "degree",
-        "long_name": "current direction",
-        "instrument": "Nortek Aquadopp Profiler Z-Cell 600kHz",
-        "standard_name": "sea_water_velocity_to_direction"
-      },
-      "longitude": {
-        "units": "degrees_east",
-        "standard_name": "longitude"
+        "long_name": "Current Direction",
+        "ncei_name": "CURRENT METER - DIRECTION",
+        "ioos_category": "Currents",
+        "standard_name": "sea_water_velocity_to_direction",
+        "standard_name_url": "https://vocab.nerc.ac.uk/collection/P07/current/5D4D7YMF",
+        "coverage_content_type": "physicalMeasurement"
       }
     },
-    "additional_attributes_path": "/mnt/datasets_config/south_fork_attributes.yaml"
+    "additional_attributes_file": "empire_attributes.yaml"
   },
-  "start_date": "2025-07-03",
+  "start_date": "2025-07-02",
   "dataset_type": "profile",
   "file_pattern": {
-    "day_pattern": "SFW01_WB_02_current_{partition_date:%Y%m%d}_*.txt"
+    "day_pattern": "EW01_ADCP_{partition_date:%Y%m%d}_*.txt"
   },
   "profile_data": [
     {
-      "depth": 1,
       "mappings": {
         "CurrSpd1": "CurrSpd",
+        "ZCelDpth1": "depth",
         "CurrDirTo1": "CurrDirTo"
       }
     },
     {
-      "depth": 4,
       "mappings": {
         "CurrSpd2": "CurrSpd",
+        "ZCelDpth2": "depth",
         "CurrDirTo2": "CurrDirTo"
       }
     },
     {
-      "depth": 6,
       "mappings": {
         "CurrSpd3": "CurrSpd",
+        "ZCelDpth3": "depth",
         "CurrDirTo3": "CurrDirTo"
       }
     },
     {
-      "depth": 8,
       "mappings": {
         "CurrSpd4": "CurrSpd",
+        "ZCelDpth4": "depth",
         "CurrDirTo4": "CurrDirTo"
       }
     },
     {
-      "depth": 10,
       "mappings": {
         "CurrSpd5": "CurrSpd",
+        "ZCelDpth5": "depth",
         "CurrDirTo5": "CurrDirTo"
       }
     },
     {
-      "depth": 12,
       "mappings": {
         "CurrSpd6": "CurrSpd",
+        "ZCelDpth6": "depth",
         "CurrDirTo6": "CurrDirTo"
       }
     },
     {
-      "depth": 14,
       "mappings": {
         "CurrSpd7": "CurrSpd",
+        "ZCelDpth7": "depth",
         "CurrDirTo7": "CurrDirTo"
       }
     },
     {
-      "depth": 16,
       "mappings": {
         "CurrSpd8": "CurrSpd",
+        "ZCelDpth8": "depth",
         "CurrDirTo8": "CurrDirTo"
       }
     },
     {
-      "depth": 18,
       "mappings": {
         "CurrSpd9": "CurrSpd",
+        "ZCelDpth9": "depth",
         "CurrDirTo9": "CurrDirTo"
       }
     },
     {
-      "depth": 20,
       "mappings": {
         "CurrSpd10": "CurrSpd",
+        "ZCelDpth10": "depth",
         "CurrDirTo10": "CurrDirTo"
       }
     },
     {
-      "depth": 22,
       "mappings": {
         "CurrSpd11": "CurrSpd",
+        "ZCelDpth11": "depth",
         "CurrDirTo11": "CurrDirTo"
       }
     },
     {
-      "depth": 24,
       "mappings": {
         "CurrSpd12": "CurrSpd",
+        "ZCelDpth12": "depth",
         "CurrDirTo12": "CurrDirTo"
       }
     },
     {
-      "depth": 26,
       "mappings": {
         "CurrSpd13": "CurrSpd",
+        "ZCelDpth13": "depth",
         "CurrDirTo13": "CurrDirTo"
       }
     },
     {
-      "depth": 28,
       "mappings": {
         "CurrSpd14": "CurrSpd",
+        "ZCelDpth14": "depth",
         "CurrDirTo14": "CurrDirTo"
       }
     },
     {
-      "depth": 30,
       "mappings": {
         "CurrSpd15": "CurrSpd",
+        "ZCelDpth15": "depth",
         "CurrDirTo15": "CurrDirTo"
       }
     },
     {
-      "depth": 32,
       "mappings": {
         "CurrSpd16": "CurrSpd",
+        "ZCelDpth16": "depth",
         "CurrDirTo16": "CurrDirTo"
       }
     },
     {
-      "depth": 34,
       "mappings": {
         "CurrSpd17": "CurrSpd",
+        "ZCelDpth17": "depth",
         "CurrDirTo17": "CurrDirTo"
       }
     },
     {
-      "depth": 36,
       "mappings": {
         "CurrSpd18": "CurrSpd",
+        "ZCelDpth18": "depth",
         "CurrDirTo18": "CurrDirTo"
       }
     },
     {
-      "depth": 38,
       "mappings": {
         "CurrSpd19": "CurrSpd",
+        "ZCelDpth19": "depth",
         "CurrDirTo19": "CurrDirTo"
       }
     },
     {
-      "depth": 40,
       "mappings": {
         "CurrSpd20": "CurrSpd",
+        "ZCelDpth20": "depth",
         "CurrDirTo20": "CurrDirTo"
       }
     }

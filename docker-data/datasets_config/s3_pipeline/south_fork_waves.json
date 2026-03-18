@@ -148,7 +148,7 @@
         "standard_name": "sea_surface_secondary_swell_wave_from_direction"
       }
     },
-    "additional_attributes_path": "/mnt/datasets_config/south_fork_attributes.yaml"
+    "additional_attributes_file": "south_fork_attributes.yaml"
   },
   "start_date": "2025-07-03",
   "dataset_type": "timeseries",

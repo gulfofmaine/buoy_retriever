@@ -81,4 +81,3 @@ variable_attributes:
        standard_name: sea_surface_wave_significant_height
        units: m
        ioos_category: Surface Waves
-

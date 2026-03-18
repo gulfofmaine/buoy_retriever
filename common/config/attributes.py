@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 from typing import Annotated, Any
 
@@ -23,10 +24,13 @@ class NcAttributes(BaseModel):
 
     variables: Annotated[
         dict[str, Attributes],
-        Field(description="Variable-specific attributes", default_factory=dict),
+        Field(
+            description="Variable-specific attributes",
+            default_factory=dict,
+        ),
     ]
 
-    additional_attributes_path: Annotated[
+    additional_attributes_file: Annotated[
         str,
         Field(
             description="Path to the file that defines additional attributes for source",
@@ -34,8 +38,16 @@ class NcAttributes(BaseModel):
     ] = None
 
     def add_attributes_from_yaml(self):
-        if self.additional_attributes_path is not None:
-            with Path.open(self.additional_attributes_path, "r") as file:
+        if self.additional_attributes_file is not None:
+            try:
+                metadata_path = os.environ["METADATA_PATH"]
+            except KeyError:
+                metadata_path = ""
+
+            with Path.open(
+                Path(metadata_path) / self.additional_attributes_file,
+                "r",
+            ) as file:
                 data = yaml.safe_load(file)
             if "global_attributes" in data:
                 self.global_attributes = (
@@ -55,7 +67,6 @@ class NcAttributes(BaseModel):
     @classmethod
     def from_yaml(cls, path: Path):
         """Load attributes from a YAML file"""
-        import yaml
 
         with path.open("r") as f:
             data = yaml.safe_load(f)
