@@ -31,7 +31,9 @@ def defs(dataset_config):
 
 @pytest.mark.parametrize(
     "asset_name",
-    [pytest.param("empire_met")],
+    [
+        pytest.param("empire_met"),
+    ],
 )
 def test_can_build_defs(defs):
     assert defs is not None
@@ -208,6 +210,15 @@ def test_daily_asset(
             "2025-11-01",
         ),
         pytest.param(
+            "empire_met",
+            {
+                "2025-10-12": "tests/test_data/empire_met/2025-10-12.csv",
+                "2025-10-13": "tests/test_data/empire_met/2025-10-13.csv",
+            },
+            "tests/test_data/empire_met/test_empire_met_monthly_asset_with_nans.nc",
+            "2025-12-01",
+        ),
+        pytest.param(
             "empire_waves",
             {
                 "2025-11-12": "tests/test_data/empire_waves/test_empire_waves_20251112.csv",
@@ -266,7 +277,9 @@ def test_daily_asset(
         ),
         pytest.param(
             "cvow",
-            {"2025-12-22": "tests/test_data/cvow/test_cvow_20251222.csv"},
+            {
+                "2025-12-22": "tests/test_data/cvow/test_cvow_20251222.csv",
+            },
             "tests/test_data/cvow/test_cvow_202512.nc",
             "2025-12-01",
         ),
@@ -298,7 +311,6 @@ def test_monthly_asset(
             daily_snapshot_dict[daily_key],
             parse_dates=[dataset_config.config.source_time_var],
         )
-        print(daily_df[daily_key])
 
     ds = monthly_ds(context, daily_df=daily_df)
 
