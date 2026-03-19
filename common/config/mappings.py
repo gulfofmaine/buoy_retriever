@@ -8,11 +8,15 @@ class VarMap(BaseModel):
 
     source: Annotated[
         str,
-        Field(description="The source variable name in the input data"),
+        Field(
+            description="The source variable name in the input data",
+        ),
     ]
     output: Annotated[
         str,
-        Field(description="The output variable name in the dataset"),
+        Field(
+            description="The output variable name in the dataset",
+        ),
     ]
 
 
@@ -33,11 +37,15 @@ class DepthMap(BaseModel):
 
     source_variable: Annotated[
         str,
-        Field(description="The source variable name in the input data"),
+        Field(
+            description="The source variable name in the input data",
+        ),
     ]
     depth: Annotated[
         int,
-        Field(description="The depth (in meters) for this variable"),
+        Field(
+            description="The depth (in meters) for this variable",
+        ),
     ]
 
 
@@ -46,11 +54,15 @@ class DepthGroup(BaseModel):
 
     output_variable: Annotated[
         str,
-        Field(description="The output variable name in the dataset"),
+        Field(
+            description="The output variable name in the dataset",
+        ),
     ]
     depths: Annotated[
         list[DepthMap],
-        Field(description="List of source variables and their corresponding depths"),
+        Field(
+            description="List of source variables and their corresponding depths",
+        ),
     ]
 
 
@@ -73,5 +85,67 @@ class OptionalDepthMappingMixin:
         list[DepthGroup] | None,
         Field(
             description="Depth mappings for variables with multiple depth levels",
+        ),
+    ] = None
+
+
+class SplitOperator(BaseModel):
+    """Takes the source variable, splits it on the separator and  maps the resulting array to new variables"""
+
+    sep: Annotated[
+        str,
+        Field(
+            description="The separator",
+        ),
+    ]
+
+    output_variables: Annotated[
+        dict[int, str],
+        Field(
+            description="Mapping of index number to output variable.",
+        ),
+    ]
+    source_variable: Annotated[
+        str,
+        Field(
+            description="The source variable to split into multiple columns",
+        ),
+    ]
+
+
+class VariableConverterMixIn:
+    """Mixin to add column conversion rules to a dataset"""
+
+    variable_converter: Annotated[
+        list[SplitOperator],
+        Field(
+            description="List of variable conversion steps",
+        ),
+    ] = None
+
+
+class ProfileDepthMappings(BaseModel):
+    depth: Annotated[
+        float,
+        Field(
+            description="Optional- fixed depth for the mapping.",
+        ),
+    ] = None
+
+    mappings: Annotated[
+        dict[str, str],
+        Field(
+            description="Maps input variables to output variables at the current depth ",
+        ),
+    ]
+
+
+class OptionalProfileDepthMixin:
+    """Mixin to add profile depth mappings configuration to a dataset"""
+
+    profile_data: Annotated[
+        list[ProfileDepthMappings],
+        Field(
+            description="Mapping for variables with multiple depth levels",
         ),
     ] = None

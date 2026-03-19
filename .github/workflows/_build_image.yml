@@ -30,6 +30,11 @@ on:
         description: Should the image be pushed to the container registry
         required: false
         default: false
+      test_docker_cmd_options:
+        type: string
+        description: Docker command line options needed to run the tests
+        required: false
+        default: ''
     #   test_dagster_jobs:
     #     type: boolean
     #     description: Test if Dagster can load jobs from the repo
@@ -142,7 +147,11 @@ on:
         description: Upload test results to Codecov
         required: false
         default: false
-
+      test_docker_cmd_options:
+        type: string
+        description: Docker command line options needed to run the tests
+        required: false
+        default: ''
 jobs:
   build-image:
     runs-on: ubuntu-22.04
@@ -218,7 +227,7 @@ jobs:
       - name: Run tests inside container
         if: ${{ inputs.test_command }}
         run: |
-            docker run --name test-container -e CI=true ${{ env.IMAGE_NAME }}:${{ env.DOCKER_TAG }} /bin/sh -c "${{ inputs.test_command }}"
+            docker run --name test-container ${{ inputs.test_docker_cmd_options }} -e CI=true ${{ env.IMAGE_NAME }}:${{ env.DOCKER_TAG }} /bin/sh -c "${{ inputs.test_command }}"
 
       - name: Extract coverage data
         if: ${{ inputs.test_command && inputs.coverage_flags != '' }}
