@@ -135,6 +135,7 @@ services:
       - ./common/:/home/ioos/common/:cached
       - ./docker-data/shared-fs:/mnt/efs/
       - ./docker-data/datasets_config/s3_pipeline/metadata/:/mnt/datasets_config/metadata
+      - ./docker-data/test-data:/mnt/test-data:cached
     depends_on:
       backend:
         condition: service_started
@@ -154,6 +155,7 @@ services:
       - /home/ioos/.pixi
       - ./common/:/home/ioos/common/:cached
       - ./docker-data/shared-fs:/mnt/efs/
+      - ./docker-data/test-data:/mnt/test-data:cached
     depends_on:
       backend:
         condition: service_started

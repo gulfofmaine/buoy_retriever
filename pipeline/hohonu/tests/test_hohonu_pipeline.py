@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 
 import dagster as dg
 import pandas as pd
@@ -9,6 +10,8 @@ from common import io, test_utils
 from pipeline import HohonuDataset, defs_for_dataset
 
 from hohonu_api import HohonuApi
+
+TEST_DATA_DIR = Path("/mnt/test-data/hohonu/")
 
 
 @pytest.fixture(scope="module")
@@ -21,18 +24,8 @@ def vcr_config():
 
 @pytest.fixture
 def dataset():
-    return HohonuDataset(
-        **{
-            "slug": "hohonu-test",
-            "config": {
-                "station": "me_tide_boothbay_harbor_dmr",
-                "latitude": 43.8445,
-                "hohonu_id": "hohonu-169",
-                "longitude": -69.6409,
-                "start_date": "2023-12-06",
-            },
-        },
-    )
+    config_path = TEST_DATA_DIR / "fixtures/boothbay_dmr.json"
+    return HohonuDataset.from_fixture(config_path, "2026-01-10T14:03:55.644Z")
 
 
 @pytest.fixture
@@ -45,14 +38,14 @@ def test_can_build_defs(defs):
     assert len(defs.assets) == 2
 
 
-@pytest.mark.vcr()
+@pytest.mark.vcr(TEST_DATA_DIR / "cassettes/test_hohonu_pipeline/test_daily_asset.yaml")
 def test_daily_asset(defs, dataset):
     daily_df = test_utils.get_asset_by_name(defs, "daily_df")
     spec = daily_df.get_asset_spec()
 
     assert daily_df is not None, "There should be a daily_df asset"
-    assert spec.group_name == "hohonu_test", "The group name should be hohonu_test"
-    assert spec.description == "Download daily dataframe from Hohonu for hohonu-test"
+    assert spec.group_name == "boothbay_dmr", "The group name should be boothbay_dmr"
+    assert spec.description == "Download daily dataframe from Hohonu for boothbay_dmr"
     assert spec.metadata[io.DESIRED_PATH] == dataset.daily_partition_path()
 
     context = dg.build_asset_context(partition_key="2025-09-30")
@@ -65,8 +58,8 @@ def test_daily_asset(defs, dataset):
     assert isinstance(df, pd.DataFrame)
 
     # Uncomment to update CSV snapshot
-    # df.to_csv("tests/test_daily_asset.csv", index=False)
-    snapshot = pd.read_csv("tests/test_daily_asset.csv", parse_dates=["time"])
+    # df.to_csv(TEST_DATA_DIR / "test_daily_asset.csv", index=False)
+    snapshot = pd.read_csv(TEST_DATA_DIR / "test_daily_asset.csv", parse_dates=["time"])
     pd.testing.assert_frame_equal(df, snapshot)
 
 
@@ -74,13 +67,16 @@ def test_monthly_asset(defs, dataset):
     monthly_ds = test_utils.get_asset_by_name(defs, "monthly_ds")
     spec = monthly_ds.get_asset_spec()
     assert monthly_ds is not None
-    assert spec.group_name == "hohonu_test"
-    assert spec.description == "Monthly NetCDFs for hohonu-test"
+    assert spec.group_name == "boothbay_dmr"
+    assert spec.description == "Monthly NetCDFs for boothbay_dmr"
     assert spec.metadata[io.DESIRED_PATH] == dataset.monthly_partition_path()
     context = dg.build_asset_context(partition_key="2025-09-01")
 
     daily_df = {
-        "2025-09-01": pd.read_csv("tests/test_daily_asset.csv", parse_dates=["time"]),
+        "2025-09-01": pd.read_csv(
+            TEST_DATA_DIR / "test_daily_asset.csv",
+            parse_dates=["time"],
+        ),
     }
     daily_df["2025-09-02"] = daily_df["2025-09-01"].copy()
     daily_df["2025-09-02"]["time"] += pd.Timedelta(days=1)
