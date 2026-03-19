@@ -1,0 +1,45 @@
+[
+  {
+    "model": "datasets.dataset",
+    "fields": {
+      "slug": "south_fork",
+      "pipeline": ["s3_timeseries"],
+      "state": "Active",
+      "created": "2026-01-25T00:35:49.843Z",
+      "edited": "2026-01-25T00:35:49.843Z"
+    }
+  },
+  {
+    "model": "datasets.datasetconfig",
+    "pk": 17,
+    "fields": {
+      "dataset": ["south_fork"],
+      "config": {
+        "reader": {
+          "sep": ";",
+          "comment": "#"
+        },
+        "station": "SF01-wave",
+        "latitude": 41.0775,
+        "longitude": -71.1855,
+        "s3_source": {
+          "bucket": "ott-south-fork-wind",
+          "prefix": "/"
+        },
+        "start_date": "2025-01-27T00:00:00.000Z",
+        "file_pattern": {
+          "day_pattern": "SFW01_WB_02_wave_{partition_date:%Y%m%d}_*"
+        },
+        "variable_mappings": [
+          {
+            "output": "time",
+            "source": "datetime"
+          }
+        ]
+      },
+      "created": "2026-01-25T00:35:49.866Z",
+      "edited": "2026-02-02T21:59:54.686Z",
+      "state": "Testing"
+    }
+  }
+]

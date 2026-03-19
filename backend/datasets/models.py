@@ -41,7 +41,7 @@ class Dataset(models.Model):
         return self.slug
 
     def natural_key(self):
-        return self.slug
+        return (self.slug,)
 
     def can_view(self, user: User) -> bool:
         """Check if the user has view permission for this dataset."""

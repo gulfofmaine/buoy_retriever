@@ -218,7 +218,7 @@ jobs:
       - name: Run tests inside container
         if: ${{ inputs.test_command }}
         run: |
-            docker run --name test-container -e CI=true ${{ env.IMAGE_NAME }}:${{ env.DOCKER_TAG }} /bin/sh -c "${{ inputs.test_command }}"
+            docker run -v ./docker-data/test-data:/mnt/test-data:ro --name test-container -e CI=true ${{ env.IMAGE_NAME }}:${{ env.DOCKER_TAG }} /bin/sh -c "${{ inputs.test_command }}"
 
       - name: Extract coverage data
         if: ${{ inputs.test_command && inputs.coverage_flags != '' }}

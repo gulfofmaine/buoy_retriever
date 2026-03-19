@@ -2,18 +2,18 @@
   {
     "model": "datasets.dataset",
     "fields": {
-      "slug": "empire_met_frontend",
-      "pipeline": "s3_timeseries",
+      "slug": "empire_met",
+      "pipeline": ["s3_timeseries"],
       "state": "Active",
       "created": "2026-01-05T21:15:24.482Z",
-      "edited": "2026-01-09T01:31:27.934Z"
+      "edited": "2026-03-19T20:22:26.679Z"
     }
   },
   {
     "model": "datasets.datasetconfig",
     "pk": 9,
     "fields": {
-      "dataset": "empire_met_frontend",
+      "dataset": ["empire_met"],
       "config": {
         "reader": {
           "sep": ";",
@@ -49,7 +49,7 @@
         ]
       },
       "created": "2026-01-09T01:31:15.453Z",
-      "edited": "2026-01-09T01:31:27.935Z",
+      "edited": "2026-03-16T14:55:06.160Z",
       "state": "Published"
     }
   },
@@ -57,7 +57,7 @@
     "model": "datasets.datasetconfig",
     "pk": 8,
     "fields": {
-      "dataset": "empire_met_frontend",
+      "dataset": ["empire_met"],
       "config": {
         "reader": {
           "sep": ";",
@@ -93,7 +93,7 @@
         ]
       },
       "created": "2026-01-05T21:15:24.530Z",
-      "edited": "2026-01-09T20:23:56.877Z",
+      "edited": "2026-03-16T14:55:06.160Z",
       "state": "Draft"
     }
   }

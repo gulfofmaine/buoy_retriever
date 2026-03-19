@@ -1,4 +1,5 @@
 import json
+from datetime import datetime, timedelta
 from enum import Enum
 from pathlib import Path
 from typing import Self, TypeVar
@@ -56,7 +57,12 @@ class DatasetBase[ConfigT](BaseModel):
                 x
                 for x in data
                 if x["model"] == "datasets.datasetconfig"
-                and x["fields"]["created"] == created_dt_str
+                and (
+                    datetime.fromisoformat(x["fields"]["created"])
+                    >= datetime.fromisoformat(created_dt_str) - timedelta(seconds=1)
+                    and datetime.fromisoformat(x["fields"]["created"])
+                    <= datetime.fromisoformat(created_dt_str) + timedelta(seconds=1)
+                )
             ),
             None,
         )
