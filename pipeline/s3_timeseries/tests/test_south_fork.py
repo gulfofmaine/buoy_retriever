@@ -103,7 +103,7 @@ def test_monthly_asset(defs, dataset_config, s3_resource):
     assert isinstance(ds, xr.Dataset)
     snapshot_path = TEST_DATA_DIR / "south_fork/monthly_ds_2025-02.nc"
     # Uncomment to update NetCDF snapshot
-    ds.to_netcdf(snapshot_path)
+    # ds.to_netcdf(snapshot_path)
     snapshot = xr.load_dataset(snapshot_path)
 
     xr.testing.assert_equal(ds, snapshot)
