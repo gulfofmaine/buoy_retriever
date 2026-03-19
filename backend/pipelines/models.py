@@ -2,6 +2,11 @@ from django.db import models
 from django.utils.crypto import get_random_string
 
 
+class PipelineManager(models.Manager):
+    def get_by_natural_key(self, slug):
+        return self.get(slug=slug)
+
+
 class Pipeline(models.Model):
     slug = models.SlugField(unique=True)
     name = models.CharField(max_length=255)
@@ -12,11 +17,16 @@ class Pipeline(models.Model):
     edited = models.DateTimeField(auto_now=True)
     active = models.BooleanField(default=True)
 
+    objects = PipelineManager()
+
     def __repr__(self):
         return f"{self.name} ({self.slug})"
 
     def __str__(self):
         return self.__repr__()
+
+    def natural_key(self):
+        return (self.slug,)
 
 
 def _generate_api_key():

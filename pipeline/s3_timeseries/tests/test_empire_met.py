@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import dagster as dg
 import pandas as pd
 import pytest
@@ -6,25 +8,13 @@ import xarray as xr
 from common import io, test_utils
 from pipeline import S3TimeseriesDataset, defs_for_dataset
 
+TEST_DATA_DIR = Path("/mnt/test-data/s3_timeseries/")
+
 
 @pytest.fixture
 def dataset_config():
-    return S3TimeseriesDataset(
-        slug="empire-met-test",
-        config={
-            "reader": {"sep": ";", "comment": "#"},
-            "station": "EW1-met",
-            "latitude": None,
-            "s3_source": {"bucket": "ott-empire", "prefix": "/"},
-            "start_date": "2025-07-03",
-            "file_pattern": {"day_pattern": "EW01_met_{partition_date:%Y%m%d}_*.txt"},
-            "variable_mappings": [
-                {"output": "time", "source": "datetime"},
-                {"output": "latitude", "source": "Latitude_Avg"},
-                {"output": "longitude", "source": "Longitude_Avg"},
-            ],
-        },
-    )
+    config_path = TEST_DATA_DIR / "fixtures/empire_met.json"
+    return S3TimeseriesDataset.from_fixture(config_path, "2026-01-09T01:31:15.453Z")
 
 
 @pytest.fixture
@@ -45,7 +35,7 @@ def test_sensor(defs, mocked_s3, s3_credentials):
     mocked_s3.put_object(Bucket=bucket, Key=object_key1, Body="test")
     mocked_s3.put_object(Bucket=bucket, Key=object_key2, Body="test")
 
-    sensor = test_utils.get_sensor_by_name(defs, "empire_met_test_s3_sensor")
+    sensor = test_utils.get_sensor_by_name(defs, "empire_met_s3_sensor")
     assert sensor is not None
 
     context = dg.build_sensor_context(
@@ -66,9 +56,7 @@ def test_daily_asset(defs, dataset_config, s3_resource):
     spec = daily_df.get_asset_spec()
 
     assert daily_df is not None, "There should be a daily_df asset"
-    assert spec.group_name == "empire_met_test", (
-        "The group name should be empire_met_test"
-    )
+    assert spec.group_name == "empire_met", "The group name should be empire_met"
     assert spec.description == "Download daily dataframe from S3."
     assert spec.metadata[io.DESIRED_PATH] == dataset_config.daily_partition_path()
 
@@ -79,7 +67,7 @@ def test_daily_asset(defs, dataset_config, s3_resource):
     assert isinstance(df, pd.DataFrame)
     assert not df.empty
 
-    snapshot_path = "tests/test_data/empire_met/test_empire_met_daily_asset.csv"
+    snapshot_path = TEST_DATA_DIR / "empire_met/test_empire_met_daily_asset.csv"
 
     # Uncomment to update CSV snapshot
     # df.to_csv(snapshot_path, index=False)
@@ -91,7 +79,7 @@ def test_monthly_asset(defs, dataset_config):
     monthly_ds = test_utils.get_asset_by_name(defs, "monthly_ds")
     spec = monthly_ds.get_asset_spec()
     assert monthly_ds is not None
-    assert spec.group_name == "empire_met_test"
+    assert spec.group_name == "empire_met"
     assert (
         spec.description
         == "Combine daily dataframes into a monthly NetCDF and apply transformations."
@@ -101,7 +89,7 @@ def test_monthly_asset(defs, dataset_config):
 
     daily_df = {
         "2025-11-12": pd.read_csv(
-            "tests/test_data/empire_met/test_empire_met_daily_asset.csv",
+            TEST_DATA_DIR / "empire_met/test_empire_met_daily_asset.csv",
             parse_dates=["datetime"],
         ),
     }
@@ -111,7 +99,7 @@ def test_monthly_asset(defs, dataset_config):
     ds = monthly_ds(context, daily_df=daily_df)
 
     assert isinstance(ds, xr.Dataset)
-    snapshot_path = "tests/test_data/empire_met/test_empire_met_monthly_asset.nc"
+    snapshot_path = TEST_DATA_DIR / "empire_met/test_empire_met_monthly_asset.nc"
     # ds.to_netcdf(snapshot_path)
     snapshot = xr.load_dataset(snapshot_path)
 
@@ -124,11 +112,11 @@ def test_monthly_asset_with_nans(defs, dataset_config):
 
     daily_df = {
         "2025-10-12": pd.read_csv(
-            "tests/test_data/empire_met/2025-10-12.csv",
+            TEST_DATA_DIR / "empire_met/2025-10-12.csv",
             parse_dates=["datetime"],
         ),
         "2025-10-13": pd.read_csv(
-            "tests/test_data/empire_met/2025-10-13.csv",
+            TEST_DATA_DIR / "empire_met/2025-10-13.csv",
             parse_dates=["datetime"],
         ),
     }
@@ -137,7 +125,7 @@ def test_monthly_asset_with_nans(defs, dataset_config):
 
     assert isinstance(ds, xr.Dataset)
     snapshot_path = (
-        "tests/test_data/empire_met/test_empire_met_monthly_asset_with_nans.nc"
+        TEST_DATA_DIR / "empire_met/test_empire_met_monthly_asset_with_nans.nc"
     )
     # ds.to_netcdf(snapshot_path)
     snapshot = xr.load_dataset(snapshot_path)

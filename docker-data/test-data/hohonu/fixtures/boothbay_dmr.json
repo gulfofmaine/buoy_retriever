@@ -1,0 +1,29 @@
+[
+  {
+    "model": "datasets.dataset",
+    "fields": {
+      "slug": "boothbay_dmr",
+      "pipeline": ["hohonu"],
+      "state": "Active",
+      "created": "2026-01-10T14:03:55.643Z",
+      "edited": "2026-03-19T20:43:33.231Z"
+    }
+  },
+  {
+    "model": "datasets.datasetconfig",
+    "pk": 14,
+    "fields": {
+      "dataset": ["boothbay_dmr"],
+      "config": {
+        "station": "me_tide_boothbay_harbor_dmr",
+        "latitude": 43.8445,
+        "hohonu_id": "hohonu-169",
+        "longitude": -69.6409,
+        "start_date": "2023-12-06"
+      },
+      "created": "2026-01-10T14:03:55.644Z",
+      "edited": "2026-01-10T14:03:55.644Z",
+      "state": "Published"
+    }
+  }
+]

@@ -99,6 +99,20 @@ Currently there is some testing for common utilities and Hohonu pipelines.
     - To run tests with real AWS data, include the `--aws` to `pytest`. This requires AWS credentials that can access the buckets.
   - Hohonu - `make test-hohonu` for a more isolated test, or  `docker compose exec/run hohonu pixi run pytest` will mount volumes (in case snapshots need to be updated).
 
+Test data is stored in `docker-data/test-data`. This includes dataset configurations, which can be synced to and from the backend.
+
+### Data management commands
+
+There are several commands to help sync dataset configs to/from the backend for testing and development.
+
+- View all datasets `docker compose exec backend pixi run ./manage.py list_datasets`
+- Save a dataset and configs to disk `docker compose exec backend pixi run ./manage.py dump_dataset <dataset_id>`
+- Load a dataset and configs back into the database `docker compose exec backend pixi run ./manage.py load_dataset <dataset_id>`.
+  - It by default does a dry run so you can see what changes will be made. Add `--write` or `-w` to write out to a file.
+  - The command searches through `docker-data/test-data` to find the matching dataset_id, but a path can be specified with `--input_path <INPUT_PATH>`
+
+These can be used with the `DatasetBase.from_fixture()` method which takes a path to a dataset fixture, and the creation time (within a second to handle some time funkiness between systems) of a specific config to assemble a tested config from the Django database fixtures.
+
 ### Formatting/linting
 
 Various formatters and linters are configured as pre-commit hooks and in Github Actions.

@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import dagster as dg
 import pandas as pd
 import pytest
@@ -6,26 +8,13 @@ import xarray as xr
 from common import io, test_utils
 from pipeline import S3TimeseriesDataset, defs_for_dataset
 
+TEST_DATA_DIR = Path("/mnt/test-data/s3_timeseries/")
+
 
 @pytest.fixture
 def dataset_config():
-    return S3TimeseriesDataset(
-        slug="south-fork-test",
-        config={
-            "reader": {"sep": ";", "comment": "#"},
-            "station": "SFW01-wave",
-            "latitude": 41.0775,
-            "longitude": -71.1855,
-            "s3_source": {"bucket": "ott-south-fork-wind", "prefix": "/"},
-            "start_date": "2025-01-27",
-            "file_pattern": {
-                "day_pattern": "SFW01_WB_02_wave_{partition_date:%Y%m%d}_*",
-            },
-            "variable_mappings": [
-                {"output": "time", "source": "datetime"},
-            ],
-        },
-    )
+    config_path = TEST_DATA_DIR / "fixtures/south_fork.json"
+    return S3TimeseriesDataset.from_fixture(config_path, "2026-01-25T00:35:49.866Z")
 
 
 @pytest.fixture
@@ -46,7 +35,7 @@ def test_sensor(defs, mocked_s3, s3_credentials):
     mocked_s3.put_object(Bucket=bucket, Key=object_key1, Body="test")
     mocked_s3.put_object(Bucket=bucket, Key=object_key2, Body="test")
 
-    sensor = test_utils.get_sensor_by_name(defs, "south_fork_test_s3_sensor")
+    sensor = test_utils.get_sensor_by_name(defs, "south_fork_s3_sensor")
     assert sensor is not None
 
     context = dg.build_sensor_context(
@@ -66,9 +55,7 @@ def test_daily_asset(defs, dataset_config, s3_resource):
     spec = daily_df.get_asset_spec()
 
     assert daily_df is not None, "There should be a daily_df asset"
-    assert spec.group_name == "south_fork_test", (
-        "The group name should be south_fork_test"
-    )
+    assert spec.group_name == "south_fork", "The group name should be south_fork"
     assert spec.description == "Download daily dataframe from S3."
     assert spec.metadata[io.DESIRED_PATH] == dataset_config.daily_partition_path()
 
@@ -79,7 +66,7 @@ def test_daily_asset(defs, dataset_config, s3_resource):
     assert isinstance(df, pd.DataFrame)
     assert not df.empty
 
-    snapshot_path = "tests/test_data/south_fork/daily_df_2025-02-10.csv"
+    snapshot_path = TEST_DATA_DIR / "south_fork/daily_df_2025-02-10.csv"
 
     # Uncomment to update CSV snapshot
     df.to_csv(snapshot_path, index=False)
@@ -91,9 +78,7 @@ def test_monthly_asset(defs, dataset_config, s3_resource):
     monthly_ds = test_utils.get_asset_by_name(defs, "monthly_ds")
     spec = monthly_ds.get_asset_spec()
     assert monthly_ds is not None, "There should be a monthly_ds asset"
-    assert spec.group_name == "south_fork_test", (
-        "The group name should be south_fork_test"
-    )
+    assert spec.group_name == "south_fork", "The group name should be south_fork"
     assert (
         spec.description
         == "Combine daily dataframes into a monthly NetCDF and apply transformations."
@@ -104,7 +89,7 @@ def test_monthly_asset(defs, dataset_config, s3_resource):
 
     daily_df = {
         "2025-02-10": pd.read_csv(
-            "tests/test_data/south_fork/daily_df_2025-02-10.csv",
+            TEST_DATA_DIR / "south_fork/daily_df_2025-02-10.csv",
             parse_dates=["datetime"],
         ),
     }
@@ -116,9 +101,9 @@ def test_monthly_asset(defs, dataset_config, s3_resource):
     ds = monthly_ds(context, daily_df=daily_df)
 
     assert isinstance(ds, xr.Dataset)
-    snapshot_path = "tests/test_data/south_fork/monthly_ds_2025-02.nc"
+    snapshot_path = TEST_DATA_DIR / "south_fork/monthly_ds_2025-02.nc"
     # Uncomment to update NetCDF snapshot
-    ds.to_netcdf(snapshot_path)
+    # ds.to_netcdf(snapshot_path)
     snapshot = xr.load_dataset(snapshot_path)
 
     xr.testing.assert_equal(ds, snapshot)

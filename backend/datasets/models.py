@@ -3,6 +3,11 @@ from django.contrib.auth.models import User, Group
 from guardian.shortcuts import assign_perm
 
 
+class DatasetManager(models.Manager):
+    def get_by_natural_key(self, slug):
+        return self.get(slug=slug)
+
+
 class Dataset(models.Model):
     """A slightly more full featured dataset model where
     the configuration is separated so that it can be versioned"""
@@ -27,11 +32,16 @@ class Dataset(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     edited = models.DateTimeField(auto_now=True)
 
+    objects = DatasetManager()
+
     class Meta:
         permissions = (("publish_dataset", "Can publish dataset"),)
 
     def __str__(self):
         return self.slug
+
+    def natural_key(self):
+        return (self.slug,)
 
     def can_view(self, user: User) -> bool:
         """Check if the user has view permission for this dataset."""
