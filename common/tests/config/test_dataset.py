@@ -1,5 +1,7 @@
 from pathlib import Path
 
+import pytest
+
 from common.config import ConfigState, DatasetBase, DatasetConfigBase
 
 
@@ -50,10 +52,43 @@ def test_dataset():
     }
 
 
+class LoadableTestDataset(DatasetBase):
+    """A dataset class that can be loaded from a fixture"""
+
+    config: DatasetConfigBase
+
+
 def test_dataset_from_fixture():
-    path = Path("docker-data/test-data/s3_timeseries/fixtures/empire_met_frontend.json")
+    path = (
+        Path(__file__).parent.parent.parent.parent
+        / "docker-data/test-data/s3_timeseries/fixtures/empire_met.json"
+    )
     created_dt_str = "2026-01-05T21:15:24.530Z"
-    dataset = DatasetTest.from_fixture(path, created_dt_str)
-    assert dataset.slug == "empire-met-frontend"
+    dataset = LoadableTestDataset.from_fixture(path, created_dt_str)
+    assert dataset.slug == "empire_met"
     assert dataset.config_state == ConfigState.DRAFT
-    assert dataset.config.test_field == "test"
+
+
+def test_dataset_from_fixture_approximate_timestamp():
+    path = (
+        Path(__file__).parent.parent.parent.parent
+        / "docker-data/test-data/s3_timeseries/fixtures/empire_met.json"
+    )
+    created_dt_str = "2026-01-05T21:15:24.000Z"  # slightly different timestamp
+    dataset = LoadableTestDataset.from_fixture(path, created_dt_str)
+    assert dataset.slug == "empire_met"
+    assert dataset.config_state == ConfigState.DRAFT
+
+
+def test_dataset_from_fixture_invalid_timestamp():
+    path = (
+        Path(__file__).parent.parent.parent.parent
+        / "docker-data/test-data/s3_timeseries/fixtures/empire_met.json"
+    )
+    created_dt_str = "2026-01-01T01:00:00.000Z"
+    with pytest.raises(ValueError) as e:
+        LoadableTestDataset.from_fixture(path, created_dt_str)
+    assert (
+        str(e.value)
+        == f"No dataset config found in fixture {path} with created datetime {created_dt_str}"
+    )

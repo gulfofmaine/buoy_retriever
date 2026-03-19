@@ -26,7 +26,7 @@ class Pipeline(models.Model):
         return self.__repr__()
 
     def natural_key(self):
-        return self.slug
+        return (self.slug,)
 
 
 def _generate_api_key():

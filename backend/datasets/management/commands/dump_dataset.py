@@ -12,7 +12,7 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument("dataset_slug", type=str)
         parser.add_argument(
-            "--output_path",
+            "--output-path",
             type=Path,
             help="Path to save the JSON file",
         )
