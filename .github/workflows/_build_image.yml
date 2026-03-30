@@ -155,13 +155,13 @@ jobs:
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3.11.1
+        uses: docker/setup-buildx-action@e468171a9de216ec08956ac3ada2f0791b6bd435 # v3.11.1
 
       - name: Cache Docker layers
-        uses: actions/cache@v4.3.0
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
         with:
           path: /tmp/.buildx-cache
           key: ohw-docker-buildx-${{ inputs.image_name }}-${{ github.sha }}
@@ -180,7 +180,7 @@ jobs:
           echo "image_ref=${DOCKER_TAG}" >> $GITHUB_OUTPUT
 
       - name: Build Docker Image
-        uses: docker/build-push-action@v6.18.0
+        uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6.18.0
         with:
           tags: |
             ${{ env.IMAGE_NAME }}:${{ env.DOCKER_TAG }}
@@ -205,7 +205,7 @@ jobs:
           docker run ${{ env.IMAGE_NAME }}:${{ env.DOCKER_TAG }} pixi list > pixi_packages.txt
 
       - name: Archive Pixi Package List
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: pixi-environment
           path: pixi_packages.txt
@@ -227,7 +227,7 @@ jobs:
 
       - name: Upload coverage to Codecov
         if: ${{ inputs.test_command && inputs.coverage_flags != '' }}
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@75cd11691c0faa626561e295848008c8a7dddffe # v5
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         with:
@@ -244,7 +244,7 @@ jobs:
 
       - name: Upload test results to Codecov
         if: ${{ !cancelled() && inputs.test_command && inputs.upload_tests }}
-        uses: codecov/test-results-action@v1
+        uses: codecov/test-results-action@0fa95f0e1eeaafde2c782583b36b28ad0d8c77d3 # v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
 
@@ -290,7 +290,7 @@ jobs:
     #       cat dagster_schedules.txt >> $GITHUB_STEP_SUMMARY
 
       - name: Log into Docker Hub
-        uses: docker/login-action@v3.5.0
+        uses: docker/login-action@184bdaa0721073962dff0199f1fb9940f07167d1 # v3.5.0
         if: ${{ inputs.push_image}}
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
