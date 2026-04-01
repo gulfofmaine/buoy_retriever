@@ -1,4 +1,4 @@
-FROM ghcr.io/prefix-dev/pixi:0.55.0-noble@sha256:423daf63e4e876ab42b1be9ddee3fc867ba8b9fa511e0634de3b9df12ff1a90d AS base
+FROM ghcr.io/prefix-dev/pixi:0.66.0 AS base
 
 # Output logging faster
 ENV PYTHONUNBUFFERED=1
@@ -22,10 +22,10 @@ USER ${USER}
 WORKDIR ${USER_HOME}
 
 COPY --chown=${USER}:${USER} ./pyproject.toml ./pixi.lock ${USER_HOME}
-RUN --mount=type=cache,id=br_pixi,target=${USER_HOME}.cache/rattler/cache,uid=${USER_UID},gid=${USER_UID} \
-    pixi install -e default
+RUN --mount=type=cache,id=br_pixi,target=${USER_HOME}/.cache/rattler/cache,uid=${USER_UID},gid=${USER_UID} \
+    pixi install -e default --frozen --manifest-path ./pyproject.toml
 
-RUN pixi shell-hook -e default > /support/shell-hook.sh \
+RUN pixi shell-hook -e default --shell bash | grep -vie "activate.d" | grep -vie "completion" > /support/shell-hook.sh \
     && echo 'exec "$@"' >> /support/shell-hook.sh
 
 ARG IMAGE_TAG
