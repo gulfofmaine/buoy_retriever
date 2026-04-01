@@ -7,8 +7,7 @@ ENV PYTHONWARNINGS=once
 
 # User variables
 ENV USER=uwsgi
-ENV USER_HOME="/home/${USER}/"
-ENV USER_UID=1001
+ENV USER_UID=988
 
 # Setup user
 RUN groupadd ${USER} \
