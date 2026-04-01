@@ -7,12 +7,14 @@ ENV PYTHONWARNINGS=once
 
 # User variables
 ENV USER=uwsgi
+ENV USER_HOME="/home/${USER}"
 ENV USER_UID=988
+ENV PIXI_HOME="${USER_HOME}/.pixi"
 
 # Setup user
 RUN groupadd ${USER} \
     && useradd -rm -d ${USER_HOME} -s /bin/bash -g ${USER} -u ${USER_UID} ${USER}
-RUN mkdir -p /static /media /support
+RUN mkdir -p "${USER_HOME}/app" /static /media /support
 RUN chown -R ${USER}:${USER} ${USER_HOME} /static /media /support
 
 
