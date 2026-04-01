@@ -32,13 +32,15 @@ COPY --chown=${USER}:${USER} ./pyproject.toml ./pixi.lock ${USER_HOME}
 RUN --mount=type=cache,id=br_pixi,target=${USER_HOME}/.cache/rattler/cache,uid=${USER_UID},gid=${USER_UID} \
     pixi install -e default --frozen --manifest-path ./pyproject.toml
 
-RUN pixi shell-hook -e default --shell bash | grep -vie "activate.d" | grep -vie "completion" > /support/shell-hook.sh \
-    && echo 'exec "$@"' >> /support/shell-hook.sh
+RUN echo '#!/bin/bash' > /support/shell-hook.sh \
+    && pixi shell-hook -e default --shell bash | grep -vie "activate.d" | grep -vie "completion" >> /support/shell-hook.sh \
+    && echo 'exec "$@"' >> /support/shell-hook.sh \
+    && chmod +x /support/shell-hook.sh
 
 ARG IMAGE_TAG
 ENV IMAGE_TAG=${IMAGE_TAG:-unknown}
 
-ENTRYPOINT ["/bin/bash", "/support/shell-hook.sh"]
+ENTRYPOINT ["/support/shell-hook.sh"]
 
 HEALTHCHECK --interval=30s --timeout=10s --start-period=20s \
     CMD /usr/bin/curl -D- -o /dev/null --silent --fail "http://localhost:8080/backend/health/"
