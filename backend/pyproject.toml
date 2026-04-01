@@ -14,7 +14,7 @@ classifiers = [
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
 ]
-dependencies = [  ]
+dependencies = ["django-allauth[socialaccount]>=65.15.0,<66.0.0"  ]
 
 [tool.ruff]
 lint.extend-select = [
