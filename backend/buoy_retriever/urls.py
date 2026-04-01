@@ -27,4 +27,6 @@ urlpatterns = [
     path(f"{prefix}api/", api.urls),
     path(f"{prefix}health/", include("health_check.urls")),  # health check endpoints
     path(prefix, include("django.contrib.auth.urls")),
+    path("accounts/", include("allauth.socialaccount.providers.openid_connect.urls")),
+
 ]
