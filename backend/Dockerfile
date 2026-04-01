@@ -21,16 +21,16 @@ ENV PIXI_HOME="${USER_HOME}/.pixi"
 # Setup user
 RUN groupadd ${USER} \
     && useradd -rm -d ${USER_HOME} -s /bin/bash -g ${USER} -u ${USER_UID} ${USER}
-RUN mkdir -p "${USER_HOME}/app" /static /media /support
-RUN chown -R ${USER}:${USER} ${USER_HOME} /static /media /support
-
+RUN mkdir -p /static /media /support /opt/pixi/envs
+RUN chown -R ${USER}:${USER} ${USER_HOME} /static /media /support /opt/pixi/envs
 
 USER ${USER}
 WORKDIR ${USER_HOME}
 
 COPY --chown=${USER}:${USER} ./pyproject.toml ./pixi.lock ${USER_HOME}
 RUN --mount=type=cache,id=br_pixi,target=${USER_HOME}/.cache/rattler/cache,uid=${USER_UID},gid=${USER_UID} \
-    pixi install -e default --frozen --manifest-path ./pyproject.toml
+    pixi config set detached-environments "/opt/pixi/envs" \
+    && pixi install -e default --frozen --manifest-path ./pyproject.toml
 
 RUN echo '#!/bin/bash' > /support/shell-hook.sh \
     && pixi shell-hook -e default --shell bash | grep -vie "activate.d" | grep -vie "completion" >> /support/shell-hook.sh \
