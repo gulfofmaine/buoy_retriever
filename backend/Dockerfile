@@ -15,21 +15,22 @@ ENV PYTHONWARNINGS=once
 # User variables
 ENV USER=uwsgi
 ENV USER_HOME="/home/${USER}"
+ENV APP_DIR="/home/${USER}/app"
 ENV USER_UID=988
 ENV PIXI_HOME="${USER_HOME}/.pixi"
 
 # Setup user
 RUN groupadd ${USER} \
     && useradd -rm -d ${USER_HOME} -s /bin/bash -g ${USER} -u ${USER_UID} ${USER}
-RUN mkdir -p /static /media /support /opt/pixi/envs
-RUN chown -R ${USER}:${USER} ${USER_HOME} /static /media /support /opt/pixi/envs
+RUN mkdir -p /static /media /support ${APP_DIR} /opt/pixi/envs
+RUN chown -R ${USER}:${USER} ${USER_HOME} /static /media /support ${APP_DIR} /opt/pixi/envs
 
 USER ${USER}
-WORKDIR ${USER_HOME}
+WORKDIR ${APP_DIR}
 
-COPY --chown=${USER}:${USER} ./pyproject.toml ./pixi.lock ${USER_HOME}
+COPY --chown=${USER}:${USER} ./pyproject.toml ./pixi.lock ${APP_DIR}
 RUN --mount=type=cache,id=br_pixi,target=${USER_HOME}/.cache/rattler/cache,uid=${USER_UID},gid=${USER_UID} \
-    pixi config set detached-environments "/opt/pixi/envs" \
+    pixi config set --global detached-environments "/opt/pixi/envs" \
     && pixi install -e default --frozen --manifest-path ./pyproject.toml
 
 RUN echo '#!/bin/bash' > /support/shell-hook.sh \
