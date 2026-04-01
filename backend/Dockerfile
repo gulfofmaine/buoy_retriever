@@ -1,5 +1,12 @@
 FROM ghcr.io/prefix-dev/pixi:0.66.0 AS base
 
+# Gather required base utils
+RUN apt-get update && apt-get install -y \
+        curl \
+        && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
 # Output logging faster
 ENV PYTHONUNBUFFERED=1
 # Show deprecation warnings https://docs.djangoproject.com/en/2.2/howto/upgrade-version/#resolving-deprecation-warnings
@@ -33,7 +40,8 @@ ENV IMAGE_TAG=${IMAGE_TAG:-unknown}
 
 ENTRYPOINT ["/bin/bash", "/support/shell-hook.sh"]
 
-HEALTHCHECK --interval=30s --timeout=10s --start-period=20s CMD ["curl", "-f", "http://localhost:8000/backend/health/"] || exit 1
+HEALTHCHECK --interval=30s --timeout=10s --start-period=20s \
+    CMD /usr/bin/curl -D- -o /dev/null --silent --fail "http://localhost:8080/backend/health/"
 
 
 FROM base AS develop
