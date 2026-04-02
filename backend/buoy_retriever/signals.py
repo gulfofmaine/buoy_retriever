@@ -16,6 +16,8 @@ KNOWN_TLDS = (
     'axiomdatascience.com',
     'tetratech.com',
     'gmri.org',
+    'noaa.gov',
+    'joasurveys.com',
 )
 
 

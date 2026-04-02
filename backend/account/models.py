@@ -9,11 +9,10 @@ class User(AbstractUser):
     pass
 
 class UserAccountAdapter(DefaultAccountAdapter):
-    pass
-    # def is_open_for_signup(self, request):
-    #     if request.path.rstrip("/") == reverse("account_signup").rstrip("/"):
-    #         return False
-    #     return True
+    def is_open_for_signup(self, request):
+        if request.path.rstrip("/") == reverse("account_signup").rstrip("/"):
+            return False
+        return True
 
 
 class SocialAccountAdapter(DefaultSocialAccountAdapter):
