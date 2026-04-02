@@ -156,6 +156,8 @@ AUTH_USER_MODEL = "buoy_retriever_account.User"
 
 ACCOUNT_ADAPTER = 'account.models.UserAccountAdapter'
 SOCIALACCOUNT_ADAPTER = 'account.models.SocialAccountAdapter'
+
+SOCIALACCOUNT_ONLY = True
 ACCOUNT_SIGNUP_FIELDS = ['username', 'email*']
 ACCOUNT_LOGIN_METHODS = {'email'}
 ACCOUNT_CONFIRM_EMAIL_ON_GET = False
