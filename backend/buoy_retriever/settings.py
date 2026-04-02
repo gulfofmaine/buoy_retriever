@@ -88,6 +88,7 @@ INSTALLED_APPS = [
     "health_check",
     "health_check.db",
     "corsheaders",
+    "buoy_retriever",
     "guardian",
     "account",
     "datasets",
