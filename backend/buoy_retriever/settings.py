@@ -158,7 +158,7 @@ ACCOUNT_ADAPTER = 'account.models.UserAccountAdapter'
 SOCIALACCOUNT_ADAPTER = 'account.models.SocialAccountAdapter'
 ACCOUNT_SIGNUP_FIELDS = ['username', 'email*']
 ACCOUNT_LOGIN_METHODS = {'email'}
-ACCOUNT_CONFIRM_EMAIL_ON_GET = True
+ACCOUNT_CONFIRM_EMAIL_ON_GET = False
 ACCOUNT_DEFAULT_HTTP_PROTOCOL = 'http'
 ACCOUNT_EMAIL_VERIFICATION = 'none'
 LOGIN_URL = '/accounts/oidc/authentik/login/?process='
