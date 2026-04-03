@@ -28,10 +28,19 @@ RUN chown -R ${USER}:${USER} ${USER_HOME} /static /media /support ${APP_DIR} /op
 USER ${USER}
 WORKDIR ${APP_DIR}
 
+# Copy only env spec and build
 COPY --chown=${USER}:${USER} ./pyproject.toml ./pixi.lock ${APP_DIR}
 RUN --mount=type=cache,id=br_pixi,target=${USER_HOME}/.cache/rattler/cache,uid=${USER_UID},gid=${USER_UID} \
     pixi config set --global detached-environments "/opt/pixi/envs" \
     && pixi install -e default --frozen --manifest-path ./pyproject.toml
+
+# Copy app source (and only app source)
+COPY --chown=${USER}:${USER} ./manage.py ${APP_DIR}/
+COPY --chown=${USER}:${USER} ./account ${APP_DIR}/account
+COPY --chown=${USER}:${USER} ./buoy_retriever ${APP_DIR}/buoy_retriever
+COPY --chown=${USER}:${USER} ./datasets ${APP_DIR}/datasets
+COPY --chown=${USER}:${USER} ./pipelines ${APP_DIR}/pipelines
+COPY --chown=${USER}:${USER} ./src ${APP_DIR}/src
 
 RUN echo '#!/bin/bash' > /support/shell-hook.sh \
     && pixi shell-hook -e default --shell bash | grep -vie "activate.d" | grep -vie "completion" >> /support/shell-hook.sh \
