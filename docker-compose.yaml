@@ -1,3 +1,7 @@
+volumes:
+  dbdata:
+  django_static:
+
 services:
   db:
     image: timescale/timescaledb-ha:pg17-ts2.21@sha256:a2f4731fd341e93a96fdc49f21137db0ec27bd3d72a5dab241fec2b344f2f54c
@@ -8,7 +12,7 @@ services:
     environment:
       PGDATA: /var/lib/postgresql/data/PGDATA
     volumes:
-      - ./docker-data/postgres:/var/lib/postgresql/data:cached
+      - dbdata:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-buoy_retriever}"]
       interval: 2s
@@ -36,7 +40,7 @@ services:
       - ./backend:/home/uwsgi:cached
       - /home/uwsgi/.pixi
       - ./docker-data/media:/media:cached
-      - ./docker-data/static:/static:cached
+      - django_static:/static:rw
     ports:
       - "${BUOY_RETRIEVER_BACKEND_PORT:-8080}:8080"
     env_file:
