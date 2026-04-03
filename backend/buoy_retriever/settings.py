@@ -174,10 +174,10 @@ SOCIALACCOUNT_PROVIDERS = {
         "OAUTH_PKCE_ENABLED": True,
         "APPS": [
             {
-                "provider_id": "authentik",
-                "name": "authentik",
-                "client_id": os.environ.get( "AUTHENTIK_CLIENT_ID", default=""),
-                "secret": os.environ.get( "AUTHENTIK_CLIENT_SECRET", default=""),
+                "provider_id":  os.environ.get( "OIDC_PROVIDER", default="authentik"),
+                "name":  os.environ.get( "OIDC_PROVIDER", default="authentik"),
+                "client_id": os.environ.get( "OIDC_CLIENT_ID", default=""),
+                "secret": os.environ.get( "OIDC_CLIENT_SECRET", default=""),
                 "settings": {
                     # When enabled, an additional call to the userinfo
                     # endpoint takes place. The data returned is stored in
@@ -185,7 +185,7 @@ SOCIALACCOUNT_PROVIDERS = {
                     # token payload is used instead.
                     "fetch_userinfo": True,
                     "oauth_pkce_enabled": True,
-                    "server_url": "https://ego.axds.co/application/o/asset-docs/.well-known/openid-configuration",
+                    "server_url": os.environ.get( "OIDC_WELLKNOWN_CONF_URL", default="" )
                     # Optional token endpoint authentication method.
                     # May be one of "client_secret_basic", "client_secret_post"
                     # If omitted, a method from the the server's
