@@ -49,6 +49,8 @@ services:
     environment:
       BACKEND_ENV: dev
       POSTGRES_HOST: db
+      # Allows for setting schema to something other than 'public'
+      POSTGRES_OPTIONS: "-c search_path=buoy_retriever"
       # CACHE_HOST: cache
       # QUEUE_HOST: queue
     depends_on:
