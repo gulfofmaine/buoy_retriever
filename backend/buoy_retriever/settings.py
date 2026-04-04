@@ -139,6 +139,7 @@ DATABASES = {
         "PORT": int(os.environ.get("POSTGRES_PORT", 5432)),  # noqa: PLW1508
         "OPTIONS": {
             "sslmode": "prefer",
+            "options": f"-c search_path={os.environ.get("POSTGRES_SCHEMA", "public")}",
         },
     },
 }
