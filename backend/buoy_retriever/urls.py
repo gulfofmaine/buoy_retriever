@@ -32,9 +32,9 @@ urlpatterns = [
     path(f"{prefix}api/", api.urls),
     path(f"{prefix}health/", include("health_check.urls")),  # health check endpoints
     # path(prefix, include("django.contrib.auth.urls")),
-    path("accounts/signup/", signup, name="account_signup"),
-    path("accounts/login/", login, name="account_login"),
-    path("accounts/logout/", logout, name="account_logout"),
-    path("accounts/", include("allauth.socialaccount.providers.openid_connect.urls")),
+    path(f"{prefix}accounts/signup/", signup, name="account_signup"),
+    path(f"{prefix}accounts/login/", login, name="account_login"),
+    path(f"{prefix}accounts/logout/", logout, name="account_logout"),
+    path(f"{prefix}accounts/", include("allauth.socialaccount.providers.openid_connect.urls")),
 
 ]

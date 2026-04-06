@@ -163,7 +163,7 @@ ACCOUNT_LOGIN_METHODS = {'email'}
 ACCOUNT_CONFIRM_EMAIL_ON_GET = False
 ACCOUNT_DEFAULT_HTTP_PROTOCOL = 'http'
 ACCOUNT_EMAIL_VERIFICATION = 'none'
-LOGIN_URL = '/accounts/oidc/authentik/login/?process='
+LOGIN_URL = '/backend/accounts/oidc/authentik/login/?process='
 LOGIN_REDIRECT_URL = '/backend/admin/'
 LOGOUT_REDIRECT_URL = '/backend/admin/'
 
