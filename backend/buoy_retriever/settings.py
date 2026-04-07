@@ -170,7 +170,7 @@ SOCIALACCOUNT_ONLY = True
 ACCOUNT_SIGNUP_FIELDS = ['username', 'email*']
 ACCOUNT_LOGIN_METHODS = {'email'}
 ACCOUNT_CONFIRM_EMAIL_ON_GET = False
-ACCOUNT_DEFAULT_HTTP_PROTOCOL = 'http'
+ACCOUNT_DEFAULT_HTTP_PROTOCOL = config( 'DJANGO_ACCOUNT_DEFAULT_HTTP_PROTOCOL', cast=str, default='http' )
 ACCOUNT_EMAIL_VERIFICATION = 'none'
 LOGIN_URL = '/backend/accounts/oidc/authentik/login/?process='
 LOGIN_REDIRECT_URL = '/backend/admin/'
