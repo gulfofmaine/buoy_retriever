@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 import os
 from pathlib import Path
+from decouple import Csv, config
 
 from corsheaders.defaults import default_headers
 import sentry_sdk
@@ -57,8 +58,16 @@ CORS_ALLOW_HEADERS = (
     "sentry-trace",
 )
 
+_CSRF_TRUSTED_ORIGINS_FROM_ENV = config( "DJANGO_CSRF_TRUSTED_ORIGINS", cast=Csv(str), default='' )
 
 CSRF_TRUSTED_ORIGINS = ["http://localhost:8080", "http://localhost:3000"]
+
+if _CSRF_TRUSTED_ORIGINS_FROM_ENV:
+    CSRF_TRUSTED_ORIGINS = [
+        *CSRF_TRUSTED_ORIGINS,
+        *_CSRF_TRUSTED_ORIGINS_FROM_ENV  # noqa
+    ]
+
 CSRF_COOKIE_SECURE = False
 CSRF_USE_SESSIONS = False
 

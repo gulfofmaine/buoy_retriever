@@ -46,6 +46,8 @@ services:
       POSTGRES_HOST: db
       # CACHE_HOST: cache
       # QUEUE_HOST: queue
+      # Allow for setting additional CSRF trusted origins
+      # DJANGO_CSRF_TRUSTED_ORIGINS: "http://localhost:54321"
     depends_on:
       db:
         condition: service_healthy
