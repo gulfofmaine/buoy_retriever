@@ -14,7 +14,7 @@ from pydantic import BaseModel, Field
 
 from common import assets, config, io
 from common.backend_api import BackendAPIClient
-from common.config import mappings, s3_source
+from common.config import attributes, mappings, s3_source
 from common.readers.pandas_csv import PandasCSVReader
 from common.resource.s3fs_resource import S3Credentials, S3FSResource
 from common.sentry import SentryConfig
@@ -44,14 +44,22 @@ class S3TimeseriesConfig(
     config.DatasetConfigBase,
     # config.AttributeConfigMixin,
     mappings.VariableMappingMixin,
-    # mappings.OptionalDepthMappingMixin,
     s3_source.S3SourceMixin,
+    attributes.AttributeConfigMixin,
+    mappings.VariableConverterMixIn,
 ):
     """Configuration for S3 Timeseries Dataset."""
 
     start_date: date
 
     reader: PandasCSVReader
+
+    dataset_type: Annotated[
+        str,
+        Field(description="Dateset type (timeseries or profile)"),
+    ] = "timeseries"
+
+    source_time_var: str = "datetime"
 
     file_pattern: Annotated[DayGlob, Field(description="Source file name pattern")]
 
@@ -120,6 +128,7 @@ def defs_for_dataset(dataset: S3TimeseriesDataset) -> dg.Definitions:  # noqa: C
         """Download daily dataframe from S3."""
         partition_date_string = context.asset_partition_key_for_output()
         partition_date = date.fromisoformat(partition_date_string)
+
         day_glob = (
             dataset.config.s3_source.bucket
             + dataset.config.s3_source.prefix
@@ -144,17 +153,23 @@ def defs_for_dataset(dataset: S3TimeseriesDataset) -> dg.Definitions:  # noqa: C
             context.log.debug(f"Reading {day_f}")
             with s3fs.fs.open(day_f, "rb") as f:
                 df = dataset.config.reader.read_df(f)
+
+                if dataset.config.variable_converter is not None:
+                    for converter in dataset.config.variable_converter:
+                        df = converter.convert(df)
+
                 daily_dfs.append(df)
+
         df = pd.concat(daily_dfs)
 
-        # some flexibility in datetime/time column name
-        for col_name in ["datetime", "time"]:
-            try:
-                df[col_name] = pd.to_datetime(df[col_name])
-                df = df.sort_values(col_name)
-            except KeyError:
-                pass
-
+        df[dataset.config.source_time_var] = pd.to_datetime(
+            df[dataset.config.source_time_var],
+        )
+        if dataset.config.dataset_type == "profile":
+            indx_var = [dataset.config.source_time_var, "depth"]
+        else:
+            indx_var = dataset.config.source_time_var
+        df = df.sort_values(indx_var)
         df = df.reset_index(drop=True)
 
         return df
@@ -184,6 +199,7 @@ def defs_for_dataset(dataset: S3TimeseriesDataset) -> dg.Definitions:  # noqa: C
         daily_df: dict[str, pd.DataFrame],
     ) -> xr.Dataset:
         """Combine daily dataframes into a monthly NetCDF and apply transformations."""
+
         daily_dfs = []
 
         for df_date, df in daily_df.items():
@@ -218,10 +234,15 @@ def defs_for_dataset(dataset: S3TimeseriesDataset) -> dg.Definitions:  # noqa: C
             daily_dfs.append(df)
 
         df = pd.concat(daily_dfs, ignore_index=True)
-        df = df.sort_values("time")
-        df = df.drop_duplicates(subset=["time"])
+        if dataset.config.dataset_type == "profile":
+            indx_var = ["time", "depth"]
+        else:
+            indx_var = "time"
+
+        df = df.sort_values(indx_var)
+        df = df.drop_duplicates(subset=indx_var)
         df["time"] = pd.to_datetime(df["time"])
-        df = df.set_index("time")
+        df = df.set_index(indx_var)
 
         ds = df.to_xarray()
 
@@ -236,8 +257,16 @@ def defs_for_dataset(dataset: S3TimeseriesDataset) -> dg.Definitions:  # noqa: C
         # apply attributes
 
         ds["time"].encoding.update(
-            {"units": "seconds since 1970-01-01T00:00:00Z", "calendar": "gregorian"},
+            {
+                "units": "seconds since 1970-01-01T00:00:00Z",
+                "calendar": "gregorian",
+                "standard_name": "time",
+            },
         )
+
+        dataset.config.attributes.add_attributes_from_yaml()
+
+        dataset.config.attributes.apply_to_dataset(ds)
 
         return ds
 
@@ -377,7 +406,6 @@ def build_defs() -> dg.Definitions:
         )
 
         datasets = api_client.datasets_for_pipeline(pipeline.slug, S3TimeseriesDataset)
-
         for dataset in datasets:
             dataset_defs = defs_for_dataset(dataset)
             defs = dg.Definitions.merge(defs, dataset_defs)

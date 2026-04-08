@@ -1,5 +1,6 @@
-from typing import Annotated
+from typing import Annotated, Literal
 
+import pandas as pd
 from pydantic import BaseModel, Field
 
 
@@ -8,11 +9,15 @@ class VarMap(BaseModel):
 
     source: Annotated[
         str,
-        Field(description="The source variable name in the input data"),
+        Field(
+            description="The source variable name in the input data",
+        ),
     ]
     output: Annotated[
         str,
-        Field(description="The output variable name in the dataset"),
+        Field(
+            description="The output variable name in the dataset",
+        ),
     ]
 
 
@@ -33,11 +38,15 @@ class DepthMap(BaseModel):
 
     source_variable: Annotated[
         str,
-        Field(description="The source variable name in the input data"),
+        Field(
+            description="The source variable name in the input data",
+        ),
     ]
     depth: Annotated[
         int,
-        Field(description="The depth (in meters) for this variable"),
+        Field(
+            description="The depth (in meters) for this variable",
+        ),
     ]
 
 
@@ -46,11 +55,15 @@ class DepthGroup(BaseModel):
 
     output_variable: Annotated[
         str,
-        Field(description="The output variable name in the dataset"),
+        Field(
+            description="The output variable name in the dataset",
+        ),
     ]
     depths: Annotated[
         list[DepthMap],
-        Field(description="List of source variables and their corresponding depths"),
+        Field(
+            description="List of source variables and their corresponding depths",
+        ),
     ]
 
 
@@ -73,5 +86,131 @@ class OptionalDepthMappingMixin:
         list[DepthGroup] | None,
         Field(
             description="Depth mappings for variables with multiple depth levels",
+        ),
+    ] = None
+
+
+class VariableConverter(BaseModel):
+    converter_type: str
+
+    def convert(self, df: pd.DataFrame) -> pd.DataFrame:
+        raise NotImplementedError
+
+
+class SplitOperator(VariableConverter):
+    """Takes the source variable, splits it on the separator and  maps the resulting array to new variables"""
+
+    converter_type: Literal["split"] = "split"
+    sep: Annotated[
+        str,
+        Field(
+            description="The separator",
+        ),
+    ]
+    col_data_type: Annotated[
+        str,
+        Field(
+            description="The data type of the new variables",
+        ),
+    ] = "float"
+
+    output_variables: Annotated[
+        dict[int, str],
+        Field(
+            description="Mapping of index number to output variable.",
+        ),
+    ]
+    source_variable: Annotated[
+        str,
+        Field(
+            description="The source variable to split into multiple columns",
+        ),
+    ]
+
+    def convert(self, df: pd.DataFrame) -> pd.DataFrame:
+        df = df.copy()
+        splt_col = df[self.source_variable].str.split(
+            self.sep,
+            expand=True,
+        )
+        for n_var in self.output_variables:
+            df[self.output_variables[n_var]] = splt_col[n_var].astype(
+                self.col_data_type,
+            )
+        df = df.drop(self.source_variable, axis=1)
+        return df
+
+
+class ProfileDepthMappings(BaseModel):
+    depth: Annotated[
+        float,
+        Field(
+            description="Optional- fixed depth for the mapping.",
+        ),
+    ] = None
+
+    mappings: Annotated[
+        dict[str, str],
+        Field(
+            description="Maps input variables to output variables at the current depth ",
+        ),
+    ]
+
+
+class ProfileConverter(VariableConverter):
+    converter_type: Literal["profile"] = "profile"
+
+    profile_data: Annotated[
+        list[ProfileDepthMappings],
+        Field(
+            description="Mapping for variables with multiple depth levels",
+        ),
+    ]
+
+    def convert(self, df: pd.DataFrame) -> pd.DataFrame:
+        daily_dfs = []
+        all_profile_vars = [
+            var
+            for depth_conf in self.profile_data
+            for var in depth_conf.mappings.keys()
+        ]
+
+        non_profile_vars = df.columns.difference(all_profile_vars).tolist()
+        for depth in self.profile_data:
+            keep = non_profile_vars + list(depth.mappings.keys())
+
+            df_depth = df[keep].copy()
+
+            df_depth = df_depth.rename(columns=depth.mappings)
+
+            if depth.depth is not None:
+                df_depth["depth"] = float(depth.depth)
+
+            daily_dfs.append(df_depth)
+
+        return pd.concat(daily_dfs)
+
+
+class DropColumns(VariableConverter):
+    converter_type: Literal["drop"] = "drop"
+
+    column_names: list[str]
+
+    def convert(self, df: pd.DataFrame) -> pd.DataFrame:
+        df = df.copy()
+        df = df.drop(columns=self.column_names)
+        return df
+
+
+class VariableConverterMixIn:
+    """Mixin to add column conversion rules to a dataset"""
+
+    variable_converter: Annotated[
+        list[
+            SplitOperator | DropColumns | ProfileConverter,
+            Field(discriminator="converter_type"),
+        ],
+        Field(
+            description="List of variable conversion steps",
         ),
     ] = None
