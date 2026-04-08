@@ -155,10 +155,11 @@ def test_sensor(
             "tests/test_data/south_fork_water/test_south_fork_water_20260122.csv",
             "2026-01-22",
         ),
-        # todo: Fix issue with cvow timezone when reading in test csv
-        # pytest.param("cvow",
-        #             "tests/test_data/cvow/test_cvow_daily_asset.csv",
-        #             "2025-12-22"),
+        pytest.param(
+            "cvow",
+            "tests/test_data/cvow/test_cvow_daily_asset.csv",
+            "2025-12-22",
+        ),
     ],
 )
 @pytest.mark.aws
@@ -188,10 +189,12 @@ def test_daily_asset(
     assert not df.empty
 
     # Uncomment to update CSV snapshot
-    # df.to_csv(snapshot_path, index=False)
     snapshot = pd.read_csv(
         snapshot_path,
-        parse_dates=[dataset_config.config.source_time_var],
+    )
+
+    snapshot[dataset_config.config.source_time_var] = pd.to_datetime(
+        df[dataset_config.config.source_time_var],
     )
 
     pd.testing.assert_frame_equal(df, snapshot)

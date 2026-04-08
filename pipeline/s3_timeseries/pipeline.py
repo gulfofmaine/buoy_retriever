@@ -44,7 +44,6 @@ class S3TimeseriesConfig(
     config.DatasetConfigBase,
     # config.AttributeConfigMixin,
     mappings.VariableMappingMixin,
-    mappings.OptionalProfileDepthMixin,
     s3_source.S3SourceMixin,
     attributes.AttributeConfigMixin,
     mappings.VariableConverterMixIn,
@@ -63,13 +62,6 @@ class S3TimeseriesConfig(
     source_time_var: str = "datetime"
 
     file_pattern: Annotated[DayGlob, Field(description="Source file name pattern")]
-    drop_vars: Annotated[
-        list[str],
-        Field(
-            description="Variables to drop from the dataset",
-            default_factory=list,
-        ),
-    ]
 
     latitude: Annotated[
         float | None,
@@ -163,53 +155,20 @@ def defs_for_dataset(dataset: S3TimeseriesDataset) -> dg.Definitions:  # noqa: C
                 df = dataset.config.reader.read_df(f)
 
                 if dataset.config.variable_converter is not None:
-                    for split_conv in dataset.config.variable_converter:
-                        if isinstance(split_conv, mappings.SplitOperator):
-                            splt_col = df[split_conv.source_variable].str.split(
-                                split_conv.sep,
-                                expand=True,
-                            )
-                            for n_var in split_conv.output_variables:
-                                df[split_conv.output_variables[n_var]] = splt_col[n_var]
-                            df = df.drop(split_conv.source_variable, axis=1)
-                if dataset.config.drop_vars is not None:
-                    df = df.drop(columns=dataset.config.drop_vars)
+                    for converter in dataset.config.variable_converter:
+                        df = converter.convert(df)
 
-                if dataset.config.dataset_type == "profile":
-                    # Translate the profile data from multiple columns for each variable (CurSpd1, curSpd2,..curSpdN) to
-                    # two columns: curSpd, depth
-
-                    all_profile_vars = [
-                        var
-                        for depth_conf in dataset.config.profile_data
-                        for var in depth_conf.mappings.keys()
-                    ]
-
-                    non_profile_vars = df.columns.difference(all_profile_vars).tolist()
-
-                    for depth in dataset.config.profile_data:
-                        keep = non_profile_vars + list(depth.mappings.keys())
-
-                        df_depth = df[keep].copy()
-
-                        df_depth = df_depth.rename(columns=depth.mappings)
-
-                        if depth.depth is not None:
-                            df_depth["depth"] = float(depth.depth)
-
-                        daily_dfs.append(df_depth)
-
-                        indx_var = [dataset.config.source_time_var, "depth"]
-
-                else:
-                    daily_dfs.append(df)
-                    indx_var = dataset.config.source_time_var
+                daily_dfs.append(df)
 
         df = pd.concat(daily_dfs)
 
         df[dataset.config.source_time_var] = pd.to_datetime(
             df[dataset.config.source_time_var],
         )
+        if dataset.config.dataset_type == "profile":
+            indx_var = [dataset.config.source_time_var, "depth"]
+        else:
+            indx_var = dataset.config.source_time_var
         df = df.sort_values(indx_var)
         df = df.reset_index(drop=True)
 

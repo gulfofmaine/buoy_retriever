@@ -5,31 +5,7 @@
     "na_values": "No data"
   },
   "station": "CVOW Wave Rider 1",
-  "drop_vars": [
-    "CVOW WRB03_DWR4_OSS PRV_HRD_150 PRV DATAWELL DIRECTIONAL SPECTRUM  () (last)",
-    "CVOW WRB03_DWR4_OSS PRV_HRD_150 PRV PEAK SPECTRAL DENSITY POWER  (m2/Hz) (nodatamode_repeat)",
-    "CVOW WRB03_DWR4_OSS PRV_HRD_150 PRV WATER CURRENT VERTICAL MEAN SPEED  (m/s) (nodatamode_repeat)",
-    "CVOW WRB03_DWR4_OSS PRV_HRD_150 PRV WAVE M01 PERIOD  (s) (nodatamode_repeat)",
-    "CVOW WRB03_DWR4_OSS PRV_HRD_150 PRV WAVE M13 PERIOD  (s) (nodatamode_repeat)",
-    "CVOW WRB03_DWR4_OSS PRV_HRD_150 PRV WAVE M24 PERIOD  (s) (nodatamode_repeat)",
-    "CVOW WRB03_DWR4_OSS PRV_HRD_150 PRV WAVE MM10 PERIOD  (s) (nodatamode_repeat)",
-    "CVOW WRB03_DWR4_OSS PRV_HRD_150 PRV WAVE MM20 PERIOD  (s) (nodatamode_repeat)",
-    "CVOW WRB03_DWR4_OSS PRV_HRD_150 PRV WAVE PEAK PERIOD  (s) (nodatamode_repeat)",
-    "CVOW WRB01_DWR4_HQ PRV LOCATION  () (last)",
-    "CVOW WRB01_DWR4_HQ PRV PEAK SPECTRAL DENSITY POWER  (m2/Hz) (nodatamode_repeat)",
-    "CVOW WRB01_DWR4_HQ PRV WATER CURRENT MEAN DIRECTION  (Deg) (nodatamode_repeat)",
-    "CVOW WRB01_DWR4_HQ PRV WATER CURRENT MEAN SPEED  (m/s) (nodatamode_repeat)",
-    "CVOW WRB01_DWR4_HQ PRV WATER TEMPERATURE  (Cel) (nodatamode_repeat)",
-    "CVOW WRB01_DWR4_HQ PRV WAVE M01 PERIOD  (s) (nodatamode_repeat)",
-    "CVOW WRB01_DWR4_HQ PRV WAVE M13 PERIOD  (s) (nodatamode_repeat)",
-    "CVOW WRB01_DWR4_HQ PRV WAVE M24 PERIOD  (s) (nodatamode_repeat)",
-    "CVOW WRB01_DWR4_HQ PRV WAVE MEAN DIRECTION  (Deg) (nodatamode_repeat)",
-    "CVOW WRB01_DWR4_HQ PRV WAVE MM10 PERIOD  (s) (nodatamode_repeat)",
-    "CVOW WRB01_DWR4_HQ PRV WAVE MM20 PERIOD  (s) (nodatamode_repeat)",
-    "CVOW WRB01_DWR4_HQ PRV WAVE PEAK PERIOD  (s) (nodatamode_repeat)",
-    "CVOW WRB01_DWR4_HQ PRV WAVE PERIOD  (s) (nodatamode_repeat)",
-    "CVOW WRB01_DWR4_HQ PRV WAVE SIGNIFICANT HEIGHT  (m) (nodatamode_repeat)"
-  ],
+
   "s3_source": {
     "bucket": "ott-cvow-temp",
     "prefix": "/"
@@ -75,12 +51,42 @@
   ],
   "variable_converter": [
     {
+      "converter_type": "split",
       "sep": ":",
       "source_variable": "CVOW WRB03_DWR4_OSS PRV_HRD_150 PRV LOCATION  () (last)",
+      "col_data_type": "float",
       "output_variables": {
         "0": "latitude",
         "2": "longitude"
       }
+    },
+    {
+      "converter_type": "drop",
+      "column_names": [
+        "CVOW WRB03_DWR4_OSS PRV_HRD_150 PRV DATAWELL DIRECTIONAL SPECTRUM  () (last)",
+        "CVOW WRB03_DWR4_OSS PRV_HRD_150 PRV PEAK SPECTRAL DENSITY POWER  (m2/Hz) (nodatamode_repeat)",
+        "CVOW WRB03_DWR4_OSS PRV_HRD_150 PRV WATER CURRENT VERTICAL MEAN SPEED  (m/s) (nodatamode_repeat)",
+        "CVOW WRB03_DWR4_OSS PRV_HRD_150 PRV WAVE M01 PERIOD  (s) (nodatamode_repeat)",
+        "CVOW WRB03_DWR4_OSS PRV_HRD_150 PRV WAVE M13 PERIOD  (s) (nodatamode_repeat)",
+        "CVOW WRB03_DWR4_OSS PRV_HRD_150 PRV WAVE M24 PERIOD  (s) (nodatamode_repeat)",
+        "CVOW WRB03_DWR4_OSS PRV_HRD_150 PRV WAVE MM10 PERIOD  (s) (nodatamode_repeat)",
+        "CVOW WRB03_DWR4_OSS PRV_HRD_150 PRV WAVE MM20 PERIOD  (s) (nodatamode_repeat)",
+        "CVOW WRB03_DWR4_OSS PRV_HRD_150 PRV WAVE PEAK PERIOD  (s) (nodatamode_repeat)",
+        "CVOW WRB01_DWR4_HQ PRV LOCATION  () (last)",
+        "CVOW WRB01_DWR4_HQ PRV PEAK SPECTRAL DENSITY POWER  (m2/Hz) (nodatamode_repeat)",
+        "CVOW WRB01_DWR4_HQ PRV WATER CURRENT MEAN DIRECTION  (Deg) (nodatamode_repeat)",
+        "CVOW WRB01_DWR4_HQ PRV WATER CURRENT MEAN SPEED  (m/s) (nodatamode_repeat)",
+        "CVOW WRB01_DWR4_HQ PRV WATER TEMPERATURE  (Cel) (nodatamode_repeat)",
+        "CVOW WRB01_DWR4_HQ PRV WAVE M01 PERIOD  (s) (nodatamode_repeat)",
+        "CVOW WRB01_DWR4_HQ PRV WAVE M13 PERIOD  (s) (nodatamode_repeat)",
+        "CVOW WRB01_DWR4_HQ PRV WAVE M24 PERIOD  (s) (nodatamode_repeat)",
+        "CVOW WRB01_DWR4_HQ PRV WAVE MEAN DIRECTION  (Deg) (nodatamode_repeat)",
+        "CVOW WRB01_DWR4_HQ PRV WAVE MM10 PERIOD  (s) (nodatamode_repeat)",
+        "CVOW WRB01_DWR4_HQ PRV WAVE MM20 PERIOD  (s) (nodatamode_repeat)",
+        "CVOW WRB01_DWR4_HQ PRV WAVE PEAK PERIOD  (s) (nodatamode_repeat)",
+        "CVOW WRB01_DWR4_HQ PRV WAVE PERIOD  (s) (nodatamode_repeat)",
+        "CVOW WRB01_DWR4_HQ PRV WAVE SIGNIFICANT HEIGHT  (m) (nodatamode_repeat)"
+      ]
     }
   ]
 }

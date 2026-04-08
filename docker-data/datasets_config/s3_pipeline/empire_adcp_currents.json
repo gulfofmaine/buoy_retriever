@@ -5,7 +5,6 @@
   },
   "station": "Empire Wind 1",
   "latitude": 40.319,
-  "drop_vars": ["ZCel_WTmp"],
   "longitude": -73.4461,
   "s3_source": {
     "bucket": "ott-empire",
@@ -47,152 +46,162 @@
   "file_pattern": {
     "day_pattern": "EW01_ADCP_{partition_date:%Y%m%d}_*.txt"
   },
-  "profile_data": [
-    {
-      "mappings": {
-        "CurrSpd1": "CurrSpd",
-        "ZCelDpth1": "depth",
-        "CurrDirTo1": "CurrDirTo"
-      }
-    },
-    {
-      "mappings": {
-        "CurrSpd2": "CurrSpd",
-        "ZCelDpth2": "depth",
-        "CurrDirTo2": "CurrDirTo"
-      }
-    },
-    {
-      "mappings": {
-        "CurrSpd3": "CurrSpd",
-        "ZCelDpth3": "depth",
-        "CurrDirTo3": "CurrDirTo"
-      }
-    },
-    {
-      "mappings": {
-        "CurrSpd4": "CurrSpd",
-        "ZCelDpth4": "depth",
-        "CurrDirTo4": "CurrDirTo"
-      }
-    },
-    {
-      "mappings": {
-        "CurrSpd5": "CurrSpd",
-        "ZCelDpth5": "depth",
-        "CurrDirTo5": "CurrDirTo"
-      }
-    },
-    {
-      "mappings": {
-        "CurrSpd6": "CurrSpd",
-        "ZCelDpth6": "depth",
-        "CurrDirTo6": "CurrDirTo"
-      }
-    },
-    {
-      "mappings": {
-        "CurrSpd7": "CurrSpd",
-        "ZCelDpth7": "depth",
-        "CurrDirTo7": "CurrDirTo"
-      }
-    },
-    {
-      "mappings": {
-        "CurrSpd8": "CurrSpd",
-        "ZCelDpth8": "depth",
-        "CurrDirTo8": "CurrDirTo"
-      }
-    },
-    {
-      "mappings": {
-        "CurrSpd9": "CurrSpd",
-        "ZCelDpth9": "depth",
-        "CurrDirTo9": "CurrDirTo"
-      }
-    },
-    {
-      "mappings": {
-        "CurrSpd10": "CurrSpd",
-        "ZCelDpth10": "depth",
-        "CurrDirTo10": "CurrDirTo"
-      }
-    },
-    {
-      "mappings": {
-        "CurrSpd11": "CurrSpd",
-        "ZCelDpth11": "depth",
-        "CurrDirTo11": "CurrDirTo"
-      }
-    },
-    {
-      "mappings": {
-        "CurrSpd12": "CurrSpd",
-        "ZCelDpth12": "depth",
-        "CurrDirTo12": "CurrDirTo"
-      }
-    },
-    {
-      "mappings": {
-        "CurrSpd13": "CurrSpd",
-        "ZCelDpth13": "depth",
-        "CurrDirTo13": "CurrDirTo"
-      }
-    },
-    {
-      "mappings": {
-        "CurrSpd14": "CurrSpd",
-        "ZCelDpth14": "depth",
-        "CurrDirTo14": "CurrDirTo"
-      }
-    },
-    {
-      "mappings": {
-        "CurrSpd15": "CurrSpd",
-        "ZCelDpth15": "depth",
-        "CurrDirTo15": "CurrDirTo"
-      }
-    },
-    {
-      "mappings": {
-        "CurrSpd16": "CurrSpd",
-        "ZCelDpth16": "depth",
-        "CurrDirTo16": "CurrDirTo"
-      }
-    },
-    {
-      "mappings": {
-        "CurrSpd17": "CurrSpd",
-        "ZCelDpth17": "depth",
-        "CurrDirTo17": "CurrDirTo"
-      }
-    },
-    {
-      "mappings": {
-        "CurrSpd18": "CurrSpd",
-        "ZCelDpth18": "depth",
-        "CurrDirTo18": "CurrDirTo"
-      }
-    },
-    {
-      "mappings": {
-        "CurrSpd19": "CurrSpd",
-        "ZCelDpth19": "depth",
-        "CurrDirTo19": "CurrDirTo"
-      }
-    },
-    {
-      "mappings": {
-        "CurrSpd20": "CurrSpd",
-        "ZCelDpth20": "depth",
-        "CurrDirTo20": "CurrDirTo"
-      }
-    }
-  ],
+
   "variable_mappings": [
     {
       "output": "time",
       "source": "datetime"
+    }
+  ],
+  "variable_converter": [
+    {
+      "converter_type": "drop",
+      "column_names": ["ZCel_WTmp"]
+    },
+    {
+      "converter_type": "profile",
+      "profile_data": [
+        {
+          "mappings": {
+            "CurrSpd1": "CurrSpd",
+            "ZCelDpth1": "depth",
+            "CurrDirTo1": "CurrDirTo"
+          }
+        },
+        {
+          "mappings": {
+            "CurrSpd2": "CurrSpd",
+            "ZCelDpth2": "depth",
+            "CurrDirTo2": "CurrDirTo"
+          }
+        },
+        {
+          "mappings": {
+            "CurrSpd3": "CurrSpd",
+            "ZCelDpth3": "depth",
+            "CurrDirTo3": "CurrDirTo"
+          }
+        },
+        {
+          "mappings": {
+            "CurrSpd4": "CurrSpd",
+            "ZCelDpth4": "depth",
+            "CurrDirTo4": "CurrDirTo"
+          }
+        },
+        {
+          "mappings": {
+            "CurrSpd5": "CurrSpd",
+            "ZCelDpth5": "depth",
+            "CurrDirTo5": "CurrDirTo"
+          }
+        },
+        {
+          "mappings": {
+            "CurrSpd6": "CurrSpd",
+            "ZCelDpth6": "depth",
+            "CurrDirTo6": "CurrDirTo"
+          }
+        },
+        {
+          "mappings": {
+            "CurrSpd7": "CurrSpd",
+            "ZCelDpth7": "depth",
+            "CurrDirTo7": "CurrDirTo"
+          }
+        },
+        {
+          "mappings": {
+            "CurrSpd8": "CurrSpd",
+            "ZCelDpth8": "depth",
+            "CurrDirTo8": "CurrDirTo"
+          }
+        },
+        {
+          "mappings": {
+            "CurrSpd9": "CurrSpd",
+            "ZCelDpth9": "depth",
+            "CurrDirTo9": "CurrDirTo"
+          }
+        },
+        {
+          "mappings": {
+            "CurrSpd10": "CurrSpd",
+            "ZCelDpth10": "depth",
+            "CurrDirTo10": "CurrDirTo"
+          }
+        },
+        {
+          "mappings": {
+            "CurrSpd11": "CurrSpd",
+            "ZCelDpth11": "depth",
+            "CurrDirTo11": "CurrDirTo"
+          }
+        },
+        {
+          "mappings": {
+            "CurrSpd12": "CurrSpd",
+            "ZCelDpth12": "depth",
+            "CurrDirTo12": "CurrDirTo"
+          }
+        },
+        {
+          "mappings": {
+            "CurrSpd13": "CurrSpd",
+            "ZCelDpth13": "depth",
+            "CurrDirTo13": "CurrDirTo"
+          }
+        },
+        {
+          "mappings": {
+            "CurrSpd14": "CurrSpd",
+            "ZCelDpth14": "depth",
+            "CurrDirTo14": "CurrDirTo"
+          }
+        },
+        {
+          "mappings": {
+            "CurrSpd15": "CurrSpd",
+            "ZCelDpth15": "depth",
+            "CurrDirTo15": "CurrDirTo"
+          }
+        },
+        {
+          "mappings": {
+            "CurrSpd16": "CurrSpd",
+            "ZCelDpth16": "depth",
+            "CurrDirTo16": "CurrDirTo"
+          }
+        },
+        {
+          "mappings": {
+            "CurrSpd17": "CurrSpd",
+            "ZCelDpth17": "depth",
+            "CurrDirTo17": "CurrDirTo"
+          }
+        },
+        {
+          "mappings": {
+            "CurrSpd18": "CurrSpd",
+            "ZCelDpth18": "depth",
+            "CurrDirTo18": "CurrDirTo"
+          }
+        },
+        {
+          "mappings": {
+            "CurrSpd19": "CurrSpd",
+            "ZCelDpth19": "depth",
+            "CurrDirTo19": "CurrDirTo"
+          }
+        },
+        {
+          "mappings": {
+            "CurrSpd20": "CurrSpd",
+            "ZCelDpth20": "depth",
+            "CurrDirTo20": "CurrDirTo"
+          }
+        }
+      ]
     }
   ]
 }
