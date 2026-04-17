@@ -1,4 +1,3 @@
-import json
 import os
 from pathlib import Path
 
@@ -12,7 +11,6 @@ from moto import mock_aws
 from common import io, test_utils
 from common.resource.s3fs_resource import S3Credentials, S3FSResource
 from pipeline import S3TimeseriesDataset, defs_for_dataset
-
 
 TEST_DATA_DIR = Path("/mnt/test-data/s3_timeseries/")
 
@@ -149,7 +147,8 @@ def test_sensor(
         pytest.param(
             "empire_adcp_currents",
             "2026-04-08T19:32:26.472Z",
-            TEST_DATA_DIR / "empire_adcp_currents/test_empire_adcp_currents_20251030.csv",
+            TEST_DATA_DIR
+            / "empire_adcp_currents/test_empire_adcp_currents_20251030.csv",
             "2025-10-30",
         ),
         pytest.param(
@@ -243,7 +242,8 @@ def test_daily_asset(
             "empire_waves",
             "2026-04-08T19:34:39.383Z",
             {
-                "2025-11-12": TEST_DATA_DIR / "empire_waves/test_empire_waves_20251112.csv",
+                "2025-11-12": TEST_DATA_DIR
+                / "empire_waves/test_empire_waves_20251112.csv",
             },
             TEST_DATA_DIR / "empire_waves/test_empire_waves_202511.nc",
             "2025-11-01",
@@ -262,7 +262,8 @@ def test_daily_asset(
             "empire_adcp_water",
             "2026-04-08T19:33:23.624Z",
             {
-                "2025-10-28": TEST_DATA_DIR / "empire_adcp_water/test_empire_adcp_water_20251028.csv",
+                "2025-10-28": TEST_DATA_DIR
+                / "empire_adcp_water/test_empire_adcp_water_20251028.csv",
             },
             TEST_DATA_DIR / "empire_adcp_water/test_empire_adcp_water_202510.nc",
             "2025-10-01",
@@ -271,7 +272,8 @@ def test_daily_asset(
             "empire_adcp_currents",
             "2026-04-08T19:32:26.472Z",
             {
-                "2025-10-30": TEST_DATA_DIR / "empire_adcp_currents/test_empire_adcp_currents_20251030.csv",
+                "2025-10-30": TEST_DATA_DIR
+                / "empire_adcp_currents/test_empire_adcp_currents_20251030.csv",
             },
             TEST_DATA_DIR / "empire_adcp_currents/test_empire_adcp_currents_202510.nc",
             "2025-10-01",
@@ -280,7 +282,8 @@ def test_daily_asset(
             "south_fork_currents",
             "2026-04-08T19:35:09.835Z",
             {
-                "2026-03-04": TEST_DATA_DIR / "south_fork_currents/test_south_fork_currents_20260304.csv",
+                "2026-03-04": TEST_DATA_DIR
+                / "south_fork_currents/test_south_fork_currents_20260304.csv",
             },
             TEST_DATA_DIR / "south_fork_currents/test_south_fork_currents_202603.nc",
             "2026-03-01",
@@ -289,7 +292,8 @@ def test_daily_asset(
             "south_fork_waves",
             "2026-04-08T19:36:09.281Z",
             {
-                "2026-02-21": TEST_DATA_DIR / "south_fork_waves/test_south_fork_waves_20260221.csv",
+                "2026-02-21": TEST_DATA_DIR
+                / "south_fork_waves/test_south_fork_waves_20260221.csv",
             },
             TEST_DATA_DIR / "south_fork_waves/test_south_fork_waves_202602.nc",
             "2026-02-01",
@@ -298,7 +302,8 @@ def test_daily_asset(
             "south_fork_water",
             "2026-04-08T19:35:35.695Z",
             {
-                "2026-01-22": TEST_DATA_DIR / "south_fork_water/test_south_fork_water_20260122.csv",
+                "2026-01-22": TEST_DATA_DIR
+                / "south_fork_water/test_south_fork_water_20260122.csv",
             },
             TEST_DATA_DIR / "south_fork_water/test_south_fork_water_202601.nc",
             "2026-01-01",
