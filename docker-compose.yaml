@@ -37,6 +37,7 @@ services:
       - /home/uwsgi/.pixi
       - ./docker-data/media:/media:cached
       - ./docker-data/static:/static:cached
+      - ./docker-data/test-data:/mnt/test-data:cached
     ports:
       - "${BUOY_RETRIEVER_BACKEND_PORT:-8080}:8080"
     env_file:
@@ -134,6 +135,7 @@ services:
       - ./common/:/home/ioos/common/:cached
       - ./docker-data/shared-fs:/mnt/efs/
       - ./docker-data/datasets_config/s3_pipeline/metadata/:/mnt/datasets_config/metadata
+      - ./docker-data/test-data:/mnt/test-data:cached
     depends_on:
       backend:
         condition: service_started
@@ -153,6 +155,7 @@ services:
       - /home/ioos/.pixi
       - ./common/:/home/ioos/common/:cached
       - ./docker-data/shared-fs:/mnt/efs/
+      - ./docker-data/test-data:/mnt/test-data:cached
     depends_on:
       backend:
         condition: service_started

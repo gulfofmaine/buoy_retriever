@@ -1,5 +1,8 @@
+import json
+from datetime import datetime, timedelta
 from enum import Enum
-from typing import TypeVar
+from pathlib import Path
+from typing import Self, TypeVar
 
 from pydantic import BaseModel, Field
 
@@ -39,3 +42,39 @@ class DatasetBase[ConfigT](BaseModel):
     def safe_slug(self) -> str:
         """Dagster safe name for this dataset"""
         return self.slug.lower().replace("-", "_")
+
+    @classmethod
+    def from_fixture(cls: type[Self], path: Path, created_dt_str: str) -> Self:
+        """Load a dataset config from a JSON fixture file"""
+        with path.open() as f:
+            data = json.load(f)
+
+        dataset_data = next((x for x in data if x["model"] == "datasets.dataset"), None)
+        if not dataset_data:
+            raise ValueError(f"No dataset found in fixture {path}")
+        config_data = next(
+            (
+                x
+                for x in data
+                if x["model"] == "datasets.datasetconfig"
+                and (
+                    datetime.fromisoformat(x["fields"]["created"])
+                    >= datetime.fromisoformat(created_dt_str) - timedelta(seconds=1)
+                    and datetime.fromisoformat(x["fields"]["created"])
+                    <= datetime.fromisoformat(created_dt_str) + timedelta(seconds=1)
+                )
+            ),
+            None,
+        )
+        if not config_data:
+            raise ValueError(
+                f"No dataset config found in fixture {path} with created datetime {created_dt_str}",
+            )
+
+        data = {
+            "slug": dataset_data["fields"]["slug"],
+            "config": config_data["fields"]["config"],
+            "config_state": config_data["fields"]["state"],
+        }
+
+        return cls(**data)

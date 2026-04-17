@@ -1,0 +1,29 @@
+[
+  {
+    "model": "datasets.dataset",
+    "fields": {
+      "slug": "bath_me",
+      "pipeline": ["hohonu"],
+      "state": "Active",
+      "created": "2026-01-10T14:03:55.644Z",
+      "edited": "2026-03-19T20:50:03.327Z"
+    }
+  },
+  {
+    "model": "datasets.datasetconfig",
+    "pk": 15,
+    "fields": {
+      "dataset": ["bath_me"],
+      "config": {
+        "station": "hohonu_bath_me",
+        "latitude": 43.8943,
+        "hohonu_id": "hohonu-118",
+        "longitude": -69.8148,
+        "start_date": "2022-11-08T00:00:00.000Z"
+      },
+      "created": "2026-01-10T14:03:55.644Z",
+      "edited": "2026-01-10T14:03:55.644Z",
+      "state": "Published"
+    }
+  }
+]
