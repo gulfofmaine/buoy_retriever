@@ -1,4 +1,4 @@
-FROM ghcr.io/prefix-dev/pixi:0.66.0 AS base
+FROM ghcr.io/prefix-dev/pixi:0.66.0@sha256:e8857b9ba407f92958feb0098c816cae713264251d43bb42217bcedfc8a719fd AS base
 
 # Gather required base utils
 RUN apt-get update && apt-get install -y \
