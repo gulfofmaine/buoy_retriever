@@ -16,7 +16,7 @@ ENV PYTHONWARNINGS=once
 ENV USER=uwsgi
 ENV USER_HOME="/home/${USER}"
 ENV APP_DIR="/home/${USER}/app"
-ENV USER_UID=988
+ENV USER_UID=1001
 ENV PIXI_HOME="${USER_HOME}/.pixi"
 
 # Setup user
