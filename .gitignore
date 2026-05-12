@@ -214,6 +214,10 @@ __marimo__/
 docker-data/postgres
 docker-data/dagster_postgres
 
+# media artifacts and static files
+docker-data/media
+docker-data/static
+
 # Ignore .env files that may contain sensitive information
 docker-data/secret.env
 docker-data/shared-fs/

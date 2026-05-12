@@ -30,6 +30,8 @@ services:
     build:
       context: ./backend
       target: develop
+      # For testing backend when running behind uwsgi
+      # target: deploy
     image: buoy_retriever_backend
     command: "python manage.py runserver 0:8080"
     volumes:
@@ -50,8 +52,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
-      # - cache
-      # - queue
+    # - cache
+    # - queue
 
   frontend:
     build:

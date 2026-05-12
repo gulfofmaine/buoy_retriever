@@ -1,5 +1,13 @@
 FROM ghcr.io/prefix-dev/pixi:0.55.0-noble@sha256:423daf63e4e876ab42b1be9ddee3fc867ba8b9fa511e0634de3b9df12ff1a90d AS base
 
+# Gather required base utils
+RUN apt-get update && apt-get install -y \
+        curl \
+        media-types \
+        && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
 # Output logging faster
 ENV PYTHONUNBUFFERED=1
 # Show deprecation warnings https://docs.djangoproject.com/en/2.2/howto/upgrade-version/#resolving-deprecation-warnings
@@ -34,11 +42,12 @@ ENTRYPOINT ["/bin/bash", "/support/shell-hook.sh"]
 
 HEALTHCHECK --interval=30s --timeout=10s --start-period=20s CMD ["curl", "-f", "http://localhost:8000/backend/health/"] || exit 1
 
-
 FROM base AS develop
 
+FROM base AS deploy
 
-# FROM base AS deploy
-
-# COPY --chown=${USER}:${USER} . ${USER_HOME}
-# CMD ["uwsgi"l]
+CMD python manage.py collectstatic --noinput \
+    && uwsgi --http 0.0.0.0:8080 \
+        --module buoy_retriever.wsgi \
+        --static-map /backend/static=/static \
+        --master --log-master --processes 4 --threads 2
