@@ -32,7 +32,7 @@ WORKDIR ${APP_DIR}
 COPY --chown=${USER}:${USER} ./pyproject.toml ./pixi.lock ${APP_DIR}
 RUN --mount=type=cache,id=br_pixi,target=${USER_HOME}/.cache/rattler/cache,uid=${USER_UID},gid=${USER_UID} \
     pixi config set --global detached-environments "/opt/pixi/envs" \
-    && pixi install -e default --frozen --manifest-path ./pyproject.toml
+    && pixi install -e default --frozen
 
 # Copy app source (and only app source)
 COPY --chown=${USER}:${USER} ./manage.py ${APP_DIR}/
