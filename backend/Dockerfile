@@ -1,4 +1,11 @@
-FROM ghcr.io/prefix-dev/pixi:0.55.0-noble@sha256:423daf63e4e876ab42b1be9ddee3fc867ba8b9fa511e0634de3b9df12ff1a90d AS base
+FROM ghcr.io/prefix-dev/pixi:0.66.0@sha256:e8857b9ba407f92958feb0098c816cae713264251d43bb42217bcedfc8a719fd AS base
+
+# Gather required base utils
+RUN apt-get update && apt-get install -y \
+        curl \
+        && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # Output logging faster
 ENV PYTHONUNBUFFERED=1
@@ -7,32 +14,45 @@ ENV PYTHONWARNINGS=once
 
 # User variables
 ENV USER=uwsgi
-ENV USER_HOME="/home/${USER}/"
+ENV USER_HOME="/home/${USER}"
+ENV APP_DIR="/home/${USER}/app"
 ENV USER_UID=1001
+ENV PIXI_HOME="${USER_HOME}/.pixi"
 
 # Setup user
 RUN groupadd ${USER} \
     && useradd -rm -d ${USER_HOME} -s /bin/bash -g ${USER} -u ${USER_UID} ${USER}
-RUN mkdir -p /static /media /support
-RUN chown -R ${USER}:${USER} ${USER_HOME} /static /media /support
-
+RUN mkdir -p /static /media /support ${APP_DIR} /opt/pixi/envs
+RUN chown -R ${USER}:${USER} ${USER_HOME} /static /media /support ${APP_DIR} /opt/pixi/envs
 
 USER ${USER}
-WORKDIR ${USER_HOME}
+WORKDIR ${APP_DIR}
 
-COPY --chown=${USER}:${USER} ./pyproject.toml ./pixi.lock ${USER_HOME}
-RUN --mount=type=cache,id=br_pixi,target=${USER_HOME}.cache/rattler/cache,uid=${USER_UID},gid=${USER_UID} \
-    pixi install -e default
+# Copy only env spec and build
+COPY --chown=${USER}:${USER} ./pyproject.toml ./pixi.lock ${APP_DIR}
+RUN --mount=type=cache,id=br_pixi,target=${USER_HOME}/.cache/rattler/cache,uid=${USER_UID},gid=${USER_UID} \
+    pixi config set --global detached-environments "/opt/pixi/envs" \
+    && pixi install -e default --frozen
 
-RUN pixi shell-hook -e default > /support/shell-hook.sh \
-    && echo 'exec "$@"' >> /support/shell-hook.sh
+# Copy app source (and only app source)
+COPY --chown=${USER}:${USER} ./manage.py ${APP_DIR}/
+COPY --chown=${USER}:${USER} ./account ${APP_DIR}/account
+COPY --chown=${USER}:${USER} ./buoy_retriever ${APP_DIR}/buoy_retriever
+COPY --chown=${USER}:${USER} ./datasets ${APP_DIR}/datasets
+COPY --chown=${USER}:${USER} ./pipelines ${APP_DIR}/pipelines
+
+RUN echo '#!/bin/bash' > /support/shell-hook.sh \
+    && pixi shell-hook -e default --shell bash | grep -vie "activate.d" | grep -vie "completion" >> /support/shell-hook.sh \
+    && echo 'exec "$@"' >> /support/shell-hook.sh \
+    && chmod +x /support/shell-hook.sh
 
 ARG IMAGE_TAG
 ENV IMAGE_TAG=${IMAGE_TAG:-unknown}
 
-ENTRYPOINT ["/bin/bash", "/support/shell-hook.sh"]
+ENTRYPOINT ["/support/shell-hook.sh"]
 
-HEALTHCHECK --interval=30s --timeout=10s --start-period=20s CMD ["curl", "-f", "http://localhost:8000/backend/health/"] || exit 1
+HEALTHCHECK --interval=30s --timeout=10s --start-period=20s \
+    CMD /usr/bin/curl -D- -o /dev/null --silent --fail "http://localhost:8080/backend/health/"
 
 
 FROM base AS develop

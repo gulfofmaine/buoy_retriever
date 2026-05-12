@@ -24,6 +24,11 @@ POSTGRES_USER=buoy_retriever
 POSTGRES_NAME=buoy_retriever
 POSTGRES_HOST=db
 BACKEND_SECRET_KEY=something_complex_and_random
+# If desired, configure OIDC identity provider information
+OIDC_PROVIDER=provider_name
+OIDC_CLIENT_ID=...
+OIDC_CLIENT_SECRET=...
+OIDC_WELLKNOWN_CONF_URL=...
 ```
 
 Once the secret (/shared) values are set, `docker compose up --build backend` will start the database, cache, queue, and Django allowing for initial configuration.

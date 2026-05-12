@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 import os
 from pathlib import Path
+from decouple import Csv, config
 
 from corsheaders.defaults import default_headers
 import sentry_sdk
@@ -57,8 +58,16 @@ CORS_ALLOW_HEADERS = (
     "sentry-trace",
 )
 
+_CSRF_TRUSTED_ORIGINS_FROM_ENV = config( "DJANGO_CSRF_TRUSTED_ORIGINS", cast=Csv(str), default='' )
 
 CSRF_TRUSTED_ORIGINS = ["http://localhost:8080", "http://localhost:3000"]
+
+if _CSRF_TRUSTED_ORIGINS_FROM_ENV:
+    CSRF_TRUSTED_ORIGINS = [
+        *CSRF_TRUSTED_ORIGINS,
+        *_CSRF_TRUSTED_ORIGINS_FROM_ENV  # noqa
+    ]
+
 CSRF_COOKIE_SECURE = False
 CSRF_USE_SESSIONS = False
 
@@ -81,6 +90,11 @@ SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
+    # allauth
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.openid_connect',
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
@@ -88,6 +102,7 @@ INSTALLED_APPS = [
     "health_check",
     "health_check.db",
     "corsheaders",
+    "buoy_retriever",
     "guardian",
     "account",
     "datasets",
@@ -103,6 +118,8 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    # Add the allauth account middleware
+    "allauth.account.middleware.AccountMiddleware",
 ]
 
 ROOT_URLCONF = "buoy_retriever.urls"
@@ -144,8 +161,51 @@ DATABASES = {
 }
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+AUTH_USER_MODEL = "buoy_retriever_account.User"
 
-AUTH_USER_MODEL = "account.User"
+ACCOUNT_ADAPTER = 'account.models.UserAccountAdapter'
+SOCIALACCOUNT_ADAPTER = 'account.models.SocialAccountAdapter'
+
+SOCIALACCOUNT_ONLY = True
+ACCOUNT_SIGNUP_FIELDS = ['username', 'email*']
+ACCOUNT_LOGIN_METHODS = {'email'}
+ACCOUNT_CONFIRM_EMAIL_ON_GET = False
+ACCOUNT_DEFAULT_HTTP_PROTOCOL = config( 'DJANGO_ACCOUNT_DEFAULT_HTTP_PROTOCOL', cast=str, default='http' )
+ACCOUNT_EMAIL_VERIFICATION = 'none'
+LOGIN_URL = '/backend/accounts/oidc/authentik/login/?process='
+LOGIN_REDIRECT_URL = '/backend/admin/'
+LOGOUT_REDIRECT_URL = '/backend/admin/'
+
+SOCIALACCOUNT_PROVIDERS = {
+    "openid_connect": {
+        # Optional PKCE defaults to False, but may be required by your provider
+        # Can be set globally, or per app (settings).
+        "OAUTH_PKCE_ENABLED": True,
+        "APPS": [
+            {
+                "provider_id":  os.environ.get( "OIDC_PROVIDER", default="authentik"),
+                "name":  os.environ.get( "OIDC_PROVIDER", default="authentik"),
+                "client_id": os.environ.get( "OIDC_CLIENT_ID", default=""),
+                "secret": os.environ.get( "OIDC_CLIENT_SECRET", default=""),
+                "settings": {
+                    # When enabled, an additional call to the userinfo
+                    # endpoint takes place. The data returned is stored in
+                    # `SocialAccount.extra_data`. When disabled, the (decoded) ID
+                    # token payload is used instead.
+                    "fetch_userinfo": True,
+                    "oauth_pkce_enabled": True,
+                    "server_url": os.environ.get( "OIDC_WELLKNOWN_CONF_URL", default="" )
+                    # Optional token endpoint authentication method.
+                    # May be one of "client_secret_basic", "client_secret_post"
+                    # If omitted, a method from the the server's
+                    # token auth methods list is used
+                    # "token_auth_method": "client_secret_basic",
+                },
+            },
+        ]
+    }
+}
+
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
@@ -169,6 +229,8 @@ AUTH_PASSWORD_VALIDATORS = [
 AUTHENTICATION_BACKENDS = (
     "django.contrib.auth.backends.ModelBackend",  # this is default
     "guardian.backends.ObjectPermissionBackend",
+    # `allauth` specific authentication methods
+    'allauth.account.auth_backends.AuthenticationBackend',
 )
 
 

@@ -17,6 +17,11 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import include, path
+from allauth.account.views import (
+    login,
+    logout,
+    signup
+)
 
 from .api import api
 
@@ -26,5 +31,10 @@ urlpatterns = [
     path(f"{prefix}admin/", admin.site.urls),
     path(f"{prefix}api/", api.urls),
     path(f"{prefix}health/", include("health_check.urls")),  # health check endpoints
-    path(prefix, include("django.contrib.auth.urls")),
+    # path(prefix, include("django.contrib.auth.urls")),
+    path(f"{prefix}accounts/signup/", signup, name="account_signup"),
+    path(f"{prefix}accounts/login/", login, name="account_login"),
+    path(f"{prefix}accounts/logout/", logout, name="account_logout"),
+    path(f"{prefix}accounts/", include("allauth.socialaccount.providers.openid_connect.urls")),
+
 ]
