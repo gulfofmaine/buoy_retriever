@@ -30,16 +30,10 @@ services:
     build:
       context: ./backend
       target: develop
+      # For testing backend when running behind uwsgi
+      # target: deploy
     image: buoy_retriever_backend
     command: "python manage.py runserver 0:8080"
-    # For testing backend when running behind uwsgi
-    # command: >
-    #   sh -c 'python manage.py collectstatic --noinput
-    #   && uwsgi --http 0.0.0.0:8080
-    #   --module buoy_retriever.wsgi
-    #   --static-map /backend/static=/static --master --log-master
-    #   --processes 4 --threads 2
-    #   '
     volumes:
       - ./backend:/home/uwsgi:cached
       - /home/uwsgi/.pixi
