@@ -34,7 +34,6 @@ services:
     command: "python manage.py runserver 0:8080"
     volumes:
       - ./backend:/home/uwsgi/app:cached
-      # - ./docker-data/uwsgi-pixi:/home/uwsgi/.pixi
       - ./docker-data/media:/media:cached
       - ./docker-data/static:/static:cached
     ports:
