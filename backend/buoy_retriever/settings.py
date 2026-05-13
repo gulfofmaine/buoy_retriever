@@ -182,15 +182,15 @@ AUTHENTICATION_BACKENDS = (
 
 NINJA_JWT = {
     'ALGORITHM': 'RS256',
-    'JWK_URL': os.environ.get( "OIDC_NINJA_JWK_URL", None ),
-    # TODO: Audience,
+    'JWK_URL': os.environ.get( "NINJA_JWT_JWK_URL", None ),
+    'AUDIENCE': os.environ.get( "NINJA_JWT_AUDIENCE", None ),
     'LEEWAY': 0,
     # TODO: override?
-    'USER_AUTHENTICATION_RULE': 'ninja_jwt.authentication.default_user_authentication_rule',
-
-    # 'AUTH_TOKEN_CLASSES': ('ninja_jwt.tokens.AccessToken',),
-    # 'TOKEN_TYPE_CLAIM': 'token_type',
-    # 'TOKEN_USER_CLASS': 'ninja_jwt.models.TokenUser',
+    # 'USER_AUTHENTICATION_RULE': 'ninja_jwt.authentication.default_user_authentication_rule',
+    "JTI_CLAIM": None,
+    "TOKEN_TYPE_CLAIM": None,
+    "USER_ID_CLAIM": os.environ.get( "NINJA_JWT_USER_ID_CLAIM", "sub" ),
+    "USER_ID_FIELD": "username",
 }
 
 
