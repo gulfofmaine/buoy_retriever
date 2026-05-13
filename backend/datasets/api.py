@@ -5,7 +5,7 @@ from guardian.shortcuts import get_objects_for_user
 from ninja import ModelSchema, Router, Schema
 from ninja.errors import AuthorizationError
 from ninja.security import django_auth
-from ninja_jwt.authentication import JWTAuth
+from buoy_retriever.auth import JWTAuthCreateUser
 
 from pipelines.api import pipeline_api_key_auth
 from pipelines.models import Pipeline
@@ -14,11 +14,11 @@ from .models import Dataset, DatasetConfig
 
 DJANGO_OR_JWT_AUTH = (
     django_auth,
-    JWTAuth,
+    JWTAuthCreateUser(),
 )
 PIPELINE_OR_JWT_AUTH = (
     pipeline_api_key_auth,
-    JWTAuth,
+    JWTAuthCreateUser(),
 )
 
 dataset_router = Router(auth=DJANGO_OR_JWT_AUTH)

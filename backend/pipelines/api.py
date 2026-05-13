@@ -2,7 +2,7 @@ from django.http import HttpRequest
 from django.shortcuts import get_object_or_404
 from ninja import ModelSchema, Router
 from ninja.security import APIKeyHeader, django_auth
-from ninja_jwt.authentication import JWTAuth
+from buoy_retriever.auth import JWTAuthCreateUser
 
 from .models import Pipeline, PipelineApiKey
 
@@ -27,7 +27,7 @@ pipeline_api_key_auth = PipelineApiKeyAuth()
 PIPELINE_DJANGO_OR_JWT_AUTH = (
     pipeline_api_key_auth,
     django_auth,
-    JWTAuth(),
+    JWTAuthCreateUser(),
 )
 
 
