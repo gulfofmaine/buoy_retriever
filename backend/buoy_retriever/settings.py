@@ -184,6 +184,11 @@ NINJA_JWT = {
     'ALGORITHM': 'RS256',
     'JWK_URL': os.environ.get( "NINJA_JWT_JWK_URL", None ),
     'AUDIENCE': os.environ.get( "NINJA_JWT_AUDIENCE", None ),
+    # TODO: Revisit in hopes of supporting multiple audiences
+    # 'AUDIENCE': [
+    #     '...',
+    #     '...',
+    # ],
     'LEEWAY': 0,
     # TODO: override?
     # 'USER_AUTHENTICATION_RULE': 'ninja_jwt.authentication.default_user_authentication_rule',
