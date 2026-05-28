@@ -127,6 +127,8 @@ def test_monthly_asset_with_nans(defs, dataset_config):
     snapshot_path = (
         TEST_DATA_DIR / "empire_met/test_empire_met_monthly_asset_with_nans.nc"
     )
+
+    # Uncomment to update NaN snapshot
     # ds.to_netcdf(snapshot_path)
     snapshot = xr.load_dataset(snapshot_path)
 

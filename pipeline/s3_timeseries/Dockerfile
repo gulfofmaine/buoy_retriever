@@ -38,5 +38,9 @@ ENV IMAGE_TAG=${IMAGE_TAG:-unknown}
 
 ENTRYPOINT ["/bin/bash", "/shell-hook.sh"]
 
+# placeholder test metadata until we are retrieving metadata from
+# asset manager via Django API
+ENV METADATA_PATH=/mnt/test-data/s3_timeseries/metadata
+
 
 CMD [ "dagster", "code-server", "start", "-p", "4000", "-f", "pipeline.py", "-h", "0.0.0.0" ]

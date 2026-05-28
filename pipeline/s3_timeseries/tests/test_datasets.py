@@ -35,7 +35,7 @@ def defs(dataset_config):
 @pytest.mark.parametrize(
     "asset_name,created_dt_str",
     [
-        pytest.param("empire_met", "2026-01-25T00:35:49.866Z"),
+        pytest.param("empire_met", "2026-01-05T21:15:24.482Z"),
     ],
 )
 def test_can_build_defs(defs):
@@ -70,7 +70,7 @@ def mocked_s3():
     [
         pytest.param(
             "empire_met",
-            "2026-01-25T00:35:49.866Z",
+            "2026-01-05T21:15:24.482Z",
             "ott-empire",
             "EW01_met_20251112_000500_002000.txt",
             "EW01_met_20251113_235500_010000.txt",
@@ -204,6 +204,8 @@ def test_daily_asset(
     assert not df.empty
 
     # Uncomment to update CSV snapshot
+    # df.to_csv(snapshot_path, index=False)
+
     snapshot = pd.read_csv(
         snapshot_path,
     )
@@ -235,7 +237,7 @@ def test_daily_asset(
                 "2025-10-12": TEST_DATA_DIR / "empire_met/2025-10-12.csv",
                 "2025-10-13": TEST_DATA_DIR / "empire_met/2025-10-13.csv",
             },
-            TEST_DATA_DIR / "empire_met/test_empire_met_monthly_asset_with_nans.nc",
+            TEST_DATA_DIR / "empire_met/test_empire_met_202510_nans.nc",
             "2025-12-01",
         ),
         pytest.param(
@@ -349,6 +351,9 @@ def test_monthly_asset(
     ds = monthly_ds(context, daily_df=daily_df)
 
     assert isinstance(ds, xr.Dataset)
+
+    # Uncomment to update monthly NetCDF snapshot
+    # ds.to_netcdf(monthly_snapshot_path)
 
     snapshot = xr.load_dataset(monthly_snapshot_path, decode_timedelta=False)
 
