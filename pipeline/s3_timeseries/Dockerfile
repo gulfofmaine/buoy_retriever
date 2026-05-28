@@ -26,12 +26,10 @@ RUN pixi shell-hook -e default > /shell-hook.sh \
 COPY ${SOURCE}/*.py \
     ${SOURCE}/*.jinja\
     ${SOURCE}/*.yaml \
+    ${SOURCE}/.coveragerc \
     ${HOME}/
 
 COPY ${SOURCE}/tests/ ${HOME}/tests/
-
-# COPY ${SOURCE}/platforms \
-#     ${HOME}/platforms
 
 ARG IMAGE_TAG
 ENV IMAGE_TAG=${IMAGE_TAG:-unknown}

@@ -1,0 +1,8 @@
+[run]
+omit =
+    # Ignore the environment
+    .pixi/*
+
+    # Ignore tests and helpers
+    tests/*
+    common/test_utils/*
