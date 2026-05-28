@@ -1,6 +1,10 @@
 services:
   db:
     image: timescale/timescaledb-ha:pg17-ts2.21@sha256:a2f4731fd341e93a96fdc49f21137db0ec27bd3d72a5dab241fec2b344f2f54c
+    # start timescaledb-ha container as root user so it can create host mounted data directories with proper ownership
+    # after init, postgres process will be executed as non-root postgres user using gosu
+    # https://github.com/timescale/timescaledb-docker-ha/blob/v1.16.0/docker-entrypoint.sh#L352-L357
+    user: root
     ports:
       - "${BUOY_RETRIEVER_DB_PORT:-5432}:5432"
     env_file:
@@ -72,6 +76,7 @@ services:
 
   dagster_postgres:
     image: timescale/timescaledb-ha:pg17-ts2.21@sha256:a2f4731fd341e93a96fdc49f21137db0ec27bd3d72a5dab241fec2b344f2f54c
+    user: root
     environment:
       PGDATA: /var/lib/postgresql/data/PGDATA
     env_file:
