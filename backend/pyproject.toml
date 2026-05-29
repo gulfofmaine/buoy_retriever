@@ -25,6 +25,10 @@ lint.extend-select = [
 DJANGO_SETTINGS_MODULE = "buoy_retriever.settings"
 python_files = [ "tests.py", "test_*.py" ]
 
+[tool.pytest_env]
+BACKEND_ENV = { value = "testing" }
+BACKEND_SECRET_KEY = { value = "testing" }
+
 [tool.coverage.run]
 omit = [
   ".pixi/*",
@@ -51,6 +55,7 @@ django-guardian = ">=3.0.0,<4"
 [tool.pixi.feature.dev.dependencies]
 pytest-django = "*"
 pytest-cov = ">=7.1.0,<8"
+pytest-env = ">=1.6.0,<2"
 
 [tool.pixi.environments]
 dev = [ "dev" ]
