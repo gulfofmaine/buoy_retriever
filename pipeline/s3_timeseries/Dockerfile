@@ -26,17 +26,19 @@ RUN pixi shell-hook -e default > /shell-hook.sh \
 COPY ${SOURCE}/*.py \
     ${SOURCE}/*.jinja\
     ${SOURCE}/*.yaml \
+    ${SOURCE}/.coveragerc \
     ${HOME}/
 
 COPY ${SOURCE}/tests/ ${HOME}/tests/
-
-# COPY ${SOURCE}/platforms \
-#     ${HOME}/platforms
 
 ARG IMAGE_TAG
 ENV IMAGE_TAG=${IMAGE_TAG:-unknown}
 
 ENTRYPOINT ["/bin/bash", "/shell-hook.sh"]
+
+# placeholder test metadata until we are retrieving metadata from
+# asset manager via Django API
+ENV METADATA_PATH=/mnt/test-data/s3_timeseries/metadata
 
 
 CMD [ "dagster", "code-server", "start", "-p", "4000", "-f", "pipeline.py", "-h", "0.0.0.0" ]

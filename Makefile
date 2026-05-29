@@ -55,12 +55,16 @@ shell:
 test-common:
 	cd common; uv run pytest --cov=.
 
+test-backend:
+	docker build -t buoy_retriever-backend backend/
+	docker run -v ./docker-data/test-data:/mnt/test-data:ro buoy_retriever-backend pixi run pytest --cov=.
+
 test-hohonu:
 	docker build -f pipeline/hohonu/Dockerfile -t buoy_retriever-hohonu .
-	docker run buoy_retriever-hohonu pixi run pytest --cov=.
+	docker run -v ./docker-data/test-data:/mnt/test-data:ro buoy_retriever-hohonu pixi run pytest --cov=.
 
 test-s3-timeseries:
 	docker build -f pipeline/s3_timeseries/Dockerfile -t buoy_retriever-s3_timeseries .
-	docker run -e METADATA_PATH=/mnt/datasets_config/metadata -v ./docker-data/datasets_config/s3_pipeline/:/mnt/datasets_config buoy_retriever-s3_timeseries pixi run pytest --cov=.
+	docker run -v ./docker-data/test-data:/mnt/test-data:ro buoy_retriever-s3_timeseries pixi run pytest --cov=.
 
-test-all: test-common test-s3-timeseries test-hohonu
+test-all: test-common test-backend test-s3-timeseries test-hohonu

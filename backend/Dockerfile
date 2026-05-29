@@ -35,7 +35,7 @@ RUN --mount=type=cache,id=br_pixi,target=${USER_HOME}/.cache/rattler/cache,uid=$
     && pixi install -e default --frozen
 
 # Copy app source (and only app source)
-COPY --chown=${USER}:${USER} ./manage.py ${APP_DIR}/
+COPY --chown=${USER}:${USER} ./*.py ${APP_DIR}/
 COPY --chown=${USER}:${USER} ./account ${APP_DIR}/account
 COPY --chown=${USER}:${USER} ./buoy_retriever ${APP_DIR}/buoy_retriever
 COPY --chown=${USER}:${USER} ./datasets ${APP_DIR}/datasets
@@ -56,6 +56,9 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=20s \
 
 
 FROM base AS develop
+
+RUN --mount=type=cache,id=br_pixi,target=${USER_HOME}.cache/rattler/cache,uid=${USER_UID},gid=${USER_UID} \
+    pixi install -e dev
 
 
 # FROM base AS deploy

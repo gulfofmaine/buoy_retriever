@@ -128,20 +128,28 @@ WSGI_APPLICATION = "buoy_retriever.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-DATABASES = {
-    "default": {
-        # "ENGINE": "django.contrib.gis.db.backends.postgis",
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.environ.get("POSTGRES_NAME"),
-        "USER": os.environ.get("POSTGRES_USER"),
-        "HOST": os.environ.get("POSTGRES_HOST"),
-        "PASSWORD": os.environ.get("POSTGRES_PASSWORD"),
-        "PORT": int(os.environ.get("POSTGRES_PORT", 5432)),  # noqa: PLW1508
-        "OPTIONS": {
-            "sslmode": "prefer",
+if os.environ.get("BACKEND_ENV", "").lower() == "testing":
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": ":memory:",
         },
-    },
-}
+    }
+else:
+    DATABASES = {
+        "default": {
+            # "ENGINE": "django.contrib.gis.db.backends.postgis",
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": os.environ.get("POSTGRES_NAME"),
+            "USER": os.environ.get("POSTGRES_USER"),
+            "HOST": os.environ.get("POSTGRES_HOST"),
+            "PASSWORD": os.environ.get("POSTGRES_PASSWORD"),
+            "PORT": int(os.environ.get("POSTGRES_PORT", 5432)),  # noqa: PLW1508
+            "OPTIONS": {
+                "sslmode": "prefer",
+            },
+        },
+    }
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 
