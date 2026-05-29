@@ -10,11 +10,16 @@ concurrency:
   group: ${{ github.head_ref || github.ref }}
   cancel-in-progress: true
 
+
+
 jobs:
   build_backend:
     name: Build backend Python Docker image
     runs-on: ubuntu-24.04
     timeout-minutes: 10
+
+    env:
+      IMAGE_NAME: gmri/buoy_retriever_backend
 
     steps:
     - name: Checkout
@@ -23,12 +28,77 @@ jobs:
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@e468171a9de216ec08956ac3ada2f0791b6bd435 # v3.11.1
 
+    - name: Cache Docker layers
+      uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+      with:
+        path: /tmp/.buildx-cache
+        key: docker-buildx-${{ env.IMAGE_NAME }}-${{ github.sha }}
+        restore-keys: |
+          docker-buildx-${{ env.IMAGE_NAME }}
+
     - name: Build Backend
       uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6.18.0
       with:
         context: ./backend
+        cache-from: type=local,src=/tmp/.buildx-cache
+        cache-to: type=local,dest=/tmp/.buildx-cache-new
         push: false
-        tags: gmri/buoy_retriever_backend:latest
+        load: true
+        tags: ${{ env.IMAGE_NAME }}:latest
+
+    - name: Docker image sizes
+      run: |
+        docker images
+
+        echo "### Image sizes" >> $GITHUB_STEP_SUMMARY
+        docker images | grep ${{ env.IMAGE_NAME }} >> $GITHUB_STEP_SUMMARY
+
+    - name: Save Pixi Package list
+      run: |
+        docker run ${{ env.IMAGE_NAME }}:latest pixi list > pixi_packages.txt
+
+    - name: Archive Pixi Package List
+      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+      with:
+        name: backend-pixi-environment
+        path: pixi_packages.txt
+
+    - name: Pixi environment info
+      run: |
+        echo "### Backend Pixi Environment" >> $GITHUB_STEP_SUMMARY
+        cat pixi_packages.txt >> $GITHUB_STEP_SUMMARY
+
+    - name: Run tests inside container
+      run: |
+          docker run -v ./docker-data/test-data:/mnt/test-data:ro --name test-container -e CI=true ${{ env.IMAGE_NAME }}:latest /bin/sh -c "pixi run pytest --cov=. --cov-report=xml --cov-report=term-missing --junitxml=junit.xml -o junit_family=legacy"
+
+    - name: Extract coverage data
+      run: |
+          docker cp test-container:/home/ioos/coverage.xml /home/uwsgi/coverage.xml || true
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@75cd11691c0faa626561e295848008c8a7dddffe # v5
+      env:
+        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+      with:
+        flags: backend
+      # with:
+      #   files: ./coverage.xml
+      #   fail_ci_if_error: false
+      #   verbose: true
+
+    - name: Extract test results
+      run: |
+          docker cp test-container:/home/ioos/junit.xml /home/uwsgi/junit.xml || true
+
+    - name: Upload test results to Codecov
+      uses: codecov/test-results-action@0fa95f0e1eeaafde2c782583b36b28ad0d8c77d3 # v1
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+
+    - name: Clean up test container
+      run: |
+          docker rm test-container || true
 
   build_frontend:
     name: Build Next.js frontend Docker image
