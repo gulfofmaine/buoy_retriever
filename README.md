@@ -106,7 +106,7 @@ Test data is stored in `docker-data/test-data`. This includes dataset configurat
 There are several commands to help sync dataset configs to/from the backend for testing and development.
 
 - View all datasets `docker compose exec backend pixi run ./manage.py list_datasets`
-- Save a dataset and configs to disk `docker compose exec backend pixi run ./manage.py dump_dataset <dataset_id>`
+- Save a dataset and configs to disk `docker compose exec --user "$(id -u):$(id -g)" backend pixi run ./manage.py dump_dataset <dataset_id>`
 - Load a dataset and configs back into the database `docker compose exec backend pixi run ./manage.py load_dataset <dataset_id>`.
   - It by default does a dry run so you can see what changes will be made. Add `--write` or `-w` to write out to a file.
   - The command searches through `docker-data/test-data` to find the matching dataset_id, but a path can be specified with `--input_path <INPUT_PATH>`

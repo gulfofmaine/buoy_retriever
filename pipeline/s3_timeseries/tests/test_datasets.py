@@ -17,12 +17,6 @@ TEST_DATA_DIR = Path("/mnt/test-data/s3_timeseries/")
 
 @pytest.fixture
 def dataset_config(asset_name, created_dt_str):
-    # with Path.open(f"/mnt/datasets_config/{asset_name}.json") as config_f:
-    #     config = json.load(config_f)
-    # return S3TimeseriesDataset(
-    #     slug=f"{asset_name}-test",
-    #     config=config,
-    # )
     config_path = TEST_DATA_DIR / f"fixtures/{asset_name}.json"
     return S3TimeseriesDataset.from_fixture(config_path, created_dt_str)
 

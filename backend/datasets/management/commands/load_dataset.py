@@ -95,10 +95,11 @@ class Command(BaseCommand):
             if verbose > 1:
                 self.stdout.write(f"Loading object: {obj.object}")
 
+            obj.object.pk = None  # Ensure we create new objects rather than updating existing ones by default
+
             if isinstance(obj.object, Dataset):
                 existing = Dataset.objects.filter(slug=obj.object.slug).first()
                 if existing:
-                    # existing.update_from(obj.object)
                     existing.slug = obj.object.slug
                     existing.pipeline = obj.object.pipeline
                     existing.created = obj.object.created
@@ -121,25 +122,37 @@ class Command(BaseCommand):
                     raise CommandError(
                         "DatasetConfig encountered before Dataset in fixture; cannot associate config.",
                     )
-
-                existing = self._find_existing_config(
-                    dataset_slug=obj.object.dataset.slug,
-                    created=obj.object.created,
-                )
-                if existing:
-                    existing.config = obj.object.config
-                    existing.state = obj.object.state
-                    existing.created = obj.object.created
-                    existing.edited = obj.object.edited
-                    existing.dataset = dataset_obj
-                    self.stdout.write(
-                        f"Updating config for dataset {obj.object.dataset.slug} with created datetime {obj.object.created}",
+                try:
+                    existing = self._find_existing_config(
+                        dataset_slug=obj.object.dataset.slug,
+                        created=obj.object.created,
                     )
-                    objects.append(existing)
-                else:
+                    if existing:
+                        existing.config = obj.object.config
+                        existing.state = obj.object.state
+                        existing.created = obj.object.created
+                        existing.edited = obj.object.edited
+                        existing.dataset = dataset_obj
+                        self.stdout.write(
+                            f"Updating config for dataset {obj.object.dataset.slug} with created datetime {obj.object.created}",
+                        )
+                        objects.append(existing)
+
+                    # The dataset exists, but the config does not - create a new config for the dataset
+                    else:
+                        self.stdout.write(
+                            self.style.WARNING(
+                                f"Creating new config for dataset {obj.object.dataset.slug} with created datetime {obj.object.created}",
+                            ),
+                        )
+                        obj.object.dataset = dataset_obj
+                        objects.append(obj.object)
+
+                # The dataset does not exist - this config will be created along with the new dataset when we save
+                except Dataset.DoesNotExist:
                     self.stdout.write(
                         self.style.WARNING(
-                            f"Creating new config for dataset {obj.object.dataset.slug} with created datetime {obj.object.created}",
+                            f"Dataset {obj.object.dataset.slug} does not exist; will create new dataset and config",
                         ),
                     )
                     obj.object.dataset = dataset_obj
