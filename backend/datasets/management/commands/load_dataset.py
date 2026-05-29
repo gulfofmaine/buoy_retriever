@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 from datetime import timedelta
 
@@ -81,48 +82,75 @@ class Command(BaseCommand):
             raise CommandError(f"Input file {input_path} does not exist")
 
         with input_path.open() as f:
-            data = f.read()
+            raw_data = f.read()
 
-        objects = []
-        dataset_obj = None
+        write = options["write"]
 
-        for obj in serializers.deserialize(
-            "json",
-            data,
+        # Split fixture entries by model type. DatasetConfig has a FK to Dataset that
+        # Django resolves during deserialization via a DB lookup, so Datasets must be
+        # saved before Configs are deserialized.
+        raw_objects = json.loads(raw_data)
+        dataset_fixture = json.dumps(
+            [o for o in raw_objects if o["model"] == "datasets.dataset"],
+        )
+        config_fixture = json.dumps(
+            [o for o in raw_objects if o["model"] == "datasets.datasetconfig"],
+        )
+
+        deserialize_kwargs = dict(
             use_natural_foreign_keys=True,
             use_natural_primary_keys=True,
-        ):
-            if verbose > 1:
-                self.stdout.write(f"Loading object: {obj.object}")
+        )
 
-            obj.object.pk = None  # Ensure we create new objects rather than updating existing ones by default
+        dataset_obj = None
 
-            if isinstance(obj.object, Dataset):
-                existing = Dataset.objects.filter(slug=obj.object.slug).first()
-                if existing:
-                    existing.slug = obj.object.slug
-                    existing.pipeline = obj.object.pipeline
-                    existing.created = obj.object.created
-                    existing.edited = obj.object.edited
-                    existing.state = obj.object.state
-                    self.stdout.write(f"Updating dataset with slug {obj.object.slug}")
-                    objects.append(existing)
-                    dataset_obj = existing
-                else:
-                    self.stdout.write(
-                        self.style.WARNING(
-                            f"Creating new dataset with slug {obj.object.slug}",
-                        ),
-                    )
-                    objects.append(obj.object)
-                    dataset_obj = obj.object
+        try:
+            with transaction.atomic():
+                for obj in serializers.deserialize(
+                    "json",
+                    dataset_fixture,
+                    **deserialize_kwargs,
+                ):
+                    if verbose > 1:
+                        self.stdout.write(f"Loading object: {obj.object}")
 
-            elif isinstance(obj.object, DatasetConfig):
-                if dataset_obj is None:
-                    raise CommandError(
-                        "DatasetConfig encountered before Dataset in fixture; cannot associate config.",
-                    )
-                try:
+                    obj.object.pk = None
+
+                    existing = Dataset.objects.filter(slug=obj.object.slug).first()
+                    if existing:
+                        existing.slug = obj.object.slug
+                        existing.pipeline = obj.object.pipeline
+                        existing.created = obj.object.created
+                        existing.edited = obj.object.edited
+                        existing.state = obj.object.state
+                        self.stdout.write(
+                            f"Updating dataset with slug {obj.object.slug}",
+                        )
+                        dataset_obj = existing
+                    else:
+                        self.stdout.write(
+                            self.style.WARNING(
+                                f"Creating new dataset with slug {obj.object.slug}",
+                            ),
+                        )
+                        dataset_obj = obj.object
+                    dataset_obj.save()
+
+                for obj in serializers.deserialize(
+                    "json",
+                    config_fixture,
+                    **deserialize_kwargs,
+                ):
+                    if verbose > 1:
+                        self.stdout.write(f"Loading object: {obj.object}")
+
+                    obj.object.pk = None
+
+                    if dataset_obj is None:
+                        raise CommandError(
+                            "DatasetConfig encountered before Dataset in fixture; cannot associate config.",
+                        )
+
                     existing = self._find_existing_config(
                         dataset_slug=obj.object.dataset.slug,
                         created=obj.object.created,
@@ -136,42 +164,33 @@ class Command(BaseCommand):
                         self.stdout.write(
                             f"Updating config for dataset {obj.object.dataset.slug} with created datetime {obj.object.created}",
                         )
-                        objects.append(existing)
-
-                    # The dataset exists, but the config does not - create a new config for the dataset
+                        existing.save()
                     else:
                         self.stdout.write(
                             self.style.WARNING(
                                 f"Creating new config for dataset {obj.object.dataset.slug} with created datetime {obj.object.created}",
                             ),
                         )
+                        # Capture the fixture timestamp before save: auto_now_add
+                        # overrides created on INSERT, which would prevent a later
+                        # load from finding this config by timestamp.
+                        fixture_created = obj.object.created
                         obj.object.dataset = dataset_obj
-                        objects.append(obj.object)
+                        obj.object.save()
+                        DatasetConfig.objects.filter(pk=obj.object.pk).update(
+                            created=fixture_created,
+                        )
+                        self.stdout.write(self.style.SUCCESS(f"Saved {obj.object}"))
 
-                # The dataset does not exist - this config will be created along with the new dataset when we save
-                except Dataset.DoesNotExist:
+                if not write:
+                    transaction.set_rollback(True)
                     self.stdout.write(
                         self.style.WARNING(
-                            f"Dataset {obj.object.dataset.slug} does not exist; will create new dataset and config",
+                            "Dry run mode - not saving to database. Use --write or -w to write changes.",
                         ),
                     )
-                    obj.object.dataset = dataset_obj
-                    objects.append(obj.object)
 
-        if not options["write"]:
-            self.stdout.write(
-                self.style.WARNING(
-                    "Dry run mode - not saving to database. Use --write or -w to write changes.",
-                ),
-            )
-            return
-
-        try:
-            with transaction.atomic():
-                for obj in objects:
-                    obj.save()
-                    self.stdout.write(self.style.SUCCESS(f"Saved {obj}"))
         except DatabaseError as e:
             raise CommandError(
-                f"Database error occurred while saving. Rolling back transaction: {e}",
-            )
+                "Database error occurred while saving, rolling back transaction",
+            ) from e

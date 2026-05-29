@@ -57,6 +57,9 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=20s \
 
 FROM base AS develop
 
+RUN --mount=type=cache,id=br_pixi,target=${USER_HOME}.cache/rattler/cache,uid=${USER_UID},gid=${USER_UID} \
+    pixi install -e dev
+
 
 # FROM base AS deploy
 

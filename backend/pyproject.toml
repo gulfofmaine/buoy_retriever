@@ -21,6 +21,10 @@ lint.extend-select = [
   "DJ", # django specific linting
 ]
 
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "buoy_retriever.settings"
+python_files = [ "tests.py", "test_*.py" ]
+
 [tool.pixi.workspace]
 channels = [ "conda-forge" ]
 platforms = [ "linux-64", "linux-aarch64" ]
@@ -38,3 +42,15 @@ django-cors-headers = ">=4.9.0,<5"
 django-health-check = ">=3.20.0,<4"
 sentry-sdk = ">=2.43.0,<3"
 django-guardian = ">=3.0.0,<4"
+
+[tool.pixi.feature.dev.dependencies]
+pytest-django = "*"
+
+[tool.pixi.environments]
+dev = [ "dev" ]
+
+[tool.pixi.feature.dev.tasks]
+test = "pytest"
+
+[tool.bandit]
+exclude_dirs = [ "tests" ]
