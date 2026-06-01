@@ -181,7 +181,7 @@ AUTHENTICATION_BACKENDS = (
 )
 
 NINJA_JWT = {
-    'ALGORITHM': 'RS256',
+    'ALGORITHM': os.environ.get( "NINJA_JWT_ALGORITHM", "RS256" ),
     'JWK_URL': os.environ.get( "NINJA_JWT_JWK_URL", None ),
     'AUDIENCE': os.environ.get( "NINJA_JWT_AUDIENCE", None ),
     # TODO: Revisit in hopes of supporting multiple audiences
