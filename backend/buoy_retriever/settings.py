@@ -87,7 +87,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "health_check",
     "health_check.db",
-    'ninja_jwt',
+    "ninja_jwt",
     "corsheaders",
     "guardian",
     "account",
@@ -181,20 +181,20 @@ AUTHENTICATION_BACKENDS = (
 )
 
 NINJA_JWT = {
-    'ALGORITHM': os.environ.get( "NINJA_JWT_ALGORITHM", "RS256" ),
-    'JWK_URL': os.environ.get( "NINJA_JWT_JWK_URL", None ),
-    'AUDIENCE': os.environ.get( "NINJA_JWT_AUDIENCE", None ),
+    "ALGORITHM": os.environ.get("NINJA_JWT_ALGORITHM", "RS256"),
+    "JWK_URL": os.environ.get("NINJA_JWT_JWK_URL", None),
+    "AUDIENCE": os.environ.get("NINJA_JWT_AUDIENCE", None),
     # TODO: Revisit in hopes of supporting multiple audiences
     # 'AUDIENCE': [
     #     '...',
     #     '...',
     # ],
-    'LEEWAY': 0,
+    "LEEWAY": 0,
     # TODO: override?
     # 'USER_AUTHENTICATION_RULE': 'ninja_jwt.authentication.default_user_authentication_rule',
     "JTI_CLAIM": None,
     "TOKEN_TYPE_CLAIM": None,
-    "USER_ID_CLAIM": os.environ.get( "NINJA_JWT_USER_ID_CLAIM", "sub" ),
+    "USER_ID_CLAIM": os.environ.get("NINJA_JWT_USER_ID_CLAIM", "sub"),
     "USER_ID_FIELD": "username",
 }
 
