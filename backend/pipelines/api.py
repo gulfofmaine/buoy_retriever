@@ -62,7 +62,7 @@ def list_pipelines(request: HttpRequest):
     return Pipeline.objects.all()
 
 
-@router.post("/", response=PipelineSchema, auth=PIPELINE_DJANGO_OR_JWT_AUTH)
+@router.post("/", response=PipelineSchema, auth=pipeline_api_key_auth)
 def create_update_pipeline(request: HttpRequest, payload: PipelinePostSchema):
     """If a pipeline with the given slug already exists, update it instead of creating a new one."""
     try:
